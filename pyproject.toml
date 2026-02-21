@@ -1,0 +1,57 @@
+cat > pyproject.toml << 'EOF'
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "motion-analytics-toolkit"
+version = "0.1.0"
+description = "Comprehensive motion analytics for robotics and biomechanics"
+readme = "README.md"
+authors = [
+    {name = "Kathryn Cramer", email = "your.email@example.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21",
+    "scipy>=1.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0",
+]
+docs = [
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+    "nbsphinx>=0.8",
+]
+viz = [
+    "matplotlib>=3.5",
+    "plotly>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/KathrynC/motion-analytics-toolkit"
+Repository = "https://github.com/KathrynC/motion-analytics-toolkit.git"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["motion_analytics*"]
+EOF
