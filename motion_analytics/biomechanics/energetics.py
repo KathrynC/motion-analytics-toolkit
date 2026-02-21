@@ -1,6 +1,7 @@
 """Mechanical work, power, and efficiency analysis."""
 
 import numpy as np
+from typing import Dict
 from ..core.base import MotionAnalyzer
 from ..core.schemas import Telemetry
 
@@ -26,7 +27,7 @@ class EnergeticsAnalyzer(MotionAnalyzer):
         
         dt = 1 / telemetry.sampling_rate
         power = np.gradient(total_energy, dt)
-        work = np.trapz(np.abs(power), dx=dt)
+        work = np.trapezoid(np.abs(power), dx=dt)
         
         # Displacement
         displacement = np.linalg.norm(positions[-1] - positions[0])
@@ -41,7 +42,7 @@ class EnergeticsAnalyzer(MotionAnalyzer):
             torque = np.array([ts.joints[joint_name].torque for ts in telemetry.timesteps])
             velocity = np.array([ts.joints[joint_name].velocity for ts in telemetry.timesteps])
             power_joint = torque * velocity
-            work_joint = np.trapz(np.abs(power_joint), dx=dt)
+            work_joint = np.trapezoid(np.abs(power_joint), dx=dt)
             joint_work[joint_name] = float(work_joint)
         
         results = {

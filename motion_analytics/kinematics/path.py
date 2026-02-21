@@ -34,7 +34,7 @@ class PathAnalyzer(MotionAnalyzer):
         path_curvature = {
             'mean': float(np.mean(curvature)),
             'max': float(np.max(curvature)),
-            'integral': float(np.trapz(curvature, dx=1/telemetry.sampling_rate)),
+            'integral': float(np.trapezoid(curvature, dx=1/telemetry.sampling_rate)),
             'complexity': float(np.std(curvature))
         }
         

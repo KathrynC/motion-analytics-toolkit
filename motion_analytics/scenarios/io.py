@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-from .base import Scenario, ScenarioSuite, StressSummary
+from .base import Scenario, ScenarioSuite, StressResult, StressSummary
 
 
 def load_scenarios(path: Path) -> ScenarioSuite:

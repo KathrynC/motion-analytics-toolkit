@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Dict, Optional, Any
 
-from .base import Archetype, extract_behavioral_features
+from .base import Archetype, ArchetypeLibrary, extract_behavioral_features
 from ..core.schemas import Telemetry
 
 

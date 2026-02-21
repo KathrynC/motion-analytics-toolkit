@@ -1,13 +1,13 @@
 """Signal processing utilities for motion analysis."""
 
 import numpy as np
-from scipy import signal
-from typing import Tuple, Optional
+import scipy.signal as _signal
+from typing import Dict, Tuple, Optional
 
 def compute_phase_difference(sig1: np.ndarray, sig2: np.ndarray) -> float:
     """Compute average phase difference between two signals using Hilbert transform."""
-    analytic1 = signal.hilbert(sig1 - np.mean(sig1))
-    analytic2 = signal.hilbert(sig2 - np.mean(sig2))
+    analytic1 = _signal.hilbert(sig1 - np.mean(sig1))
+    analytic2 = _signal.hilbert(sig2 - np.mean(sig2))
     
     phase1 = np.angle(analytic1)
     phase2 = np.angle(analytic2)
@@ -18,8 +18,8 @@ def compute_phase_difference(sig1: np.ndarray, sig2: np.ndarray) -> float:
 
 def compute_phase_locking_value(sig1: np.ndarray, sig2: np.ndarray) -> float:
     """Compute phase locking value (0 to 1) between two signals."""
-    analytic1 = signal.hilbert(sig1 - np.mean(sig1))
-    analytic2 = signal.hilbert(sig2 - np.mean(sig2))
+    analytic1 = _signal.hilbert(sig1 - np.mean(sig1))
+    analytic2 = _signal.hilbert(sig2 - np.mean(sig2))
     
     phase1 = np.angle(analytic1)
     phase2 = np.angle(analytic2)
@@ -70,27 +70,27 @@ def compute_dimensionless_jerk(
     return float(norm_jerk)
 
 def detect_peaks_with_prominence(
-    signal: np.ndarray,
+    data: np.ndarray,
     sampling_rate: float,
     min_distance: float = 0.1,  # seconds
     prominence: Optional[float] = None
 ) -> Tuple[np.ndarray, Dict]:
     """
-    Detect peaks in signal with minimum time between peaks.
-    
+    Detect peaks in a signal with minimum time between peaks.
+
     Returns:
         peak_indices: indices of detected peaks
         properties: dictionary with peak properties
     """
     min_distance_samples = int(min_distance * sampling_rate)
-    
+
     if prominence is None:
-        prominence = 0.5 * np.std(signal)
-    
-    peaks, properties = signal.find_peaks(
-        signal,
+        prominence = 0.5 * np.std(data)
+
+    peaks, properties = _signal.find_peaks(
+        data,
         distance=min_distance_samples,
         prominence=prominence
     )
-    
+
     return peaks, properties

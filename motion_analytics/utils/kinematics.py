@@ -1,7 +1,7 @@
 """Kinematics utilities for the 3‑link robot used in Evolutionary‑Robotics."""
 
 import numpy as np
-from typing import Tuple
+from typing import Dict, Tuple
 
 def rpy_to_rotation_matrix(roll: float, pitch: float, yaw: float) -> np.ndarray:
     """

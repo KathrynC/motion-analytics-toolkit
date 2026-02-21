@@ -25,6 +25,8 @@ requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.21",
     "scipy>=1.7",
+    "networkx>=2.6",
+    "scikit-learn>=1.0",
 ]
 
 [project.optional-dependencies]
