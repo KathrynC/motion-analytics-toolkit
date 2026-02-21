@@ -1,0 +1,159 @@
+{
+  "version": "v1",
+  "description": "Motion-analytics-toolkit pattern language: formalizes module relationships as a validated, topologically sorted DAG with coverage analysis.",
+  "patterns": [
+    {
+      "id": "grounding_foundation",
+      "name": "Grounding Foundation",
+      "stage": "semantic",
+      "problem": "Motion labels lack embodied semantics when assigned without conceptual grounding criteria.",
+      "solution": "Establish Lakoff-style grounding criteria and ICMs before any perceptual or analytic processing.",
+      "confidence_tier": "core",
+      "larger_patterns": [],
+      "smaller_patterns": [
+        "image_schema_detection"
+      ],
+      "order_hint": 0,
+      "tags": ["semantic", "grounding", "lakoff"],
+      "module_path": "motion_analytics.archetypes.base"
+    },
+    {
+      "id": "image_schema_detection",
+      "name": "Image Schema Detection",
+      "stage": "perception",
+      "problem": "Raw telemetry contains implicit spatial-temporal gestalts that are lost without structured detection.",
+      "solution": "Detect image schemas (containment, path, balance, force) from telemetry before feature extraction.",
+      "confidence_tier": "core",
+      "larger_patterns": [
+        "grounding_foundation"
+      ],
+      "smaller_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "order_hint": 10,
+      "tags": ["perception", "image-schema", "gestalt"],
+      "module_path": "motion_analytics.core.image_schemas"
+    },
+    {
+      "id": "behavioral_feature_extraction",
+      "name": "Behavioral Feature Extraction",
+      "stage": "analytics",
+      "problem": "Downstream archetype matching and lattice construction require standardized behavioral features.",
+      "solution": "Extract gait, energetics, and kinematic features into a common Beer-framework profile.",
+      "confidence_tier": "core",
+      "larger_patterns": [
+        "image_schema_detection"
+      ],
+      "smaller_patterns": [
+        "archetype_matching",
+        "lattice_construction",
+        "stress_testing"
+      ],
+      "order_hint": 20,
+      "tags": ["analytics", "beer", "features"],
+      "module_path": "motion_analytics.biomechanics.gait"
+    },
+    {
+      "id": "archetype_matching",
+      "name": "Archetype Matching",
+      "stage": "semantic",
+      "problem": "Behavioral profiles are meaningless without mapping to conceptual archetypes.",
+      "solution": "Match extracted features against grounded archetype library using structural transfer.",
+      "confidence_tier": "core",
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ],
+      "order_hint": 30,
+      "tags": ["semantic", "archetype", "matching"],
+      "module_path": "motion_analytics.archetypes.persona"
+    },
+    {
+      "id": "lattice_construction",
+      "name": "Lattice Construction",
+      "stage": "topology",
+      "problem": "Individual motion profiles cannot reveal population-level structure without spatial embedding.",
+      "solution": "Construct a semantic cellular automaton lattice from Beer features for neighborhood analysis.",
+      "confidence_tier": "adaptable",
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "cluster_identification"
+      ],
+      "order_hint": 35,
+      "tags": ["topology", "lattice", "cellular-automata"],
+      "module_path": "motion_analytics.semantic_ca.lattice"
+    },
+    {
+      "id": "cluster_identification",
+      "name": "Cluster Identification",
+      "stage": "topology",
+      "problem": "Lattice structure alone does not reveal emergent groupings or phase boundaries.",
+      "solution": "Apply cluster and boundary detection to identify emergent motion families.",
+      "confidence_tier": "adaptable",
+      "larger_patterns": [
+        "lattice_construction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ],
+      "order_hint": 40,
+      "tags": ["topology", "cluster", "emergence"],
+      "module_path": "motion_analytics.semantic_ca.emergence"
+    },
+    {
+      "id": "stress_testing",
+      "name": "Stress Testing",
+      "stage": "robustness",
+      "problem": "High-performing motions may fail under environmental perturbation.",
+      "solution": "Run scenario suites to evaluate robustness and vulnerability before governance.",
+      "confidence_tier": "adaptable",
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ],
+      "order_hint": 45,
+      "tags": ["robustness", "scenarios", "stress"],
+      "module_path": "motion_analytics.scenarios.base"
+    },
+    {
+      "id": "violation_auditing",
+      "name": "Violation Auditing",
+      "stage": "governance",
+      "problem": "Archetype assignments can violate grounding constraints without systematic auditing.",
+      "solution": "Audit all archetype-motion mappings for metaphor violations and constraint breaches.",
+      "confidence_tier": "core",
+      "larger_patterns": [
+        "archetype_matching",
+        "cluster_identification",
+        "stress_testing"
+      ],
+      "smaller_patterns": [
+        "coverage_reporting"
+      ],
+      "order_hint": 60,
+      "tags": ["governance", "audit", "violations"],
+      "module_path": "motion_analytics.archetypes.violations"
+    },
+    {
+      "id": "coverage_reporting",
+      "name": "Coverage Reporting",
+      "stage": "report",
+      "problem": "Progress is hard to evaluate without integrated pattern and quality diagnostics.",
+      "solution": "Generate reports that summarize pattern coverage, tier breakdown, and dependency completeness.",
+      "confidence_tier": "core",
+      "larger_patterns": [
+        "violation_auditing"
+      ],
+      "smaller_patterns": [],
+      "order_hint": 70,
+      "tags": ["report", "coverage", "diagnostics"],
+      "module_path": "motion_analytics.patterns.coverage"
+    }
+  ]
+}

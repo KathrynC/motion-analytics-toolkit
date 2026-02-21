@@ -1,0 +1,132 @@
+{
+  "version": "v1",
+  "source": "/Users/gardenofcomputation/motion-analytics-toolkit/patterns/motion_analytics_pattern_language.v1.json",
+  "sequence": [
+    {
+      "index": 0,
+      "id": "grounding_foundation",
+      "name": "Grounding Foundation",
+      "stage": "semantic",
+      "confidence_tier": "core",
+      "order_hint": 0,
+      "larger_patterns": [],
+      "smaller_patterns": [
+        "image_schema_detection"
+      ]
+    },
+    {
+      "index": 1,
+      "id": "image_schema_detection",
+      "name": "Image Schema Detection",
+      "stage": "perception",
+      "confidence_tier": "core",
+      "order_hint": 10,
+      "larger_patterns": [
+        "grounding_foundation"
+      ],
+      "smaller_patterns": [
+        "behavioral_feature_extraction"
+      ]
+    },
+    {
+      "index": 2,
+      "id": "behavioral_feature_extraction",
+      "name": "Behavioral Feature Extraction",
+      "stage": "analytics",
+      "confidence_tier": "core",
+      "order_hint": 20,
+      "larger_patterns": [
+        "image_schema_detection"
+      ],
+      "smaller_patterns": [
+        "archetype_matching",
+        "lattice_construction",
+        "stress_testing"
+      ]
+    },
+    {
+      "index": 3,
+      "id": "archetype_matching",
+      "name": "Archetype Matching",
+      "stage": "semantic",
+      "confidence_tier": "core",
+      "order_hint": 30,
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ]
+    },
+    {
+      "index": 4,
+      "id": "lattice_construction",
+      "name": "Lattice Construction",
+      "stage": "topology",
+      "confidence_tier": "adaptable",
+      "order_hint": 35,
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "cluster_identification"
+      ]
+    },
+    {
+      "index": 5,
+      "id": "cluster_identification",
+      "name": "Cluster Identification",
+      "stage": "topology",
+      "confidence_tier": "adaptable",
+      "order_hint": 40,
+      "larger_patterns": [
+        "lattice_construction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ]
+    },
+    {
+      "index": 6,
+      "id": "stress_testing",
+      "name": "Stress Testing",
+      "stage": "robustness",
+      "confidence_tier": "adaptable",
+      "order_hint": 45,
+      "larger_patterns": [
+        "behavioral_feature_extraction"
+      ],
+      "smaller_patterns": [
+        "violation_auditing"
+      ]
+    },
+    {
+      "index": 7,
+      "id": "violation_auditing",
+      "name": "Violation Auditing",
+      "stage": "governance",
+      "confidence_tier": "core",
+      "order_hint": 60,
+      "larger_patterns": [
+        "archetype_matching",
+        "cluster_identification",
+        "stress_testing"
+      ],
+      "smaller_patterns": [
+        "coverage_reporting"
+      ]
+    },
+    {
+      "index": 8,
+      "id": "coverage_reporting",
+      "name": "Coverage Reporting",
+      "stage": "report",
+      "confidence_tier": "core",
+      "order_hint": 70,
+      "larger_patterns": [
+        "violation_auditing"
+      ],
+      "smaller_patterns": []
+    }
+  ]
+}
