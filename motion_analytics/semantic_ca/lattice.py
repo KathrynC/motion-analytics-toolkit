@@ -32,7 +32,24 @@ class Lattice:
     feature_matrix: np.ndarray  # shape (n_nodes, n_features)
     adjacency: np.ndarray  # binary adjacency matrix (n_nodes x n_nodes)
     similarity_matrix: np.ndarray  # float matrix of similarity scores
+    feature_layers: Dict[str, List[int]] = field(default_factory=dict)
+    # Maps layer name -> list of feature column indices
+    # e.g. {'grounded': [0,1,2,3,4,5], 'linking': [6,7,8,9,10,11,12]}
     
+    def grounded_features(self) -> np.ndarray:
+        """Return only the grounded (sensorimotor) feature columns."""
+        indices = self.feature_layers.get('grounded', [])
+        if not indices:
+            return self.feature_matrix
+        return self.feature_matrix[:, indices]
+
+    def linking_features(self) -> np.ndarray:
+        """Return only the linking (cross-domain) feature columns."""
+        indices = self.feature_layers.get('linking', [])
+        if not indices:
+            return np.empty((self.feature_matrix.shape[0], 0))
+        return self.feature_matrix[:, indices]
+
     @classmethod
     def from_dictionary(
         cls,
@@ -41,7 +58,8 @@ class Lattice:
         similarity_metric: SimilarityMetric = cosine_similarity,
         graph_type: str = 'threshold',
         threshold: float = 0.7,
-        k: int = 5
+        k: int = 5,
+        feature_layers: Optional[Dict[str, List[int]]] = None,
     ) -> 'Lattice':
         """
         Build a lattice from a motion dictionary JSON file.
@@ -102,7 +120,8 @@ class Lattice:
             node_ids=node_ids,
             feature_matrix=feature_matrix,
             adjacency=adj,
-            similarity_matrix=sim
+            similarity_matrix=sim,
+            feature_layers=feature_layers or {},
         )
     
     def neighbors(self, node_idx: int) -> List[int]:

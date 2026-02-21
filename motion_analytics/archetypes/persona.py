@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from typing import Dict, Optional, Any
 
-from .base import Archetype, ArchetypeLibrary, extract_behavioral_features
+from .base import (Archetype, ArchetypeLibrary, GroundingCriterion, ICM,
+                    extract_behavioral_features)
 from ..core.schemas import Telemetry
 
 
@@ -16,15 +17,17 @@ class PersonaArchetype(Archetype):
     Similarity can be computed either in weight space (if weights are available)
     or in behavioral feature space.
     """
-    
+
     def __init__(
         self,
         name: str,
         weight_vector: Optional[np.ndarray] = None,
         feature_vector: Optional[np.ndarray] = None,
-        description: str = ""
+        description: str = "",
+        grounding_criteria: Optional[list] = None,
+        icm: Optional[ICM] = None,
     ):
-        super().__init__(name, description)
+        super().__init__(name, description, grounding_criteria, icm)
         self.weight_vector = weight_vector  # shape (6,) or (10,) for crosswired
         self.feature_vector = feature_vector  # precomputed behavioral features
         
@@ -81,16 +84,20 @@ class PersonaArchetype(Archetype):
         data['weight_vector'] = self.weight_vector.tolist() if self.weight_vector is not None else None
         data['feature_vector'] = self.feature_vector.tolist() if self.feature_vector is not None else None
         return data
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'PersonaArchetype':
         wv = np.array(data['weight_vector']) if data.get('weight_vector') else None
         fv = np.array(data['feature_vector']) if data.get('feature_vector') else None
+        gc = [GroundingCriterion.from_dict(c) for c in data.get('grounding_criteria', [])]
+        icm = ICM.from_dict(data['icm']) if data.get('icm') else None
         return cls(
             name=data['name'],
             weight_vector=wv,
             feature_vector=fv,
-            description=data.get('description', '')
+            description=data.get('description', ''),
+            grounding_criteria=gc or None,
+            icm=icm,
         )
 
 

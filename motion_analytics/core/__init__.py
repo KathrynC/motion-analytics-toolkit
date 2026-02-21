@@ -7,6 +7,7 @@ from .signal import (
     compute_dimensionless_jerk,
     detect_peaks_with_prominence,
 )
+from .image_schemas import ImageSchema, ImageSchemaDetector
 
 __all__ = [
     'MotionAnalyzer', 'CompositeAnalyzer',
@@ -14,4 +15,5 @@ __all__ = [
     'compute_phase_difference', 'compute_phase_locking_value',
     'compute_spectral_arc_length', 'compute_dimensionless_jerk',
     'detect_peaks_with_prominence',
+    'ImageSchema', 'ImageSchemaDetector',
 ]

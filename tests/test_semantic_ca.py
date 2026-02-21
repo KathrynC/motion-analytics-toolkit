@@ -16,7 +16,7 @@ from motion_analytics.semantic_ca.rules import (
 from motion_analytics.semantic_ca.emergence import (
     ClusterDetector, BoundaryDetector, PhaseTransitionDetector,
 )
-from motion_analytics.semantic_ca.builtin import BEER_METRICS, DEFAULT_SIMILARITY
+from motion_analytics.semantic_ca.builtin import BEER_METRICS, DEFAULT_SIMILARITY, BEER_FEATURE_LAYERS
 
 
 # ---------------------------------------------------------------------------
@@ -295,3 +295,119 @@ class TestBuiltin:
         b = np.array([0.0, 1.0])
         s = DEFAULT_SIMILARITY(a, b)
         assert 0.0 <= s <= 1.0
+
+    def test_beer_feature_layers_keys(self):
+        assert 'grounded' in BEER_FEATURE_LAYERS
+        assert 'linking' in BEER_FEATURE_LAYERS
+
+    def test_beer_feature_layers_cover_all_13(self):
+        all_indices = set(BEER_FEATURE_LAYERS['grounded'] + BEER_FEATURE_LAYERS['linking'])
+        assert all_indices == set(range(13))
+
+    def test_beer_feature_layers_no_overlap(self):
+        grounded = set(BEER_FEATURE_LAYERS['grounded'])
+        linking = set(BEER_FEATURE_LAYERS['linking'])
+        assert grounded & linking == set()
+
+
+# ---------------------------------------------------------------------------
+# Prototype identification tests
+# ---------------------------------------------------------------------------
+
+class TestPrototypeIdentification:
+    def test_find_prototypes_basic(self):
+        lattice = _build_lattice(10, threshold=0.5)
+        detector = ClusterDetector(lattice)
+        clusters = detector.find_clusters_hierarchical(threshold=2.0)
+        prototypes = detector.find_prototypes(clusters)
+        assert isinstance(prototypes, dict)
+        for cid, info in prototypes.items():
+            assert 'prototype_idx' in info
+            assert 'prototype_id' in info
+            assert 'centroid' in info
+            assert 'membership' in info
+
+    def test_prototype_is_in_cluster(self):
+        lattice = _build_lattice(10, threshold=0.5)
+        detector = ClusterDetector(lattice)
+        clusters = detector.find_clusters_hierarchical(threshold=2.0)
+        prototypes = detector.find_prototypes(clusters)
+        for cid, info in prototypes.items():
+            assert info['prototype_idx'] in clusters[cid]
+
+    def test_membership_grades_bounded(self):
+        lattice = _build_lattice(10, threshold=0.5)
+        detector = ClusterDetector(lattice)
+        clusters = detector.find_clusters_hierarchical(threshold=2.0)
+        prototypes = detector.find_prototypes(clusters)
+        for cid, info in prototypes.items():
+            for node_idx, grade in info['membership'].items():
+                assert 0.0 <= grade <= 1.0 + 1e-10
+
+    def test_prototype_has_max_membership(self):
+        lattice = _build_lattice(10, threshold=0.5)
+        detector = ClusterDetector(lattice)
+        clusters = detector.find_clusters_hierarchical(threshold=2.0)
+        prototypes = detector.find_prototypes(clusters)
+        for cid, info in prototypes.items():
+            proto_idx = info['prototype_idx']
+            proto_membership = info['membership'][proto_idx]
+            assert proto_membership >= max(info['membership'].values()) - 1e-10
+
+    def test_empty_cluster_skipped(self):
+        lattice = _build_lattice(6, threshold=0.5)
+        detector = ClusterDetector(lattice)
+        prototypes = detector.find_prototypes([[], [0, 1, 2]])
+        assert 0 not in prototypes  # empty cluster skipped
+        assert 1 in prototypes
+
+
+# ---------------------------------------------------------------------------
+# Feature layer tests
+# ---------------------------------------------------------------------------
+
+class TestFeatureLayers:
+    def test_lattice_default_empty_layers(self):
+        lattice = _build_lattice(5)
+        assert lattice.feature_layers == {}
+
+    def test_lattice_with_layers(self):
+        path, _ = _make_dict_file(5)
+        layers = {'grounded': [0, 1, 2], 'linking': [6, 7, 8]}
+        lattice = Lattice.from_dictionary(
+            path, extract_beer_features,
+            feature_layers=layers,
+        )
+        assert lattice.feature_layers == layers
+
+    def test_grounded_features_shape(self):
+        path, _ = _make_dict_file(5)
+        layers = BEER_FEATURE_LAYERS
+        lattice = Lattice.from_dictionary(
+            path, extract_beer_features,
+            feature_layers=layers,
+        )
+        gf = lattice.grounded_features()
+        assert gf.shape == (5, len(layers['grounded']))
+
+    def test_linking_features_shape(self):
+        path, _ = _make_dict_file(5)
+        layers = BEER_FEATURE_LAYERS
+        lattice = Lattice.from_dictionary(
+            path, extract_beer_features,
+            feature_layers=layers,
+        )
+        lf = lattice.linking_features()
+        assert lf.shape == (5, len(layers['linking']))
+
+    def test_grounded_features_fallback_no_layers(self):
+        lattice = _build_lattice(5)
+        gf = lattice.grounded_features()
+        # With no layers specified, returns full feature matrix
+        assert gf.shape == lattice.feature_matrix.shape
+
+    def test_linking_features_empty_no_layers(self):
+        lattice = _build_lattice(5)
+        lf = lattice.linking_features()
+        # With no layers specified, returns empty
+        assert lf.shape[1] == 0

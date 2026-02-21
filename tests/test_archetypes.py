@@ -6,7 +6,9 @@ import numpy as np
 import pytest
 from pathlib import Path
 
-from motion_analytics.archetypes.base import Archetype, ArchetypeLibrary
+from motion_analytics.archetypes.base import (
+    Archetype, ArchetypeLibrary, GroundingCriterion, ICM,
+)
 from motion_analytics.archetypes.persona import PersonaArchetype, load_persona_library
 from motion_analytics.archetypes.structural_transfer import StructuralTransferAnalyzer
 from motion_analytics.archetypes.templates import BUILTIN_ARCHETYPES
@@ -183,3 +185,76 @@ class TestStructuralTransfer:
         assert result['weight_space_match'] is not None
         # Deleuze fold should be close
         assert result['weight_space_match']['name'] == 'deleuze_fold'
+
+
+# ---------------------------------------------------------------------------
+# Grounding criteria tests
+# ---------------------------------------------------------------------------
+
+class TestGroundingOnArchetypes:
+    def test_builtin_archetypes_have_grounding(self):
+        for arch in BUILTIN_ARCHETYPES.archetypes:
+            assert len(arch.grounding_criteria) > 0, f"{arch.name} has no grounding criteria"
+
+    def test_builtin_archetypes_have_icm(self):
+        for arch in BUILTIN_ARCHETYPES.archetypes:
+            assert arch.icm is not None, f"{arch.name} has no ICM"
+
+    def test_check_grounding_all_pass(self):
+        features = {
+            'phase_lock': 0.9,
+            'curvature_complexity': 0.1,
+            'duty_factor_asymmetry': 0.02,
+            'straightness': 0.5,
+            'symmetry_index': 0.0,
+            'workspace_volume': 0.01,
+        }
+        fold = BUILTIN_ARCHETYPES.get('deleuze_fold')
+        passed, failures = fold.check_grounding(features)
+        assert passed is True
+        assert failures == []
+
+    def test_check_grounding_with_failure(self):
+        features = {
+            'phase_lock': 0.1,  # too low for fold
+            'curvature_complexity': 0.0,
+        }
+        fold = BUILTIN_ARCHETYPES.get('deleuze_fold')
+        passed, failures = fold.check_grounding(features)
+        assert passed is False
+        assert len(failures) > 0
+
+    def test_icm_violation_detected(self):
+        features = {
+            'phase_lock': 0.2,  # below 0.3 → fold ICM violated
+            'straightness': 0.99,  # above 0.95 → fold ICM violated
+        }
+        fold = BUILTIN_ARCHETYPES.get('deleuze_fold')
+        violations = fold.icm.check_violations(features)
+        assert len(violations) >= 1
+
+    def test_icm_no_violation(self):
+        features = {
+            'phase_lock': 0.9,
+            'straightness': 0.5,
+        }
+        fold = BUILTIN_ARCHETYPES.get('deleuze_fold')
+        violations = fold.icm.check_violations(features)
+        assert violations == []
+
+    def test_persona_archetype_with_grounding_roundtrip(self):
+        gc = [GroundingCriterion('x', 'gt', 0.5, rationale='test')]
+        icm = ICM('test', ['bg'], [GroundingCriterion('y', 'lt', 0.1)])
+        pa = PersonaArchetype('test', weight_vector=np.array([1.0, 2.0]),
+                              grounding_criteria=gc, icm=icm)
+        d = pa.to_dict()
+        pa2 = PersonaArchetype.from_dict(d)
+        assert len(pa2.grounding_criteria) == 1
+        assert pa2.icm is not None
+        assert pa2.icm.name == 'test'
+
+    def test_archetype_to_dict_includes_grounding(self):
+        arch = BUILTIN_ARCHETYPES.get('deleuze_fold')
+        d = arch.to_dict()
+        assert 'grounding_criteria' in d
+        assert 'icm' in d

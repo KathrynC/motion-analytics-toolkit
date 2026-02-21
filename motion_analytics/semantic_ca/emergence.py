@@ -45,6 +45,42 @@ class ClusterDetector:
         components = [list(comp) for comp in nx.connected_components(G)]
         return components
 
+    def find_prototypes(self, clusters: List[List[int]]) -> Dict[int, Dict[str, Any]]:
+        """Identify the prototype (closest to centroid) and graded membership for each cluster.
+
+        Implements Lakoff/Rosch prototype effects: categories are organized around
+        central exemplars with graded membership radiating outward.
+
+        Returns:
+            {cluster_id: {
+                'prototype_idx': int,       -- index into lattice.entries
+                'prototype_id': str,        -- node id of prototype
+                'centroid': list[float],     -- cluster centroid in feature space
+                'membership': dict[int, float],  -- node_idx -> membership grade [0, 1]
+            }}
+        """
+        result = {}
+        for cid, members in enumerate(clusters):
+            if not members:
+                continue
+            sub_features = self.lattice.feature_matrix[members]
+            centroid = sub_features.mean(axis=0)
+            distances = np.linalg.norm(sub_features - centroid, axis=1)
+            prototype_local = int(np.argmin(distances))
+            prototype_idx = members[prototype_local]
+
+            max_dist = float(distances.max()) + 1e-10
+            membership = 1.0 - (distances / max_dist)
+
+            result[cid] = {
+                'prototype_idx': prototype_idx,
+                'prototype_id': self.lattice.node_ids[prototype_idx],
+                'centroid': centroid.tolist(),
+                'membership': {members[i]: float(membership[i])
+                               for i in range(len(members))},
+            }
+        return result
+
 
 class BoundaryDetector:
     """Identify nodes that lie on boundaries between clusters."""
