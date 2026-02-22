@@ -51,6 +51,7 @@ Interactive D3.js visualizations in `hero-concepts/`:
 
 - **Gait Archetype Atlas** (`06_archetype_atlas.html`): All 48 archetypes positioned by PCA of their 6D weight vectors, with Stoyko SystemViz category shapes, source-family coloring, and interactive tooltips showing grounding criteria and ICM definitions.
 - **Weight Hypergraph** (`07_weight_hypergraph.html`): Each archetype rendered as its actual 3-sensor → 2-motor bipartite weight graph (green=excitatory, pink=inhibitory, width=magnitude). Four hyperedge modes reveal structural relationships: sign-pattern family, strongest channel match, magnitude balance similarity, and triptych anti-phase family. Tooltips show ICM names, source titles, sign patterns, and per-channel balance analysis.
+- **Persona Weight Hypergraph** (`08_persona_weight_hypergraph.html`): 2,315 personas (2,000 fictional characters, 132 celebrities, 79 politicians, 104 mathematicians) positioned by PCA of their 6D weight vectors. K-means clustering (k=17) with convex hull overlays, 6-category color coding, name search, category filters, notable-only mode with edge visualizations (cluster, sign-pattern, cross-category twin, story family), and hover detail panel with bipartite weight glyph and behavioral metrics.
 
 ### SystemViz Entity Tagging
 
