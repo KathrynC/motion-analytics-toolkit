@@ -7,7 +7,7 @@ A comprehensive, simulator-agnostic toolkit for analyzing motion data from robot
 - **Core**: Standardized telemetry schemas, base analyzer classes, signal processing utilities, image schema detectors (PATH, CYCLE, CONTACT, BALANCE, FORCE), SystemViz entity tagging.
 - **Kinematics**: Path curvature, workspace analysis, smoothness metrics.
 - **Biomechanics**: Gait phase detection, symmetry indices, energy expenditure.
-- **Archetypes**: Match motions to conceptual personas (e.g., Deleuze, Borges) using weight-space or behavioral similarity. Lakoff grounding with feature layer classification (grounded vs linking), ICM violation auditing, and metaphor violation detection.
+- **Archetypes**: 48 behavioral archetypes from 116 gaits across 6 source types (simulation-grounded, literary/cultural, motion-word, character/celebrity, math-seeded, interpolation/meta). Lakoff grounding with feature layer classification (grounded vs linking), ICM violation auditing, and metaphor violation detection.
 - **Scenarios**: Define environmental perturbations, run stress tests, compute robustness and vulnerability. Weight perturbation, ablation, interpolation, and cross-topology suites.
 - **Semantic CA**: Build a lattice over motion dictionary entries, apply local rules, detect clusters and phase transitions. Wolfram CA classification (Classes 1-4).
 - **Patterns**: Alexander Pattern Language DAG with validation, topological sequencing, and coverage analysis.
@@ -35,6 +35,17 @@ The semantic CA module includes a `WolframClassifier` that evolves a lattice und
 | 2 | Periodic | Entropy stable, low tail variance, clusters stable |
 | 3 | Chaotic | High entropy, high variance, unstable clusters |
 | 4 | Complex | Intermediate entropy, structured boundary activity |
+
+### Archetype Atlas
+
+48 archetypes organized into 6 source families, each with grounding criteria, ICM definitions, and violation conditions. Notable archetype groups include:
+
+- **The Triptych** (Revelation/Ecclesiastes/Noether): Three gaits from the same anti-phase sign family, separated only by magnitude balance — spanning from maximum displacement (pale_horse, DX=29.17m) to maximum efficiency (whirling_wind, 0.00495) to perfect stasis (conservation_law, DX=0.031m). Demonstrates that structural principles survive substrate transfer from scripture to LLM weights to robot synapses.
+- **Gallop variants** (charging/tumbling/drifting): A single motion concept that splits into three distinct behavioral modes depending on LLM interpretation.
+- **Simulation-grounded** (11 archetypes): Derived from the 116-gait zoo with real feature vectors from PyBullet telemetry.
+- **Movement vocabulary** (8 archetypes): Semantic clusters from cross-language, cross-model LLM experiments (5 LLMs, 5 languages, 495+ gaits).
+
+A data-driven D3.js visualization (`hero-concepts/06_archetype_atlas.html`) shows all 48 archetypes positioned by PCA of their 6D weight vectors, with Stoyko SystemViz category shapes and interactive tooltips.
 
 ### SystemViz Entity Tagging
 
