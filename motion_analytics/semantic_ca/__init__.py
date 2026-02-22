@@ -3,6 +3,7 @@ from .rules import Rule, MajorityVoteRule, PropagationRule, MutationRule, Compos
 from .emergence import ClusterDetector, BoundaryDetector, PhaseTransitionDetector
 from .dynamics import DictionaryVersion, TemporalAnalyzer
 from .builtin import BEER_METRICS, DEFAULT_SIMILARITY, BEER_FEATURE_LAYERS
+from .wolfram import WolframClassifier, WolframEvidence
 
 __all__ = [
     'Lattice', 'extract_beer_features',
@@ -10,4 +11,5 @@ __all__ = [
     'ClusterDetector', 'BoundaryDetector', 'PhaseTransitionDetector',
     'DictionaryVersion', 'TemporalAnalyzer',
     'BEER_METRICS', 'DEFAULT_SIMILARITY', 'BEER_FEATURE_LAYERS',
+    'WolframClassifier', 'WolframEvidence',
 ]

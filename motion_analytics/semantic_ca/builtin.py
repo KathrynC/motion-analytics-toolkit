@@ -1,6 +1,7 @@
 """Built‑in configurations and helper functions."""
 
 from .lattice import extract_beer_features, cosine_similarity
+from ..archetypes.base import FEATURE_LAYERS as TOOLKIT_FEATURE_LAYERS, get_feature_layer
 
 # Default Beer analytics metrics used for similarity
 BEER_METRICS = [

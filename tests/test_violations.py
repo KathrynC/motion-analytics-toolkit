@@ -173,3 +173,28 @@ class TestMetaphorAuditor:
         report = auditor.audit(tel)
         # deleuze_fold should have high similarity since weights match
         assert report['deleuze_fold']['similarity'] > 0.8
+
+    def test_layer_warnings_present(self):
+        tel = _make_telemetry(weights=[0.7, -0.7, 0, 0, 0, 0, 0.7, -0.7, 0, 0])
+        auditor = MetaphorAuditor(BUILTIN_ARCHETYPES)
+        report = auditor.audit(tel)
+        for name, result in report.items():
+            assert 'layer_warnings' in result
+            assert isinstance(result['layer_warnings'], list)
+
+    def test_layer_warnings_for_linking_criteria(self):
+        """Archetypes that use linking features (phase_lock) in grounding should get warnings."""
+        lib = ArchetypeLibrary([
+            PersonaArchetype(
+                'test_arch',
+                weight_vector=np.ones(6),
+                grounding_criteria=[
+                    GroundingCriterion('phase_lock', 'gt', 0.5, rationale='linking feature in grounding'),
+                ],
+            ),
+        ])
+        tel = _make_telemetry(weights=[1, 1, 1, 1, 1, 1])
+        auditor = MetaphorAuditor(lib)
+        report = auditor.audit(tel)
+        assert len(report['test_arch']['layer_warnings']) >= 1
+        assert 'phase_lock' in report['test_arch']['layer_warnings'][0]

@@ -29,7 +29,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(BASE, "motion_seed_experiment_v2.json")) as f:
     main_data = json.load(f)
 
-with open(os.path.join(BASE, "backups",
+with open(os.path.join(BASE,
           "motion_seed_experiment_v2.singlemodel.20260221_160301.json")) as f:
     backup_data = json.load(f)
 

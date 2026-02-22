@@ -8,6 +8,8 @@ from pathlib import Path
 
 from motion_analytics.archetypes.base import (
     Archetype, ArchetypeLibrary, GroundingCriterion, ICM,
+    extract_behavioral_features, FEATURE_ALIASES,
+    FEATURE_LAYERS, get_feature_layer,
 )
 from motion_analytics.archetypes.persona import PersonaArchetype, load_persona_library
 from motion_analytics.archetypes.structural_transfer import StructuralTransferAnalyzer
@@ -76,6 +78,21 @@ class TestArchetypeBase:
         data = json.loads(path.read_text())
         assert len(data) == 1
         assert data[0]['name'] == 'a'
+
+    def test_archetype_library_load_roundtrip(self):
+        lib = ArchetypeLibrary([
+            PersonaArchetype('x', weight_vector=np.array([0.5, -0.5])),
+            PersonaArchetype('y', weight_vector=np.array([1.0, 0.0]),
+                             description='test'),
+        ])
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as f:
+            path = Path(f.name)
+        lib.save(path)
+        lib2 = ArchetypeLibrary.load(path)
+        assert len(lib2.archetypes) == 2
+        assert lib2.get('x') is not None
+        np.testing.assert_allclose(lib2.get('x').weight_vector, [0.5, -0.5])
+        assert lib2.get('y').description == 'test'
 
 
 # ---------------------------------------------------------------------------
@@ -258,3 +275,178 @@ class TestGroundingOnArchetypes:
         d = arch.to_dict()
         assert 'grounding_criteria' in d
         assert 'icm' in d
+
+
+# ---------------------------------------------------------------------------
+# Feature bridge tests (Beer-compatible features & aliases)
+# ---------------------------------------------------------------------------
+
+class TestExtractBehavioralFeatures:
+    def test_canonical_10_features_present(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        canonical = [
+            'straightness', 'curvature_complexity', 'workspace_volume',
+            'phase_lock', 'symmetry_index', 'duty_factor_asymmetry',
+            'flight_fraction', 'cost_of_transport', 'peak_power', 'efficiency',
+        ]
+        for key in canonical:
+            assert key in feats, f"Missing canonical feature: {key}"
+
+    def test_beer_compatible_features_present(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        beer_keys = [
+            'mean_speed', 'speed_cv', 'dx', 'dy', 'displacement',
+            'yaw_net_rad', 'yaw_degrees', 'contact_entropy_bits',
+        ]
+        for key in beer_keys:
+            assert key in feats, f"Missing Beer feature: {key}"
+
+    def test_aliases_present_and_consistent(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        for alias, canonical in FEATURE_ALIASES.items():
+            assert alias in feats, f"Missing alias: {alias}"
+            assert feats[alias] == feats[canonical], (
+                f"Alias {alias} != canonical {canonical}"
+            )
+
+    def test_mean_speed_nonnegative(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        assert feats['mean_speed'] >= 0.0
+
+    def test_dx_matches_com_displacement(self):
+        tel = _make_telemetry(n=200)
+        feats = extract_behavioral_features(tel)
+        positions = [ts.com_position for ts in tel.timesteps]
+        expected_dx = positions[-1][0] - positions[0][0]
+        assert abs(feats['dx'] - expected_dx) < 1e-10
+
+    def test_contact_entropy_bounded(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        # Shannon entropy of 4 states: 0 <= H <= log2(4) = 2.0
+        assert 0.0 <= feats['contact_entropy_bits'] <= 2.0
+
+    def test_yaw_degrees_consistent_with_radians(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        assert abs(feats['yaw_degrees'] - np.degrees(feats['yaw_net_rad'])) < 1e-10
+
+    def test_path_straightness_alias(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        assert feats['path_straightness'] == feats['straightness']
+
+    def test_grounding_criterion_works_with_beer_name(self):
+        """A GroundingCriterion using 'mean_speed' should now resolve."""
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        gc = GroundingCriterion('mean_speed', 'gt', 0.0)
+        assert gc.check(feats) is True
+
+    def test_all_features_are_finite_floats(self):
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        for key, val in feats.items():
+            assert isinstance(val, float), f"{key} is not float: {type(val)}"
+            assert np.isfinite(val), f"{key} is not finite: {val}"
+
+
+# ---------------------------------------------------------------------------
+# Feature layer classification tests
+# ---------------------------------------------------------------------------
+
+class TestFeatureLayerClassification:
+    def test_feature_layers_all_canonical_classified(self):
+        for key, layer in FEATURE_LAYERS.items():
+            assert layer in ('grounded', 'linking'), (
+                f"Feature {key!r} has invalid layer: {layer!r}"
+            )
+
+    def test_get_feature_layer_schema_prefix(self):
+        assert get_feature_layer('schema.PATH.straightness') == 'grounded'
+        assert get_feature_layer('schema.CYCLE.regularity') == 'grounded'
+        assert get_feature_layer('schema.FORCE.torque_asymmetry') == 'grounded'
+
+    def test_get_feature_layer_linking(self):
+        assert get_feature_layer('phase_lock') == 'linking'
+        assert get_feature_layer('symmetry_index') == 'linking'
+
+    def test_get_feature_layer_unknown_defaults_linking(self):
+        assert get_feature_layer('bogus_feature') == 'linking'
+
+    def test_get_feature_layer_alias_resolves(self):
+        # 'path_straightness' aliases to 'straightness' which is grounded
+        assert get_feature_layer('path_straightness') == 'grounded'
+
+    def test_grounding_criterion_layer_warning(self):
+        gc = GroundingCriterion('phase_lock', 'gt', 0.5, layer='grounded')
+        warning = gc.layer_warning()
+        assert warning != ""
+        assert 'linking' in warning
+
+    def test_grounding_criterion_no_warning_when_correct(self):
+        gc = GroundingCriterion('straightness', 'gt', 0.5, layer='grounded')
+        assert gc.layer_warning() == ""
+
+    def test_grounding_criterion_layer_serialization(self):
+        gc = GroundingCriterion('x', 'gt', 0.5, layer='grounded')
+        d = gc.to_dict()
+        assert d['layer'] == 'grounded'
+        gc2 = GroundingCriterion.from_dict(d)
+        assert gc2.layer == 'grounded'
+
+    def test_grounding_criterion_no_layer_backward_compat(self):
+        # Old-style dict without 'layer' key
+        d = {'feature': 'x', 'predicate': 'gt', 'value': 0.5}
+        gc = GroundingCriterion.from_dict(d)
+        assert gc.layer == ""
+        assert 'layer' not in gc.to_dict()
+
+
+# ---------------------------------------------------------------------------
+# Feature layer classification tests
+# ---------------------------------------------------------------------------
+
+class TestFeatureLayers:
+    def test_feature_layers_all_canonical_classified(self):
+        from motion_analytics.archetypes.base import FEATURE_LAYERS
+        for key, layer in FEATURE_LAYERS.items():
+            assert layer in ('grounded', 'linking'), f"{key} has invalid layer: {layer}"
+
+    def test_get_feature_layer_schema_prefix(self):
+        from motion_analytics.archetypes.base import get_feature_layer
+        assert get_feature_layer('schema.PATH.straightness') == 'grounded'
+        assert get_feature_layer('schema.CYCLE.regularity') == 'grounded'
+
+    def test_get_feature_layer_linking(self):
+        from motion_analytics.archetypes.base import get_feature_layer
+        assert get_feature_layer('phase_lock') == 'linking'
+        assert get_feature_layer('symmetry_index') == 'linking'
+
+    def test_get_feature_layer_unknown_defaults_linking(self):
+        from motion_analytics.archetypes.base import get_feature_layer
+        assert get_feature_layer('bogus_feature_xyz') == 'linking'
+
+    def test_grounding_criterion_layer_warning(self):
+        gc = GroundingCriterion(
+            'phase_lock', 'gt', 0.5, layer='grounded',
+            rationale='test criterion',
+        )
+        warning = gc.layer_warning()
+        assert 'phase_lock' in warning
+        assert 'linking' in warning
+
+    def test_grounding_criterion_no_warning_when_valid(self):
+        gc = GroundingCriterion(
+            'straightness', 'gt', 0.5, layer='grounded',
+            rationale='valid grounded criterion',
+        )
+        assert gc.layer_warning() == ""
+
+    def test_grounding_criterion_no_warning_when_unconstrained(self):
+        gc = GroundingCriterion('phase_lock', 'gt', 0.5)
+        assert gc.layer_warning() == ""

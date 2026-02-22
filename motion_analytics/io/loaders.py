@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Union
 
 from ..core.schemas import Telemetry, TimeStep, LinkState, JointState, ContactState
+from ..utils.kinematics import compute_leg_positions
 
 
 def load_er_telemetry(gait_name: str, telemetry_dir: Path) -> Telemetry:
@@ -60,24 +61,32 @@ def load_er_telemetry(gait_name: str, telemetry_dir: Path) -> Telemetry:
                     torque=jd.get('tau', 0.0)
                 )
             
-            # Link states (only torso directly from base; legs need forward kinematics)
-            # For now, we provide placeholder positions for legs.
-            # A full implementation would use forward kinematics from joint angles.
+            # Link states — torso directly from base; legs via forward kinematics
+            torso_pos = (base['x'], base['y'], base['z'])
+            torso_rpy = (rpy['r'], rpy['p'], rpy['y'])
+            back_angle = joints_dict.get('back_leg_joint',
+                                         JointState(angle=0.0, velocity=0.0)).angle
+            front_angle = joints_dict.get('front_leg_joint',
+                                          JointState(angle=0.0, velocity=0.0)).angle
+
+            back_com, front_com = compute_leg_positions(
+                torso_pos, torso_rpy, back_angle, front_angle)
+
             links = {
                 'torso': LinkState(
-                    position=[base['x'], base['y'], base['z']],
+                    position=list(torso_pos),
                     orientation=[rpy['r'], rpy['p'], rpy['y']],  # keep as RPY for now
                     linear_velocity=[vel['vx'], vel['vy'], vel['vz']],
                     angular_velocity=[ang_vel['wx'], ang_vel['wy'], ang_vel['wz']]
                 ),
                 'back_leg': LinkState(
-                    position=[0.0, 0.0, 0.0],  # placeholder
+                    position=back_com.tolist(),
                     orientation=[0.0, 0.0, 0.0, 1.0],
                     linear_velocity=[0.0, 0.0, 0.0],
                     angular_velocity=[0.0, 0.0, 0.0]
                 ),
                 'front_leg': LinkState(
-                    position=[0.0, 0.0, 0.0],
+                    position=front_com.tolist(),
                     orientation=[0.0, 0.0, 0.0, 1.0],
                     linear_velocity=[0.0, 0.0, 0.0],
                     angular_velocity=[0.0, 0.0, 0.0]

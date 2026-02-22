@@ -8,7 +8,7 @@ that aren't present and hides the absence.
 
 from typing import Dict, List
 
-from .base import Archetype, ArchetypeLibrary, extract_behavioral_features
+from .base import Archetype, ArchetypeLibrary, extract_behavioral_features, get_feature_layer
 from ..core.schemas import Telemetry
 
 
@@ -65,6 +65,15 @@ class MetaphorAuditor:
             icm_violations = archetype.icm.check_violations(features)
             icm_violated = len(icm_violations) > 0
 
+        # Layer enforcement check
+        layer_warnings: List[str] = []
+        for gc in archetype.grounding_criteria:
+            feature_layer = get_feature_layer(gc.feature)
+            if feature_layer == 'linking':
+                layer_warnings.append(
+                    f"'{gc.feature}' is a linking feature used in grounding criterion: {gc.rationale}"
+                )
+
         # Verdict
         if grounding_pass and not icm_violated:
             verdict = 'grounded'
@@ -79,5 +88,6 @@ class MetaphorAuditor:
             'failed_criteria': failed_criteria,
             'icm_violated': icm_violated,
             'icm_violations': icm_violations,
+            'layer_warnings': layer_warnings,
             'verdict': verdict,
         }

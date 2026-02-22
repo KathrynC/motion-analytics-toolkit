@@ -15,7 +15,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.6894137658494133,
+      0.0,
+      0.0,
+      0.3850249683715188,
+      27.054788836144755,
+      0.04541666666666667,
+      0.6943333333333334,
+      15.50107308567546,
+      0.0,
+      0.06679700526906857
+    ],
     "grounding_criteria": [
       {
         "feature": "mean_speed",
@@ -72,7 +83,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.10547464998796889,
+      0.0,
+      0.0,
+      0.5454911089823682,
+      -13.089956526657152,
+      0.037,
+      0.739375,
+      355.36894815820216,
+      0.0,
+      0.014174908744199943
+    ],
     "grounding_criteria": [
       {
         "feature": "yaw_degrees",
@@ -130,7 +152,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.7052624496301237,
+      0.0,
+      0.0,
+      0.4354388763287617,
+      6.038728330374607,
+      0.018833333333333323,
+      0.5890833333333333,
+      14.16654900372468,
+      0.0,
+      0.07440278046538362
+    ],
     "grounding_criteria": [
       {
         "feature": "dy",
@@ -187,7 +220,18 @@
       0.2,
       -0.2
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.9042115867251462,
+      0.0,
+      0.0,
+      0.8522192378843452,
+      -31.866750455378117,
+      0.06337499999999999,
+      0.3115,
+      4.3426864321567535,
+      0.0,
+      0.057568052380848486
+    ],
     "grounding_criteria": [
       {
         "feature": "phase_lock",
@@ -243,7 +287,18 @@
       0,
       0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.2617167312982067,
+      0.0,
+      0.0,
+      0.764297890941201,
+      12.005853125051608,
+      0.06600000000000003,
+      0.02625,
+      151.65579734144242,
+      0.0,
+      0.029436614353077845
+    ],
     "grounding_criteria": [
       {
         "feature": "path_straightness",
@@ -299,7 +354,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.5510563366171143,
+      0.0,
+      0.0,
+      0.7079050226152968,
+      -60.72423384796829,
+      0.027250000000000003,
+      0.1755,
+      24.64536616461904,
+      0.0,
+      0.04057557892710894
+    ],
     "grounding_criteria": [
       {
         "feature": "contact_entropy",
@@ -355,7 +421,18 @@
       0,
       0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.8876159310615379,
+      0.0,
+      0.0,
+      0.9886196069469357,
+      0.10009072039033995,
+      0.0005000000000000143,
+      0.350375,
+      11.106001446582718,
+      0.0,
+      0.0225103518311646
+    ],
     "grounding_criteria": [
       {
         "feature": "mean_speed",
@@ -411,7 +488,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.8459810449566822,
+      0.0,
+      0.0,
+      0.9255876437619508,
+      -18.691888420983165,
+      0.072875,
+      0.11625,
+      3.039521647065009,
+      0.0,
+      0.0822497843505745
+    ],
     "grounding_criteria": [
       {
         "feature": "contact_entropy",
@@ -467,7 +555,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.6712407952162321,
+      0.0,
+      0.0,
+      0.8968075984261156,
+      -96.82812546421493,
+      0.15712500000000001,
+      0.26475000000000004,
+      36.94328252956055,
+      0.0,
+      0.07514691649622872
+    ],
     "grounding_criteria": [
       {
         "feature": "symmetry_index",
@@ -523,7 +622,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.5729435002329784,
+      0.0,
+      0.0,
+      0.6832084710222608,
+      -40.67170801198208,
+      0.03825000000000001,
+      0.6910000000000002,
+      13.05891703642051,
+      0.0,
+      0.07784380120005867
+    ],
     "grounding_criteria": [
       {
         "feature": "speed_cv",
@@ -580,7 +690,18 @@
       0.0,
       0.0
     ],
-    "feature_vector": null,
+    "feature_vector": [
+      0.904903670789637,
+      0.0,
+      0.0,
+      0.49768683518813994,
+      73.06458104766345,
+      0.111375,
+      0.704,
+      9.038583148400344,
+      0.0,
+      0.11640351873759042
+    ],
     "grounding_criteria": [
       {
         "feature": "speed_cv",
@@ -1298,8 +1419,16 @@
     "type": "PersonaArchetype",
     "description": "Model collapse archetype: LLM output quantizes to a coarse grid {-0.7, -0.4, -0.1, 0.1, 0.4, 0.7, 1.0}, producing a family of ~10 attractors that collectively account for >3500 of 8000 character-seed trials. The quantization is a property of the LLM's token distribution, not the physics. Different attractors on this grid produce wildly different behaviors (backward walkers, crab-walkers, bouncers), but the grid itself is invariant across character prompts.",
     "weight_vector": [
-      0.1, 0.4, 0.4, -0.1, 0.4, 0.4,
-      0.0, 0.0, 0.0, 0.0
+      0.1,
+      0.4,
+      0.4,
+      -0.1,
+      0.4,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1348,8 +1477,16 @@
     "type": "PersonaArchetype",
     "description": "Model collapse archetype: qwen3-coder:30b converges to the same weight vector [0.6, 0.2, 0.5, -0.4, -0.8, -0.3] regardless of whether the semantic input is a verb, theorem, Bible passage, geographic place, or political concept. 232 occurrences across all 5 structured-random domains. The LLM has a default 'safe' output that overrides any semantic steering, producing a barely-moving robot (speed 0.17, dx 1.2).",
     "weight_vector": [
-      0.6, 0.2, 0.5, -0.4, -0.8, -0.3,
-      0.0, 0.0, 0.0, 0.0
+      0.6,
+      0.2,
+      0.5,
+      -0.4,
+      -0.8,
+      -0.3,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1401,8 +1538,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: motion words for relaxed, unhurried locomotion (amble, glide, roam, saunter, drift) converge to moderate speed (~0.7), moderate-to-straight paths, and low yaw. The Sem->Wt functor maps 'leisurely movement' concepts across languages to a consistent behavioral basin.",
     "weight_vector": [
-      0.6, 0.8, 0.4, -0.5, -0.7, -0.3,
-      0.0, 0.0, 0.0, 0.0
+      0.6,
+      0.8,
+      0.4,
+      -0.5,
+      -0.7,
+      -0.3,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1426,7 +1571,7 @@
       "background": [
         "The motion concepts amble, glide, roam, saunter, and drift share a semantic field: unhurried, purposeful but relaxed movement.",
         "Across 5 languages, these concepts converge behaviorally (combined CV 0.27-0.53), indicating the LLM reliably translates 'gentle movement' semantics into similar weight vectors.",
-        "The resulting gaits are moderate-speed, moderate-entropy, with above-average path straightness — a gentle forward progression."
+        "The resulting gaits are moderate-speed, moderate-entropy, with above-average path straightness \u2014 a gentle forward progression."
       ],
       "violation_conditions": [
         {
@@ -1453,8 +1598,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: motion words for energetic, irregular locomotion (bounce, hop, scurry, zigzag, sway, trot) converge to moderate speed (~1.0), high entropy (~1.5), high yaw (~96 deg), and low straightness (~0.43). The LLM reliably translates 'agitated movement' into weight vectors that produce tumbling, direction-changing gaits.",
     "weight_vector": [
-      0.6, 0.6, 0.6, -0.6, -0.6, -0.6,
-      0.0, 0.0, 0.0, 0.0
+      0.6,
+      0.6,
+      0.6,
+      -0.6,
+      -0.6,
+      -0.6,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1507,8 +1660,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: motion words for powerful, directed locomotion (charge, gallop, drag, retreat, patrol) converge to fast speed (~1.0), moderate entropy (~1.4), above-average displacement (~8.8m), and moderate straightness. These gaits cover ground with purpose.",
     "weight_vector": [
-      0.7, 0.7, 0.0, -0.7, 0.0, 0.7,
-      0.0, 0.0, 0.0, 0.0
+      0.7,
+      0.7,
+      0.0,
+      -0.7,
+      0.0,
+      0.7,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1559,8 +1720,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: motion words for slow, careful locomotion (forward_walk, saunter, waddle) converge to slow speed (~0.5), low entropy (~1.2), low yaw (~40 deg), and moderate-to-high torso ground contact. The robot moves carefully with its belly close to or on the ground.",
     "weight_vector": [
-      0.6, 0.2, 0.2, 0.3, -0.4, 0.4,
-      0.0, 0.0, 0.0, 0.0
+      0.6,
+      0.2,
+      0.2,
+      0.3,
+      -0.4,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1607,10 +1776,18 @@
   {
     "name": "celebrity_launcher",
     "type": "PersonaArchetype",
-    "description": "Semantically grounded archetype from celebrity data: a cross-category cluster where the LLM assigns high w24 values (>0.78), producing fast (speed ~1.9), high-displacement (~29m) gaits with low phase lock. Appears for celebrities the LLM interprets as dynamic/powerful regardless of domain — Gandhi, Messi, Cleopatra, Meryl Streep, Nancy Pelosi all produce this signature.",
+    "description": "Semantically grounded archetype from celebrity data: a cross-category cluster where the LLM assigns high w24 values (>0.78), producing fast (speed ~1.9), high-displacement (~29m) gaits with low phase lock. Appears for celebrities the LLM interprets as dynamic/powerful regardless of domain \u2014 Gandhi, Messi, Cleopatra, Meryl Streep, Nancy Pelosi all produce this signature.",
     "weight_vector": [
-      0.76, 0.24, -0.57, -0.40, 0.70, 0.83,
-      0.0, 0.0, 0.0, 0.0
+      0.76,
+      0.24,
+      -0.57,
+      -0.4,
+      0.7,
+      0.83,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1633,9 +1810,9 @@
       "name": "dynamic_persona_projection",
       "background": [
         "The LLM maps 'powerful/dynamic' celebrity personas to a specific weight signature with high w24 (motor 4 strongly driven by sensor 2).",
-        "This cluster spans historical, sports, entertainment, and political categories — the grouping is by perceived dynamism, not by domain.",
+        "This cluster spans historical, sports, entertainment, and political categories \u2014 the grouping is by perceived dynamism, not by domain.",
         "Gandhi, Messi, Cleopatra, Meryl Streep, and Pelosi share the trait of being perceived as forceful personalities, which the LLM encodes as high motor drive.",
-        "The weight vector [0.76, 0.24, -0.57, -0.40, 0.70, 0.83] produces a fast, slightly desynchronized gait — energy without elegance."
+        "The weight vector [0.76, 0.24, -0.57, -0.40, 0.70, 0.83] produces a fast, slightly desynchronized gait \u2014 energy without elegance."
       ],
       "violation_conditions": [
         {
@@ -1661,10 +1838,18 @@
   {
     "name": "celebrity_plodder",
     "type": "PersonaArchetype",
-    "description": "Semantically grounded archetype from celebrity data: the LLM assigns high w13 (>0.8) and positive w23 to celebrities it perceives as 'steady/stable' — sports figures, administrators, and establishment politicians. Produces moderate speed (~0.6), low displacement (~4m), high phase lock (>0.9), and stable contact patterns. The robot plods methodically.",
+    "description": "Semantically grounded archetype from celebrity data: the LLM assigns high w13 (>0.8) and positive w23 to celebrities it perceives as 'steady/stable' \u2014 sports figures, administrators, and establishment politicians. Produces moderate speed (~0.6), low displacement (~4m), high phase lock (>0.9), and stable contact patterns. The robot plods methodically.",
     "weight_vector": [
-      0.76, 0.86, 0.50, -0.42, -0.64, -0.34,
-      0.0, 0.0, 0.0, 0.0
+      0.76,
+      0.86,
+      0.5,
+      -0.42,
+      -0.64,
+      -0.34,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1689,7 +1874,7 @@
         "The LLM maps 'steady/establishment' celebrities to a weight pattern with strong positive w13 and w23, driving both motors symmetrically from sensors 1 and 2.",
         "Sports figures (Tom Brady, Tiger Woods, Michael Jordan), Trump admin officials (Steve Bannon, Sean Spicer), and historical leaders (Winston Churchill) cluster here.",
         "The common thread is perceived steadiness or institutional authority, not athletic ability or ideology.",
-        "High phase lock means the two joints move in tight coordination — methodical, synchronized motion."
+        "High phase lock means the two joints move in tight coordination \u2014 methodical, synchronized motion."
       ],
       "violation_conditions": [
         {
@@ -1716,8 +1901,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype from celebrity data: the LLM assigns near-zero w13 to celebrities it perceives as 'unconventional/unpredictable', producing desynchronized gaits (phase lock <0.4) with moderate speed and wandering paths. Tech founders, creative writers, and politically ambiguous figures cluster here.",
     "weight_vector": [
-      0.74, 0.24, -0.54, -0.45, 0.67, 0.12,
-      0.0, 0.0, 0.0, 0.0
+      0.74,
+      0.24,
+      -0.54,
+      -0.45,
+      0.67,
+      0.12,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1733,14 +1926,14 @@
         "predicate": "between",
         "value": 0.9,
         "tolerance": 0.35,
-        "rationale": "Moderate speed (0.55-1.25) — active but not fast. The motion is engaged but aimless."
+        "rationale": "Moderate speed (0.55-1.25) \u2014 active but not fast. The motion is engaged but aimless."
       }
     ],
     "icm": {
       "name": "unconventional_persona_projection",
       "background": [
         "The LLM maps 'unconventional/unpredictable' celebrities to weight vectors with low w13 values, which weakens the coupling between sensor 1 and motor 3.",
-        "This creates a desynchronization between the two joints — the legs move semi-independently, producing an irregular, wandering gait.",
+        "This creates a desynchronization between the two joints \u2014 the legs move semi-independently, producing an irregular, wandering gait.",
         "Tech founders (Peter Thiel, Jack Dorsey), creative figures (Neil Gaiman, Stephen King), and politically ambiguous figures (Mitt Romney, Melania Trump) cluster here.",
         "The common thread is perceived unpredictability or nonconformity."
       ],
@@ -1770,8 +1963,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: Ramsey-theoretic combinatorics theorems (Van der Waerden, Hales-Jewett, Menger, Ramsey) all converge to identical weight vectors distinct from all collapse attractors. 4/4 combinatorics theorems share exactly the same weights, producing a moderate-speed forward-right walker with very high phase lock (0.994) and strong yaw rotation (-2.99 rad). This is the cleanest field-to-behavior correspondence in the entire theorems dataset.",
     "weight_vector": [
-      0.6, 0.2, -0.4, -0.6, -0.2, 0.4,
-      0.0, 0.0, 0.0, 0.0
+      0.6,
+      0.2,
+      -0.4,
+      -0.6,
+      -0.2,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1822,8 +2023,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: OEIS recursive sequences (Fibonacci, Lucas, Pell, Tribonacci, Padovan) produce the highest phase lock among all mathematical families (0.677), despite originating from different LLM models. The recursive structure a(n) = f(a(n-1), a(n-2), ...) maps to synchronized oscillatory gaits across all 4 LLMs. 23 trials, slow speed (0.818), moderate backward displacement.",
     "weight_vector": [
-      0.03, 0.70, 0.23, 0.23, 0.17, 0.13,
-      0.0, 0.0, 0.0, 0.0
+      0.03,
+      0.7,
+      0.23,
+      0.23,
+      0.17,
+      0.13,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1876,8 +2085,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: OEIS polynomial sequences (2nd finite difference = 0, including squares, triangular numbers, pentagonal numbers) produce the straightest paths (0.674), lowest contact entropy (1.279), and highest efficiency (0.00241) among all regularity classes. 42 trials across 4 LLMs. The LLM maps 'mathematically simple' to 'kinematically simple.'",
     "weight_vector": [
-      0.3, 0.5, 0.1, 0.0, -0.2, 0.5,
-      0.0, 0.0, 0.0, 0.0
+      0.3,
+      0.5,
+      0.1,
+      0.0,
+      -0.2,
+      0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1886,7 +2103,7 @@
         "predicate": "gt",
         "value": 0.65,
         "tolerance": 0.03,
-        "rationale": "Polynomial sequences achieve 0.674 straightness vs 0.594 for irregular sequences — the straightest class."
+        "rationale": "Polynomial sequences achieve 0.674 straightness vs 0.594 for irregular sequences \u2014 the straightest class."
       },
       {
         "feature": "entropy",
@@ -1923,15 +2140,23 @@
       "OEIS: A002378 Oblong numbers (N=4)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "The LLM preserves a graded regularity structure: polynomial growth → straight efficient gait, near-polynomial → intermediate, irregular → complex gait. Mathematical simplicity maps to kinematic simplicity through the Sem->Wt functor, demonstrating that the functor respects structural hierarchy, not just categorical membership."
+    "conceptual_basis": "The LLM preserves a graded regularity structure: polynomial growth \u2192 straight efficient gait, near-polynomial \u2192 intermediate, irregular \u2192 complex gait. Mathematical simplicity maps to kinematic simplicity through the Sem->Wt functor, demonstrating that the functor respects structural hierarchy, not just categorical membership."
   },
   {
     "name": "genre_heist_lockstep",
     "type": "PersonaArchetype",
-    "description": "Semantically grounded archetype from TV character data: heist thriller characters (Money Heist, Ocean's 11) produce the slowest mean speed (0.682) AND the highest phase lock (0.883) of all 14 genre clusters. This unique 'slow but coordinated' niche has no analogue in any other genre or archetype — it is the only SLOW/COMPLEX/COORDINATED behavioral class. 7 trials, very tight cluster (speed SD=0.217, phase lock SD=0.176).",
+    "description": "Semantically grounded archetype from TV character data: heist thriller characters (Money Heist, Ocean's 11) produce the slowest mean speed (0.682) AND the highest phase lock (0.883) of all 14 genre clusters. This unique 'slow but coordinated' niche has no analogue in any other genre or archetype \u2014 it is the only SLOW/COMPLEX/COORDINATED behavioral class. 7 trials, very tight cluster (speed SD=0.217, phase lock SD=0.176).",
     "weight_vector": [
-      -0.06, 0.33, 0.47, -0.16, 0.43, -0.09,
-      0.0, 0.0, 0.0, 0.0
+      -0.06,
+      0.33,
+      0.47,
+      -0.16,
+      0.43,
+      -0.09,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1954,10 +2179,10 @@
       "name": "precision_under_pressure",
       "background": [
         "Heist thriller characters (Money Heist pl=0.947, Ocean's 11 pl=0.797) form the most phase-locked genre in the entire 450-trial character_seed experiment.",
-        "The LLM interprets heist characters as requiring precision, patience, and coordination — the opposite of action hero speed.",
+        "The LLM interprets heist characters as requiring precision, patience, and coordination \u2014 the opposite of action hero speed.",
         "Money Heist characters achieve pl=0.947, the single highest show-level phase lock in the dataset.",
         "The weight signature (high w13=0.33, high w23=0.47, high w14=0.43) creates strong coupling between ALL sensors and BOTH motors, producing tight coordination.",
-        "This is the only genre that occupies the SLOW/COMPLEX/COORDINATED region of the Speed/Entropy/PhaseLock behavioral space — all other slow genres are simple, and all other coordinated genres are faster.",
+        "This is the only genre that occupies the SLOW/COMPLEX/COORDINATED region of the Speed/Entropy/PhaseLock behavioral space \u2014 all other slow genres are simple, and all other coordinated genres are faster.",
         "Genre explains only 3-4% of behavioral variance overall, but the heist_thriller cluster is a genuine outlier in the distribution."
       ],
       "violation_conditions": [
@@ -1982,8 +2207,16 @@
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype from character-seed data: llama3.1 assigns identical weight vectors to authoritative older male mentor/authority figures across 6 unrelated TV shows. Richard Webber (Grey's Anatomy), Professor Oak (Pokemon), Hawkeye Pierce (M*A*S*H), Stan Rizzo (Mad Men), Mr. Big (Sex and the City), and Dr. Glassman (The Good Doctor) all receive [w03=-0.4, w13=0.7, w23=0.1, w04=-0.1, w14=0.4, w24=0.0], producing the fastest gait in the 8000-trial character experiment (speed=1.936, dx=+24.73).",
     "weight_vector": [
-      -0.4, 0.7, 0.1, -0.1, 0.4, 0.0,
-      0.0, 0.0, 0.0, 0.0
+      -0.4,
+      0.7,
+      0.1,
+      -0.1,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -1999,16 +2232,16 @@
         "predicate": "gt",
         "value": 0.85,
         "tolerance": 0.03,
-        "rationale": "High phase lock (0.885) indicates coordinated, purposeful stride — confident forward locomotion."
+        "rationale": "High phase lock (0.885) indicates coordinated, purposeful stride \u2014 confident forward locomotion."
       }
     ],
     "icm": {
       "name": "paternal_authority_projection",
       "background": [
         "Across 6 shows spanning medical drama, anime, comedy, period drama, romance, and sitcom, llama3.1 consistently maps 'authoritative male mentor' to identical synapse weights.",
-        "Richard Webber (chief of surgery), Professor Oak (Pokemon professor), Hawkeye Pierce (senior surgeon), Stan Rizzo (creative director), Mr. Big (powerful businessman), and Dr. Glassman (department head) share no narrative genre — they share a narrative role.",
+        "Richard Webber (chief of surgery), Professor Oak (Pokemon professor), Hawkeye Pierce (senior surgeon), Stan Rizzo (creative director), Mr. Big (powerful businessman), and Dr. Glassman (department head) share no narrative genre \u2014 they share a narrative role.",
         "The LLM's character representation space encodes 'paternal authority' as a distinct point, separate from other character archetypes like 'villain' or 'ingenue.'",
-        "The resulting gait — fast, straight, coordinated, high-displacement — is the physical embodiment of 'confident stride': the robot walks like someone who knows where they're going.",
+        "The resulting gait \u2014 fast, straight, coordinated, high-displacement \u2014 is the physical embodiment of 'confident stride': the robot walks like someone who knows where they're going.",
         "This is the strongest single-weight-vector semantic convergence in the 8000-trial character experiment."
       ],
       "violation_conditions": [
@@ -2030,15 +2263,23 @@
       "character_seed: Dr. Aaron Glassman [The Good Doctor] (llama3.1)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Narrative role convergence: the LLM maps the 'wise elder/mentor' narrative archetype — regardless of genre, era, or specific show — to a single point in weight space. The resulting fast, coordinated gait embodies 'confident authority.' This demonstrates that the Sem->Wt functor operates on narrative role abstractions, not surface-level character features."
+    "conceptual_basis": "Narrative role convergence: the LLM maps the 'wise elder/mentor' narrative archetype \u2014 regardless of genre, era, or specific show \u2014 to a single point in weight space. The resulting fast, coordinated gait embodies 'confident authority.' This demonstrates that the Sem->Wt functor operates on narrative role abstractions, not surface-level character features."
   },
   {
     "name": "oeis_divisor_chaotic",
     "type": "PersonaArchetype",
     "description": "Semantically grounded archetype: OEIS divisor-related sequences (d(n), sigma(n), abundant numbers, deficient numbers) produce the highest contact entropy (1.515 bits) and lowest path straightness (0.540) of any mathematical family. 17 trials across 4 LLMs. 35% of divisor trials land in the chaotic behavioral cluster (5x enrichment vs population base rate). The irregular, non-monotone structure of divisor functions maps to chaotic contact patterns.",
     "weight_vector": [
-      -0.2, 0.4, -0.3, 0.1, 0.0, 0.2,
-      0.0, 0.0, 0.0, 0.0
+      -0.2,
+      0.4,
+      -0.3,
+      0.1,
+      0.0,
+      0.2,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "feature_vector": null,
     "grounding_criteria": [
@@ -2047,24 +2288,24 @@
         "predicate": "gt",
         "value": 1.45,
         "tolerance": 0.07,
-        "rationale": "Divisor family achieves 1.515 bits contact entropy, the highest of 13 mathematical families — more than Fibonacci (1.306) or partition (1.392)."
+        "rationale": "Divisor family achieves 1.515 bits contact entropy, the highest of 13 mathematical families \u2014 more than Fibonacci (1.306) or partition (1.392)."
       },
       {
         "feature": "path_straightness",
         "predicate": "lt",
         "value": 0.56,
         "tolerance": 0.04,
-        "rationale": "Lowest path straightness (0.540) among families — the robot wanders rather than walking in a line."
+        "rationale": "Lowest path straightness (0.540) among families \u2014 the robot wanders rather than walking in a line."
       }
     ],
     "icm": {
       "name": "arithmetic_irregularity_embodiment",
       "background": [
-        "Divisor functions d(n), sigma(n), and their relatives (abundant/deficient classifications) have famously irregular local behavior — d(n) depends on the prime factorization of each n.",
+        "Divisor functions d(n), sigma(n), and their relatives (abundant/deficient classifications) have famously irregular local behavior \u2014 d(n) depends on the prime factorization of each n.",
         "Across 17 trials and 4 different LLMs, divisor sequences produce the most chaotic gaits: highest entropy (1.515), lowest straightness (0.540), 5x enrichment in the chaotic behavioral cluster.",
         "The effect is robust across models: even though qwen and gpt-oss collapse many sequences to shared attractors, the divisor family consistently lands in high-entropy regions.",
-        "Divisor functions contrast sharply with Fibonacci/Lucas/Pell (smooth recursive growth → high phase lock, low entropy) — the mathematical structure maps to behavioral structure.",
-        "This extends the 'polynomial strider' finding: the Sem->Wt functor preserves a spectrum from regular (polynomial → straight, efficient) through recursive (Fibonacci → phase-locked) to irregular (divisor → chaotic)."
+        "Divisor functions contrast sharply with Fibonacci/Lucas/Pell (smooth recursive growth \u2192 high phase lock, low entropy) \u2014 the mathematical structure maps to behavioral structure.",
+        "This extends the 'polynomial strider' finding: the Sem->Wt functor preserves a spectrum from regular (polynomial \u2192 straight, efficient) through recursive (Fibonacci \u2192 phase-locked) to irregular (divisor \u2192 chaotic)."
       ],
       "violation_conditions": [
         {
@@ -2084,7 +2325,7 @@
       "OEIS: A001222 Big omega: prime factors with multiplicity (N=3)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Arithmetic irregularity embodiment: divisor functions have famously irregular local behavior (d(n) depends on prime factorization), and the LLM maps this mathematical irregularity to kinematic irregularity (high entropy, low straightness). Combined with the recursive_oscillator (regular→coordinated) and polynomial_strider (simple→straight) archetypes, this establishes a full regularity spectrum: mathematical structure grades of regular/recursive/irregular map to behavioral grades of straight/oscillatory/chaotic through the Sem->Wt functor."
+    "conceptual_basis": "Arithmetic irregularity embodiment: divisor functions have famously irregular local behavior (d(n) depends on prime factorization), and the LLM maps this mathematical irregularity to kinematic irregularity (high entropy, low straightness). Combined with the recursive_oscillator (regular\u2192coordinated) and polynomial_strider (simple\u2192straight) archetypes, this establishes a full regularity spectrum: mathematical structure grades of regular/recursive/irregular map to behavioral grades of straight/oscillatory/chaotic through the Sem->Wt functor."
   },
   {
     "name": "yaw_spinner",
@@ -2109,7 +2350,7 @@
         "predicate": "lt",
         "value": -1.0,
         "tolerance": 0.2,
-        "rationale": "Strong negative yaw (z=-3.20) is the defining feature — sustained rotation during forward locomotion."
+        "rationale": "Strong negative yaw (z=-3.20) is the defining feature \u2014 sustained rotation during forward locomotion."
       },
       {
         "feature": "dx",
@@ -2130,13 +2371,13 @@
         "predicate": "gt",
         "value": 0.3,
         "tolerance": 0.05,
-        "rationale": "Fast movement (z=1.65) — rotation does not come at the cost of speed."
+        "rationale": "Fast movement (z=1.65) \u2014 rotation does not come at the cost of speed."
       }
     ],
     "icm": {
       "name": "yaw_spinner_icm",
       "background": [
-        "Rotation and forward motion can coexist — this archetype spirals rather than spins in place",
+        "Rotation and forward motion can coexist \u2014 this archetype spirals rather than spins in place",
         "High contact entropy reflects the complex footfall patterns needed to maintain both rotation and forward progress",
         "Appears across 5 languages and multiple movement concepts (dash, twirl, stomp, scurry, sprint)"
       ],
@@ -2146,7 +2387,7 @@
           "predicate": "gt",
           "value": -0.5,
           "tolerance": 0.0,
-          "rationale": "Insufficient yaw rotation breaks the spiraling archetype — becomes a simple forward walker."
+          "rationale": "Insufficient yaw rotation breaks the spiraling archetype \u2014 becomes a simple forward walker."
         },
         {
           "feature": "dx",
@@ -2168,19 +2409,19 @@
       "movement_vocab: pivot (2 trials)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Spiral locomotion archetype: LLMs interpreting energetic movement concepts (dash, twirl, sprint) across 5 languages converge on a weight configuration that produces forward-spiraling motion. The key insight is that w24 (sensor 2 → motor 4) is maximally positive (0.94) — the front touch sensor drives the front leg strongly, creating an asymmetric push that combines forward thrust with rotational torque. Cross-language functor faithfulness confirms this is a genuine behavioral attractor, not a language-specific artifact."
+    "conceptual_basis": "Spiral locomotion archetype: LLMs interpreting energetic movement concepts (dash, twirl, sprint) across 5 languages converge on a weight configuration that produces forward-spiraling motion. The key insight is that w24 (sensor 2 \u2192 motor 4) is maximally positive (0.94) \u2014 the front touch sensor drives the front leg strongly, creating an asymmetric push that combines forward thrust with rotational torque. Cross-language functor faithfulness confirms this is a genuine behavioral attractor, not a language-specific artifact."
   },
   {
     "name": "wobbler",
     "type": "PersonaArchetype",
-    "description": "Fast backward-moving gait with low phase-lock coordination and high contact entropy. Discovered via k-means clustering of 700 movement vocabulary trials. Characterized by high speed but poor coordination — the legs work against each other, producing backward displacement (dx=-2.67) with complex contact dynamics.",
+    "description": "Fast backward-moving gait with low phase-lock coordination and high contact entropy. Discovered via k-means clustering of 700 movement vocabulary trials. Characterized by high speed but poor coordination \u2014 the legs work against each other, producing backward displacement (dx=-2.67) with complex contact dynamics.",
     "weight_vector": [
-      0.760,
-      -0.730,
+      0.76,
+      -0.73,
       0.395,
-      0.850,
+      0.85,
       0.805,
-      0.230,
+      0.23,
       0.0,
       0.0,
       0.0,
@@ -2193,14 +2434,14 @@
         "predicate": "lt",
         "value": -1.5,
         "tolerance": 0.3,
-        "rationale": "Strong backward displacement (z=-3.03) is the most distinctive feature — the robot moves fast but in reverse."
+        "rationale": "Strong backward displacement (z=-3.03) is the most distinctive feature \u2014 the robot moves fast but in reverse."
       },
       {
         "feature": "phase_lock_score",
         "predicate": "lt",
         "value": 0.5,
         "tolerance": 0.1,
-        "rationale": "Low phase-lock (z=-2.56) indicates the legs are poorly coordinated — working asynchronously."
+        "rationale": "Low phase-lock (z=-2.56) indicates the legs are poorly coordinated \u2014 working asynchronously."
       },
       {
         "feature": "contact_entropy_bits",
@@ -2214,15 +2455,15 @@
         "predicate": "gt",
         "value": 0.3,
         "tolerance": 0.05,
-        "rationale": "High speed (z=1.97) despite poor coordination — energy is being expended but directed backward."
+        "rationale": "High speed (z=1.97) despite poor coordination \u2014 energy is being expended but directed backward."
       }
     ],
     "icm": {
       "name": "wobbler_icm",
       "background": [
-        "Speed without coordination produces reverse motion — the legs generate force but not in a consistent direction",
+        "Speed without coordination produces reverse motion \u2014 the legs generate force but not in a consistent direction",
         "High w03 (0.76) and w23 (0.81) mean both torso and front-leg sensors drive the back leg strongly, creating a front-heavy response pattern",
-        "Appears predominantly from high-energy concepts (dash, sprint, gallop, charge) — LLMs interpret 'fast' as 'high weights' which accidentally produces reverse locomotion"
+        "Appears predominantly from high-energy concepts (dash, sprint, gallop, charge) \u2014 LLMs interpret 'fast' as 'high weights' which accidentally produces reverse locomotion"
       ],
       "violation_conditions": [
         {
@@ -2230,14 +2471,14 @@
           "predicate": "gt",
           "value": 0.0,
           "tolerance": 0.0,
-          "rationale": "Forward displacement breaks the wobbler archetype — the defining feature is backward motion."
+          "rationale": "Forward displacement breaks the wobbler archetype \u2014 the defining feature is backward motion."
         },
         {
           "feature": "phase_lock_score",
           "predicate": "gt",
           "value": 0.7,
           "tolerance": 0.0,
-          "rationale": "Good coordination eliminates the wobble — becomes a coordinated backward walker instead."
+          "rationale": "Good coordination eliminates the wobble \u2014 becomes a coordinated backward walker instead."
         }
       ]
     },
@@ -2252,12 +2493,12 @@
       "movement_vocab: scurry (1 trial)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Paradoxical backward locomotion: LLMs interpret speed concepts by setting most weights high, but the combination of strong w03 (+0.76) and w04 (-0.73) — opposing signs for the torso sensor's drive to the two motors — creates antagonistic leg motion that propels the robot backward. This is a genuine LLM-specific behavioral mode: the semantic intent (fast forward) maps to the opposite kinematic outcome (fast backward), revealing a systematic failure mode of the Sem→Wt functor that nonetheless produces a reproducible, distinctive gait."
+    "conceptual_basis": "Paradoxical backward locomotion: LLMs interpret speed concepts by setting most weights high, but the combination of strong w03 (+0.76) and w04 (-0.73) \u2014 opposing signs for the torso sensor's drive to the two motors \u2014 creates antagonistic leg motion that propels the robot backward. This is a genuine LLM-specific behavioral mode: the semantic intent (fast forward) maps to the opposite kinematic outcome (fast backward), revealing a systematic failure mode of the Sem\u2192Wt functor that nonetheless produces a reproducible, distinctive gait."
   },
   {
     "name": "dasher",
     "type": "PersonaArchetype",
-    "description": "Fast, high-entropy gait with moderate coordination and minimal net yaw. Discovered via k-means clustering of 700 movement vocabulary trials. The most common non-collapse high-speed archetype (56 trials), characterized by energetic but directionless locomotion — fast movement without strong rotational or directional bias.",
+    "description": "Fast, high-entropy gait with moderate coordination and minimal net yaw. Discovered via k-means clustering of 700 movement vocabulary trials. The most common non-collapse high-speed archetype (56 trials), characterized by energetic but directionless locomotion \u2014 fast movement without strong rotational or directional bias.",
     "weight_vector": [
       -0.545,
       0.555,
@@ -2277,7 +2518,7 @@
         "predicate": "gt",
         "value": 0.35,
         "tolerance": 0.05,
-        "rationale": "Highest mean speed of all clusters (z=2.20) — this is the fastest non-rotational archetype."
+        "rationale": "Highest mean speed of all clusters (z=2.20) \u2014 this is the fastest non-rotational archetype."
       },
       {
         "feature": "contact_entropy_bits",
@@ -2291,15 +2532,15 @@
         "predicate": "lt",
         "value": 0.4,
         "tolerance": 0.05,
-        "rationale": "Low path straightness (0.33) — fast but not directed along any consistent heading."
+        "rationale": "Low path straightness (0.33) \u2014 fast but not directed along any consistent heading."
       }
     ],
     "icm": {
       "name": "dasher_icm",
       "background": [
         "Speed without directionality: the dasher is fast but wanders rather than traveling straight",
-        "Near-zero w13 (0.08) and w23 (-0.08) mean the back-leg and front-leg sensors barely influence the back motor — locomotion is driven primarily by w03/w04 (torso sensor) and w14/w24 (back-leg sensor to front motor)",
-        "Emerges from rotational movement concepts (twirl, pivot, turn_left, retreat) — LLMs interpret turning as asymmetric weights"
+        "Near-zero w13 (0.08) and w23 (-0.08) mean the back-leg and front-leg sensors barely influence the back motor \u2014 locomotion is driven primarily by w03/w04 (torso sensor) and w14/w24 (back-leg sensor to front motor)",
+        "Emerges from rotational movement concepts (twirl, pivot, turn_left, retreat) \u2014 LLMs interpret turning as asymmetric weights"
       ],
       "violation_conditions": [
         {
@@ -2307,14 +2548,14 @@
           "predicate": "lt",
           "value": 0.2,
           "tolerance": 0.0,
-          "rationale": "Slow movement breaks the dasher archetype — becomes a drifter or pacer."
+          "rationale": "Slow movement breaks the dasher archetype \u2014 becomes a drifter or pacer."
         },
         {
           "feature": "contact_entropy_bits",
           "predicate": "lt",
           "value": 0.3,
           "tolerance": 0.0,
-          "rationale": "Low contact entropy indicates static contact patterns — the dasher requires dynamic footfalls."
+          "rationale": "Low contact entropy indicates static contact patterns \u2014 the dasher requires dynamic footfalls."
         }
       ]
     },
@@ -2329,6 +2570,6 @@
       "movement_vocab: gallop (2 trials)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Undirected kinetic energy: the dasher embodies the LLM's interpretation of dynamic movement concepts (twirl, pivot, retreat) as weight configurations that produce speed without consistent heading. The near-zero sensor-to-back-motor weights (w13≈0, w23≈0) mean the back leg operates almost independently of touch feedback, while the front leg is strongly driven (w14=0.84), creating an asymmetric but energetic gait. Appears across zh (16 trials) and fr (16 trials) more than en (6) — suggesting Chinese and French LLM token semantics for rotational concepts map more reliably to this weight basin."
+    "conceptual_basis": "Undirected kinetic energy: the dasher embodies the LLM's interpretation of dynamic movement concepts (twirl, pivot, retreat) as weight configurations that produce speed without consistent heading. The near-zero sensor-to-back-motor weights (w13\u22480, w23\u22480) mean the back leg operates almost independently of touch feedback, while the front leg is strongly driven (w14=0.84), creating an asymmetric but energetic gait. Appears across zh (16 trials) and fr (16 trials) more than en (6) \u2014 suggesting Chinese and French LLM token semantics for rotational concepts map more reliably to this weight basin."
   }
 ]

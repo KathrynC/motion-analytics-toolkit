@@ -198,3 +198,112 @@ class TestDetectAll:
         for name, schema in schemas.items():
             assert isinstance(schema, ImageSchema)
             assert schema.name == name
+
+
+# ---------------------------------------------------------------------------
+# Schema → Feature pipeline integration tests
+# ---------------------------------------------------------------------------
+
+class TestSchemaFeaturePipeline:
+    """Tests that image schema metrics flow into extract_behavioral_features()."""
+
+    def test_schema_metrics_in_behavioral_features(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        # Prefixed schema metrics should be present
+        assert 'schema.PATH.straightness' in feats
+        assert 'schema.CYCLE.dominant_frequency' in feats
+        assert 'schema.CONTACT.contact_fraction' in feats
+        assert 'schema.BALANCE.lateral_sway' in feats
+        assert 'schema.FORCE.torque_asymmetry' in feats
+
+    def test_promoted_schema_metrics(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        promoted = [
+            'cycle_count', 'cycle_regularity', 'dominant_frequency',
+            'contact_fraction', 'contact_transitions',
+            'lateral_sway', 'vertical_oscillation', 'torque_asymmetry',
+        ]
+        for key in promoted:
+            assert key in feats, f"Missing promoted schema metric: {key}"
+
+    def test_schema_straightness_matches_canonical(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        # schema.PATH.straightness comes from ImageSchemaDetector
+        # 'straightness' comes from PathAnalyzer
+        # They should be very close (both compute path straightness)
+        assert abs(feats['schema.PATH.straightness'] - feats['straightness']) < 0.05
+
+    def test_all_schema_metrics_finite(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        for key, val in feats.items():
+            if key.startswith('schema.'):
+                assert np.isfinite(val), f"Schema metric {key} is not finite: {val}"
+
+
+# ---------------------------------------------------------------------------
+# Schema → Feature pipeline integration tests
+# ---------------------------------------------------------------------------
+
+class TestSchemaFeaturePipeline:
+    """Verify that image schemas are wired into extract_behavioral_features()."""
+
+    def test_schema_metrics_in_behavioral_features(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        expected_prefixed = [
+            'schema.PATH.straightness',
+            'schema.PATH.displacement',
+            'schema.PATH.path_length',
+            'schema.PATH.curvature_integral',
+            'schema.CYCLE.dominant_frequency',
+            'schema.CYCLE.cycle_count',
+            'schema.CYCLE.regularity',
+            'schema.CONTACT.contact_fraction',
+            'schema.CONTACT.contact_transitions',
+            'schema.CONTACT.contact_symmetry',
+            'schema.BALANCE.com_height_variance',
+            'schema.BALANCE.lateral_sway',
+            'schema.BALANCE.vertical_oscillation',
+            'schema.FORCE.peak_torque',
+            'schema.FORCE.mean_torque',
+            'schema.FORCE.torque_asymmetry',
+        ]
+        for key in expected_prefixed:
+            assert key in feats, f"Missing schema feature: {key}"
+
+    def test_promoted_schema_metrics(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        promoted = [
+            'cycle_count', 'cycle_regularity', 'dominant_frequency',
+            'contact_fraction', 'contact_transitions',
+            'lateral_sway', 'vertical_oscillation', 'torque_asymmetry',
+        ]
+        for key in promoted:
+            assert key in feats, f"Missing promoted schema feature: {key}"
+
+    def test_schema_straightness_matches_canonical(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        assert abs(feats['schema.PATH.straightness'] - feats['straightness']) < 1e-6
+
+    def test_all_schema_metrics_finite(self):
+        from motion_analytics.archetypes.base import extract_behavioral_features
+        tel = _make_telemetry()
+        feats = extract_behavioral_features(tel)
+        schema_keys = [k for k in feats if k.startswith('schema.')]
+        assert len(schema_keys) >= 15, f"Expected >=15 schema keys, got {len(schema_keys)}"
+        for key in schema_keys:
+            assert isinstance(feats[key], float), f"{key} is not float"
+            assert np.isfinite(feats[key]), f"{key} is not finite: {feats[key]}"

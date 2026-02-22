@@ -117,6 +117,45 @@ class TestSchemas:
         assert tel.sampling_rate == 240.0
 
 
+class TestTelemetryToArray:
+    def test_timestamp(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('timestamp')
+        assert arr.shape == (50,)
+        assert arr[0] == pytest.approx(0.0)
+
+    def test_com_position(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('com_position')
+        assert arr.shape == (50, 3)
+        assert arr[0, 0] == pytest.approx(0.0)
+
+    def test_com_velocity(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('com_velocity')
+        assert arr.shape == (50, 3)
+
+    def test_link_position(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('torso.position')
+        assert arr.shape == (50, 3)
+
+    def test_joint_angle(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('back_leg_joint.angle')
+        assert arr.shape == (50,)
+
+    def test_joint_torque(self):
+        tel = make_telemetry(50)
+        arr = tel.to_array('back_leg_joint.torque')
+        assert arr.shape == (50,)
+
+    def test_unknown_field_raises(self):
+        tel = make_telemetry(10)
+        with pytest.raises(KeyError, match='bogus'):
+            tel.to_array('bogus')
+
+
 # ---------------------------------------------------------------------------
 # Base analyzer tests
 # ---------------------------------------------------------------------------
