@@ -1,0 +1,1461 @@
+{
+  "schema_version": "1.0",
+  "source_file": "ludobots_archetypes.v1.json",
+  "total_archetypes": 48,
+  "feature_vector_labels": [
+    "straightness",
+    "curvature_complexity",
+    "workspace_volume",
+    "phase_lock",
+    "symmetry_index",
+    "duty_factor_asymmetry",
+    "flight_fraction",
+    "cost_of_transport",
+    "peak_power",
+    "efficiency"
+  ],
+  "feature_vector_ranges": {
+    "straightness": [
+      0.105475,
+      0.904904
+    ],
+    "curvature_complexity": [
+      0.0,
+      0.0
+    ],
+    "workspace_volume": [
+      0.0,
+      0.0
+    ],
+    "phase_lock": [
+      0.385025,
+      0.98862
+    ],
+    "symmetry_index": [
+      -96.828125,
+      73.064581
+    ],
+    "duty_factor_asymmetry": [
+      0.0005,
+      0.157125
+    ],
+    "flight_fraction": [
+      0.02625,
+      0.739375
+    ],
+    "cost_of_transport": [
+      3.039522,
+      355.368948
+    ],
+    "peak_power": [
+      0.0,
+      0.0
+    ],
+    "efficiency": [
+      0.014175,
+      0.116404
+    ]
+  },
+  "archetypes": [
+    {
+      "name": "power_strider",
+      "weight_vector": [
+        -0.3,
+        -1.0,
+        -0.3,
+        1.0,
+        0.3,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.689414,
+        0.0,
+        0.0,
+        0.385025,
+        27.054789,
+        0.045417,
+        0.694333,
+        15.501073,
+        0.0,
+        0.066797
+      ],
+      "source_gaits": [
+        "5_pelton",
+        "10_tesla_3phase",
+        "18_curie"
+      ],
+      "exemplar_gait": "5_pelton",
+      "grounding_criteria_count": 2,
+      "icm_name": "Propulsive Efficiency",
+      "description": "A high-speed gait with strong forward momentum and low duty factor asymmetry."
+    },
+    {
+      "name": "spinner",
+      "weight_vector": [
+        -0.5,
+        -0.7,
+        1.0,
+        0.5,
+        -0.7,
+        -0.7,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.105475,
+        0.0,
+        0.0,
+        0.545491,
+        -13.089957,
+        0.037,
+        0.739375,
+        355.368948,
+        0.0,
+        0.014175
+      ],
+      "source_gaits": [
+        "47_spinner_6synapse",
+        "46_spinner_crosswired",
+        "44_spinner_champion",
+        "45_spinner_stable"
+      ],
+      "exemplar_gait": "47_spinner_6synapse",
+      "grounding_criteria_count": 2,
+      "icm_name": "spinner_icm",
+      "description": "A gait that emphasizes rotational motion and spinning behavior."
+    },
+    {
+      "name": "crab_walker",
+      "weight_vector": [
+        -0.3,
+        -0.85,
+        -0.26,
+        0.85,
+        0.26,
+        0.85,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.705262,
+        0.0,
+        0.0,
+        0.435439,
+        6.038728,
+        0.018833,
+        0.589083,
+        14.166549,
+        0.0,
+        0.074403
+      ],
+      "source_gaits": [
+        "52_curie_crab",
+        "53_rucker_landcrab",
+        "55_skew_crab"
+      ],
+      "exemplar_gait": "52_curie_crab",
+      "grounding_criteria_count": 2,
+      "icm_name": "crab_walker_icm",
+      "description": "A gait that emphasizes lateral movement and sideways displacement."
+    },
+    {
+      "name": "cpg_oscillator",
+      "weight_vector": [
+        -0.7,
+        -0.5,
+        -0.3,
+        0.3,
+        0.5,
+        0.7,
+        0.3,
+        -0.5,
+        0.2,
+        -0.2
+      ],
+      "feature_vector": [
+        0.904212,
+        0.0,
+        0.0,
+        0.852219,
+        -31.86675,
+        0.063375,
+        0.3115,
+        4.342686,
+        0.0,
+        0.057568
+      ],
+      "source_gaits": [
+        "21_noether_cpg",
+        "5_bouncer"
+      ],
+      "exemplar_gait": "21_noether_cpg",
+      "grounding_criteria_count": 2,
+      "icm_name": "Rhythmic Oscillation",
+      "description": "A rhythmic gait characterized by consistent oscillation patterns with balanced symmetry and high phase locking."
+    },
+    {
+      "name": "drift_explorer",
+      "weight_vector": [
+        -0.7,
+        -0.7,
+        -0.7,
+        0.7,
+        0.7,
+        0.7,
+        0.15,
+        0,
+        0,
+        0
+      ],
+      "feature_vector": [
+        0.261717,
+        0.0,
+        0.0,
+        0.764298,
+        12.005853,
+        0.066,
+        0.02625,
+        151.655797,
+        0.0,
+        0.029437
+      ],
+      "source_gaits": [
+        "70_grunbaum_defect",
+        "85_foucault_panopticon"
+      ],
+      "exemplar_gait": "70_grunbaum_defect",
+      "grounding_criteria_count": 2,
+      "icm_name": "Spatial Exploration",
+      "description": "A gait that explores spatial boundaries with low path straightness and high curvature complexity."
+    },
+    {
+      "name": "chaotic_exploratory",
+      "weight_vector": [
+        0.3,
+        0.85,
+        0.26,
+        -0.85,
+        -0.26,
+        -0.85,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.551056,
+        0.0,
+        0.0,
+        0.707905,
+        -60.724234,
+        0.02725,
+        0.1755,
+        24.645366,
+        0.0,
+        0.040576
+      ],
+      "source_gaits": [
+        "76_dick_ubik",
+        "51_curie_spinner"
+      ],
+      "exemplar_gait": "76_dick_ubik",
+      "grounding_criteria_count": 2,
+      "icm_name": "chaotic_exploratory_icm",
+      "description": "A gait that exhibits unpredictable, non-repetitive motion with high entropy."
+    },
+    {
+      "name": "dead_inert",
+      "weight_vector": [
+        0.01,
+        -0.01,
+        0.01,
+        -0.01,
+        0.01,
+        -0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "feature_vector": [
+        0.887616,
+        0.0,
+        0.0,
+        0.98862,
+        0.100091,
+        0.0005,
+        0.350375,
+        11.106001,
+        0.0,
+        0.02251
+      ],
+      "source_gaits": [
+        "62_cage_433",
+        "7_fuller_dymaxion"
+      ],
+      "exemplar_gait": "62_cage_433",
+      "grounding_criteria_count": 2,
+      "icm_name": "dead_inert_icm",
+      "description": "A gait that shows minimal or no motion with low activity."
+    },
+    {
+      "name": "efficiency_optimizer",
+      "weight_vector": [
+        0.0,
+        1.0,
+        -1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.845981,
+        0.0,
+        0.0,
+        0.925588,
+        -18.691888,
+        0.072875,
+        0.11625,
+        3.039522,
+        0.0,
+        0.08225
+      ],
+      "source_gaits": [
+        "5_bouncer",
+        "93_borges_mirror"
+      ],
+      "exemplar_gait": "5_bouncer",
+      "grounding_criteria_count": 2,
+      "icm_name": "Energy Efficiency",
+      "description": "A gait that minimizes energy expenditure with low contact entropy and high phase locking."
+    },
+    {
+      "name": "dynamic_balancer",
+      "weight_vector": [
+        -0.5,
+        -0.8,
+        -0.5,
+        0.5,
+        0.8,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.671241,
+        0.0,
+        0.0,
+        0.896808,
+        -96.828125,
+        0.157125,
+        0.26475,
+        36.943283,
+        0.0,
+        0.075147
+      ],
+      "source_gaits": [
+        "80_deleuze_fold",
+        "1_original"
+      ],
+      "exemplar_gait": "80_deleuze_fold",
+      "grounding_criteria_count": 2,
+      "icm_name": "Stability Through Symmetry",
+      "description": "A gait that maintains balance through high symmetry and controlled speed variations."
+    },
+    {
+      "name": "temporal_dancer",
+      "weight_vector": [
+        -0.866,
+        -0.5,
+        0.0,
+        0.0,
+        0.5,
+        0.866,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.572944,
+        0.0,
+        0.0,
+        0.683208,
+        -40.671708,
+        0.03825,
+        0.691,
+        13.058917,
+        0.0,
+        0.077844
+      ],
+      "source_gaits": [
+        "10_tesla_3phase",
+        "15_noether",
+        "63_cage_prepared"
+      ],
+      "exemplar_gait": "10_tesla_3phase",
+      "grounding_criteria_count": 2,
+      "icm_name": "Rhythmic Variation",
+      "description": "A gait with high temporal complexity and variable speed, emphasizing rhythmic variation."
+    },
+    {
+      "name": "adaptive_walker",
+      "weight_vector": [
+        0.2516,
+        -1.4977,
+        -0.6411,
+        0.9733,
+        1.5825,
+        1.2083,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": [
+        0.904904,
+        0.0,
+        0.0,
+        0.497687,
+        73.064581,
+        0.111375,
+        0.704,
+        9.038583,
+        0.0,
+        0.116404
+      ],
+      "source_gaits": [
+        "56_evolved_crab_v2",
+        "58_evolved_crab_positive_v2"
+      ],
+      "exemplar_gait": "56_evolved_crab_v2",
+      "grounding_criteria_count": 2,
+      "icm_name": "Environmental Adaptation",
+      "description": "A gait that adapts to environmental constraints with variable speed and duty factor asymmetry."
+    },
+    {
+      "name": "heroic_stride",
+      "weight_vector": [
+        0.7,
+        0.4,
+        0.1,
+        -0.1,
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_verbs",
+        "oeis_sequences"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "balanced_symmetry",
+      "description": "A confident, purposeful gait with high symmetry and steady speed, often associated with protagonists."
+    },
+    {
+      "name": "villainous_shuffle",
+      "weight_vector": [
+        -0.6,
+        -0.3,
+        -0.2,
+        0.5,
+        -0.1,
+        0.3,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "dark_matter",
+        "oeis_sequences"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "asymmetric_displacement",
+      "description": "An erratic, asymmetrical walk with low phase locking and high variability in speed and direction."
+    },
+    {
+      "name": "rocking_motion",
+      "weight_vector": [
+        0.2,
+        0.5,
+        0.6,
+        -0.3,
+        0.4,
+        0.1,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "dark_matter",
+        "mathematicians"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "repetitive_oscillation",
+      "description": "A rhythmic, oscillating gait characterized by high curvature and repeated patterns, often associated with instability or introspection."
+    },
+    {
+      "name": "circular_wander",
+      "weight_vector": [
+        0.1,
+        -0.2,
+        -0.3,
+        0.4,
+        -0.1,
+        -0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "dark_matter",
+        "bible_passages"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "aimless_displacement",
+      "description": "A meandering, circular path with low straightness and high contact entropy, indicating aimless wandering or confusion."
+    },
+    {
+      "name": "mathematical_precision",
+      "weight_vector": [
+        0.4,
+        1.0,
+        -0.7,
+        -0.1,
+        0.7,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "oeis_sequences",
+        "mathematicians"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "ordered_structure",
+      "description": "A highly structured, ordered gait with minimal variation in speed and symmetry, reflecting mathematical or logical thinking."
+    },
+    {
+      "name": "divine_presence",
+      "weight_vector": [
+        0.8,
+        0.6,
+        0.5,
+        -0.2,
+        0.3,
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "bible_passages",
+        "motion_verbs"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "transcendent_motion",
+      "description": "A grand, expansive gait with high workspace volume and strong symmetry, often associated with divine or transcendent figures."
+    },
+    {
+      "name": "tragic_step",
+      "weight_vector": [
+        0.4,
+        0.7,
+        0.7,
+        -0.4,
+        0.7,
+        -0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_verbs",
+        "romeo_and_juliet"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "emotional_displacement",
+      "description": "A melancholic, slow-moving gait with high contact entropy and low symmetry, indicating sorrow or loss."
+    },
+    {
+      "name": "primal_rush",
+      "weight_vector": [
+        0.5,
+        0.3,
+        0.2,
+        -0.4,
+        0.6,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "dark_matter",
+        "motion_verbs"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "instinctive_motion",
+      "description": "A fast, aggressive gait with high speed and low symmetry, often associated with primal instincts or raw emotion."
+    },
+    {
+      "name": "the_interpolator",
+      "weight_vector": [
+        0.75,
+        0.85,
+        0.65,
+        -0.45,
+        -0.25,
+        -0.55,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "Dataset 7: Archetypes",
+        "Dataset 8: Super-gaits"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "adaptive_convergence",
+      "description": "An archetype representing smooth, adaptive movement patterns that bridge disparate states, characterized by high symmetry and controlled variability."
+    },
+    {
+      "name": "the_asymmetric_adapter",
+      "weight_vector": [
+        0.7,
+        0.2,
+        0.8,
+        -0.5,
+        0.6,
+        -0.3,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "Dataset 7: Archetypes",
+        "Dataset 8: Super-gaits"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "directional_adaptation",
+      "description": "An archetype that thrives in environments requiring asymmetric adaptation, balancing stability with responsiveness to directional changes."
+    },
+    {
+      "name": "super_gait",
+      "weight_vector": [
+        -0.939,
+        -0.385,
+        0.458,
+        -0.183,
+        0.137,
+        0.321,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "Interp Super (t=0.52)",
+        "Novelty Champion",
+        "w23-Half Variant"
+      ],
+      "exemplar_gait": "Interp Super (t=0.52)",
+      "grounding_criteria_count": 3,
+      "icm_name": "emergent_optimization",
+      "description": "Interpolation champion: extreme speed and displacement from weight-space midpoints between high-performers."
+    },
+    {
+      "name": "canceller",
+      "weight_vector": [
+        0.5,
+        -0.5,
+        0.3,
+        -0.3,
+        0.5,
+        -0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "dark_matter_cancellers"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "self_negation",
+      "description": "Opposing motor drives cancel out, producing near-zero net displacement despite active limb motion."
+    },
+    {
+      "name": "quantized_attractor",
+      "weight_vector": [
+        0.1,
+        0.4,
+        0.4,
+        -0.1,
+        0.4,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "character_seed_experiment (397 of 8000 trials)",
+        "motion_seed_experiment_v2 (1 trial)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "token_quantization_collapse",
+      "description": "Model collapse archetype: LLM output quantizes to a coarse grid {-0."
+    },
+    {
+      "name": "semantic_invariant",
+      "weight_vector": [
+        0.6,
+        0.2,
+        0.5,
+        -0.4,
+        -0.8,
+        -0.3,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "structured_random_places (87 of 100 trials)",
+        "structured_random_politics (50 of 100 trials)",
+        "structured_random_bible (44 of 100 trials)",
+        "structured_random_verbs (39 of 100 trials)",
+        "structured_random_theorems (12 of 100 trials)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "semantic_insensitivity_collapse",
+      "description": "Model collapse archetype: qwen3-coder:30b converges to the same weight vector [0."
+    },
+    {
+      "name": "gentle_ambler",
+      "weight_vector": [
+        0.6,
+        0.8,
+        0.4,
+        -0.5,
+        -0.7,
+        -0.3,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_seed: amble (4 trials, CV=0.27)",
+        "motion_seed: glide (21 trials, CV=0.51)",
+        "motion_seed: roam (4 trials, CV=0.39)",
+        "motion_seed: saunter (5 trials, CV=0.45)",
+        "motion_seed: drift (27 trials, CV=0.53)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "leisurely_locomotion",
+      "description": "Semantically grounded archetype: motion words for relaxed, unhurried locomotion (amble, glide, roam, saunter, drift) converge to moderate speed (~0."
+    },
+    {
+      "name": "agitated_scrambler",
+      "weight_vector": [
+        0.6,
+        0.6,
+        0.6,
+        -0.6,
+        -0.6,
+        -0.6,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_seed: bounce (21 trials)",
+        "motion_seed: hop (28 trials)",
+        "motion_seed: scurry (28 trials)",
+        "motion_seed: zigzag (28 trials)",
+        "motion_seed: sway (28 trials)",
+        "motion_seed: trot (4 trials)",
+        "motion_seed: sprint (29 trials)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "agitated_locomotion",
+      "description": "Semantically grounded archetype: motion words for energetic, irregular locomotion (bounce, hop, scurry, zigzag, sway, trot) converge to moderate speed (~1."
+    },
+    {
+      "name": "forceful_charger",
+      "weight_vector": [
+        0.7,
+        0.7,
+        0.0,
+        -0.7,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_seed: charge (28 trials)",
+        "motion_seed: gallop (29 trials)",
+        "motion_seed: drag (28 trials)",
+        "motion_seed: retreat (27 trials)",
+        "motion_seed: patrol (29 trials)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "directed_force",
+      "description": "Semantically grounded archetype: motion words for powerful, directed locomotion (charge, gallop, drag, retreat, patrol) converge to fast speed (~1."
+    },
+    {
+      "name": "cautious_creeper",
+      "weight_vector": [
+        0.6,
+        0.2,
+        0.2,
+        0.3,
+        -0.4,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_seed: forward_walk (22 trials, CV=0.45)",
+        "motion_seed: saunter (5 trials, CV=0.45)",
+        "motion_seed: waddle (4 trials, CV=0.28)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "cautious_locomotion",
+      "description": "Semantically grounded archetype: motion words for slow, careful locomotion (forward_walk, saunter, waddle) converge to slow speed (~0."
+    },
+    {
+      "name": "celebrity_launcher",
+      "weight_vector": [
+        0.76,
+        0.24,
+        -0.57,
+        -0.4,
+        0.7,
+        0.83,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "celebrities: Cleopatra [historical] (d=29.3m)",
+        "celebrities: Lionel Messi [sports] (d=32.1m)",
+        "celebrities: Mahatma Gandhi [historical] (d=31.3m)",
+        "celebrities: Meryl Streep [entertainment] (d=29.8m)",
+        "celebrities: Nancy Pelosi [us_politics] (d=29.7m)",
+        "celebrities: Paul Manafort [controversial] (d=34.9m)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "dynamic_persona_projection",
+      "description": "Semantically grounded archetype from celebrity data: a cross-category cluster where the LLM assigns high w24 values (>0."
+    },
+    {
+      "name": "celebrity_plodder",
+      "weight_vector": [
+        0.76,
+        0.86,
+        0.5,
+        -0.42,
+        -0.64,
+        -0.34,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "celebrities: Tom Brady [sports] (pl=0.981, ent=2.33)",
+        "celebrities: Michael Jordan [sports] (pl=0.999, ent=1.55)",
+        "celebrities: Steve Bannon [trump_admin] (pl=1.000, ent=0.69)",
+        "celebrities: Winston Churchill [historical] (pl=0.928, ent=1.21)",
+        "celebrities: Ted Cruz [us_politics] (pl=0.993, ent=1.53)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "stable_persona_projection",
+      "description": "Semantically grounded archetype from celebrity data: the LLM assigns high w13 (>0."
+    },
+    {
+      "name": "celebrity_wanderer",
+      "weight_vector": [
+        0.74,
+        0.24,
+        -0.54,
+        -0.45,
+        0.67,
+        0.12,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "celebrities: Peter Thiel [tech] (pl=0.318)",
+        "celebrities: Jack Dorsey [tech] (pl=0.320)",
+        "celebrities: Neil Gaiman [cultural] (pl=0.107)",
+        "celebrities: Mitt Romney [us_politics] (pl=0.106)",
+        "celebrities: Melania Trump [trump_family] (pl=0.200)",
+        "celebrities: Johnny Depp [entertainment] (pl=0.343)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "unconventional_persona_projection",
+      "description": "Semantically grounded archetype from celebrity data: the LLM assigns near-zero w13 to celebrities it perceives as 'unconventional/unpredictable', producing desynchronized gaits (phase lock <0."
+    },
+    {
+      "name": "theorem_combinatorial_walker",
+      "weight_vector": [
+        0.6,
+        0.2,
+        -0.4,
+        -0.6,
+        -0.2,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "theorems: Van der Waerden's Theorem (combinatorics)",
+        "theorems: Hales-Jewett Theorem (combinatorics)",
+        "theorems: Menger's Theorem (graph theory)",
+        "theorems: Ramsey's Theorem (combinatorics)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "combinatorial_convergence",
+      "description": "Semantically grounded archetype: Ramsey-theoretic combinatorics theorems (Van der Waerden, Hales-Jewett, Menger, Ramsey) all converge to identical weight vectors distinct from all collapse attractors."
+    },
+    {
+      "name": "oeis_recursive_oscillator",
+      "weight_vector": [
+        0.03,
+        0.7,
+        0.23,
+        0.23,
+        0.17,
+        0.13,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "OEIS: A000045 Fibonacci (N=4)",
+        "OEIS: A000032 Lucas (N=4)",
+        "OEIS: A000129 Pell (N=4)",
+        "OEIS: A000073 Tribonacci (N=4)",
+        "OEIS: A000931 Padovan (N=4)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "recursive_structure_resonance",
+      "description": "Semantically grounded archetype: OEIS recursive sequences (Fibonacci, Lucas, Pell, Tribonacci, Padovan) produce the highest phase lock among all mathematical families (0."
+    },
+    {
+      "name": "oeis_polynomial_strider",
+      "weight_vector": [
+        0.3,
+        0.5,
+        0.1,
+        0.0,
+        -0.2,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "OEIS: A000290 Squares (N=4)",
+        "OEIS: A000217 Triangular numbers (N=4)",
+        "OEIS: A000326 Pentagonal numbers (N=4)",
+        "OEIS: A000012 All 1's sequence (N=2)",
+        "OEIS: A002378 Oblong numbers (N=4)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "mathematical_simplicity_embodiment",
+      "description": "Semantically grounded archetype: OEIS polynomial sequences (2nd finite difference = 0, including squares, triangular numbers, pentagonal numbers) produce the straightest paths (0."
+    },
+    {
+      "name": "genre_heist_lockstep",
+      "weight_vector": [
+        -0.06,
+        0.33,
+        0.47,
+        -0.16,
+        0.43,
+        -0.09,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "character_seed: Money Heist (N=4, pl=0.947, speed=0.656)",
+        "character_seed: Ocean's 11 (N=3, pl=0.797, speed=0.716)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "precision_under_pressure",
+      "description": "Semantically grounded archetype from TV character data: heist thriller characters (Money Heist, Ocean's 11) produce the slowest mean speed (0."
+    },
+    {
+      "name": "character_wise_elder",
+      "weight_vector": [
+        -0.4,
+        0.7,
+        0.1,
+        -0.1,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "character_seed: Richard Webber [Grey's Anatomy] (llama3.1)",
+        "character_seed: Professor Oak [Pokemon] (llama3.1)",
+        "character_seed: Hawkeye Pierce [M*A*S*H] (llama3.1)",
+        "character_seed: Stan Rizzo [Mad Men] (llama3.1)",
+        "character_seed: Mr. Big [Sex and the City] (llama3.1)",
+        "character_seed: Dr. Aaron Glassman [The Good Doctor] (llama3.1)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "paternal_authority_projection",
+      "description": "Semantically grounded archetype from character-seed data: llama3."
+    },
+    {
+      "name": "oeis_divisor_chaotic",
+      "weight_vector": [
+        -0.2,
+        0.4,
+        -0.3,
+        0.1,
+        0.0,
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "OEIS: A000005 d(n) divisor function (N=4)",
+        "OEIS: A000203 sigma(n) sum-of-divisors (N=4)",
+        "OEIS: A005101 Abundant numbers (N=4)",
+        "OEIS: A005100 Deficient numbers (N=2)",
+        "OEIS: A001222 Big omega: prime factors with multiplicity (N=3)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 2,
+      "icm_name": "arithmetic_irregularity_embodiment",
+      "description": "Semantically grounded archetype: OEIS divisor-related sequences (d(n), sigma(n), abundant numbers, deficient numbers) produce the highest contact entropy (1."
+    },
+    {
+      "name": "yaw_spinner",
+      "weight_vector": [
+        -0.547,
+        0.672,
+        0.581,
+        0.581,
+        -0.356,
+        0.944,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "movement_vocab: dash (3 trials)",
+        "movement_vocab: twirl (3 trials)",
+        "movement_vocab: stomp (3 trials)",
+        "movement_vocab: scurry (3 trials)",
+        "movement_vocab: sprint (2 trials)",
+        "movement_vocab: sway (2 trials)",
+        "movement_vocab: stagger (2 trials)",
+        "movement_vocab: pivot (2 trials)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 4,
+      "icm_name": "yaw_spinner_icm",
+      "description": "High-speed rotational gait with strong negative yaw, high contact entropy, and forward displacement."
+    },
+    {
+      "name": "wobbler",
+      "weight_vector": [
+        0.76,
+        -0.73,
+        0.395,
+        0.85,
+        0.805,
+        0.23,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "movement_vocab: dash (5 trials)",
+        "movement_vocab: sprint (5 trials)",
+        "movement_vocab: gallop (3 trials)",
+        "movement_vocab: charge (2 trials)",
+        "movement_vocab: circle (1 trial)",
+        "movement_vocab: march (1 trial)",
+        "movement_vocab: stomp (1 trial)",
+        "movement_vocab: scurry (1 trial)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 4,
+      "icm_name": "wobbler_icm",
+      "description": "Fast backward-moving gait with low phase-lock coordination and high contact entropy."
+    },
+    {
+      "name": "dasher",
+      "weight_vector": [
+        -0.545,
+        0.555,
+        0.079,
+        0.839,
+        -0.075,
+        0.461,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "movement_vocab: twirl (6 trials)",
+        "movement_vocab: retreat (6 trials)",
+        "movement_vocab: scurry (4 trials)",
+        "movement_vocab: pivot (4 trials)",
+        "movement_vocab: turn_left (4 trials)",
+        "movement_vocab: zigzag (3 trials)",
+        "movement_vocab: drag (3 trials)",
+        "movement_vocab: gallop (2 trials)"
+      ],
+      "exemplar_gait": null,
+      "grounding_criteria_count": 3,
+      "icm_name": "dasher_icm",
+      "description": "Fast, high-entropy gait with moderate coordination and minimal net yaw."
+    },
+    {
+      "name": "hop",
+      "weight_vector": [
+        0.4,
+        -0.4,
+        0.4,
+        1.0,
+        1.0,
+        0.4,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_seed: hop (28 trials, CV=0.77)",
+        "motion_dictionary: hop (14 entries, 5 LLMs, 5 languages)",
+        "cross-reference: agitated_scrambler (parent cluster)"
+      ],
+      "exemplar_gait": "gpt-oss:20b hop trial #9: weights [0.7, -0.7, 0.4, 1.0, 1.0, 0.4], phase_lock=0.974",
+      "grounding_criteria_count": 3,
+      "icm_name": "bursty_aerial_locomotion",
+      "description": "Bursty ballistic gait: high speed variability (speed_cv ~1.86), near-zero contact entropy, high phase lock. Promoted from agitated_scrambler."
+    },
+    {
+      "name": "charging_gallop",
+      "weight_vector": [0.7, -0.7, 0.7, 0.4, 0.4, 0.7, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "motion_dictionary: Galopp [German] (dx=14.2, speed=1.53)",
+        "motion_dictionary: gallop (convergent trials, dx=-24.5, speed=2.39)",
+        "cross-reference: forceful_charger (parent)"
+      ],
+      "exemplar_gait": "gpt-4.1-mini Galopp: dx=14.2, speed=1.534, contact_entropy=2.026",
+      "grounding_criteria_count": 3,
+      "icm_name": "directed_gallop",
+      "description": "Forward-displacement gallop: fast, high contact entropy, ground-covering. The prototypical gallop mode."
+    },
+    {
+      "name": "tumbling_gallop",
+      "weight_vector": [0.8, -0.7, 0.6, -0.5, 0.9, -0.8, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "zoo: 5_gallop (tilt=242, chaotic/fallen)",
+        "motion_dictionary: gallop (reverse trials, phase_lock>0.95)",
+        "cross-reference: wobbler (behavioral overlap)"
+      ],
+      "exemplar_gait": "gpt-oss:20b gallop: dx=-7.99, phase_lock=0.989, torso_duty=0.585",
+      "grounding_criteria_count": 3,
+      "icm_name": "controlled_tumble",
+      "description": "Reverse-displacement gallop: tips backward, slides on torso with coordinated joints. A controlled failure mode."
+    },
+    {
+      "name": "drifting_gallop",
+      "weight_vector": [0.4, -0.4, 0.4, 0.7, 0.7, -0.4, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "movement_vocabulary: gallop drifter-cluster (13 trials)",
+        "motion_dictionary: gallop (wandering trials)",
+        "cross-reference: forceful_charger, charging_gallop, tumbling_gallop"
+      ],
+      "exemplar_gait": "movement_vocabulary best exemplar: speed=0.578, path_straightness=0.292",
+      "grounding_criteria_count": 3,
+      "icm_name": "undirected_gallop",
+      "description": "Wandering gallop: high energy (speed_cv ~1.82) but no directional coherence. The default LLM gallop mode."
+    },
+    {
+      "name": "pale_horse",
+      "weight_vector": [-0.8, 0.6, 0.2, -0.9, 0.5, -0.4, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "bible_passage: Revelation 6:8",
+        "495-gait pool displacement champion (DX=29.17m)"
+      ],
+      "exemplar_gait": "Revelation 6:8: dx=29.17, speed=3.11, work=15877, phase_lock=0.499",
+      "grounding_criteria_count": 3,
+      "icm_name": "asymmetric_juggernaut",
+      "description": "Displacement champion: DX=29.17m through brute asymmetric force. Death does not trot. It charges."
+    },
+    {
+      "name": "whirling_wind",
+      "weight_vector": [0.6, -0.5, -0.4, 0.8, 0.2, -0.9, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "bible_passage: Ecclesiastes 1:6",
+        "495-gait pool efficiency champion (0.00495)",
+        "triptych: pale_horse, conservation_law"
+      ],
+      "exemplar_gait": "Ecclesiastes 1:6: dx=-5.43, efficiency=0.00495, phase_lock=0.995, work=1096",
+      "grounding_criteria_count": 3,
+      "icm_name": "efficient_eternal_cycle",
+      "description": "Efficiency champion: phase_lock=0.995, lowest energy cost. The wind doesn't sprint. It persists."
+    },
+    {
+      "name": "conservation_law",
+      "weight_vector": [0.5, -0.5, 0.3, -0.3, 0.7, -0.7, 0.0, 0.0, 0.0, 0.0],
+      "feature_vector": null,
+      "source_gaits": [
+        "theorem: Noether's Theorem",
+        "495-gait pool deadest gait (DX=0.031m)",
+        "triptych: pale_horse, whirling_wind"
+      ],
+      "exemplar_gait": "Noether: dx=0.031, speed=0.61, work=9865, entropy=1.89",
+      "grounding_criteria_count": 3,
+      "icm_name": "dynamic_stasis",
+      "description": "Perfect cancellation: exact pairwise anti-symmetry conserves position. Thrashes vigorously, goes nowhere."
+    }
+  ],
+  "source_gait_overlaps": {
+    "10_tesla_3phase": [
+      "power_strider",
+      "temporal_dancer"
+    ],
+    "5_bouncer": [
+      "cpg_oscillator",
+      "efficiency_optimizer"
+    ],
+    "motion_verbs": [
+      "heroic_stride",
+      "divine_presence",
+      "tragic_step",
+      "primal_rush"
+    ],
+    "oeis_sequences": [
+      "heroic_stride",
+      "villainous_shuffle",
+      "mathematical_precision"
+    ],
+    "dark_matter": [
+      "villainous_shuffle",
+      "rocking_motion",
+      "circular_wander",
+      "primal_rush"
+    ],
+    "mathematicians": [
+      "rocking_motion",
+      "mathematical_precision"
+    ],
+    "bible_passages": [
+      "circular_wander",
+      "divine_presence"
+    ],
+    "Dataset 7: Archetypes": [
+      "the_interpolator",
+      "the_asymmetric_adapter"
+    ],
+    "Dataset 8: Super-gaits": [
+      "the_interpolator",
+      "the_asymmetric_adapter"
+    ],
+    "motion_seed: saunter (5 trials, CV=0.45)": [
+      "gentle_ambler",
+      "cautious_creeper"
+    ],
+    "gallop_family": [
+      "charging_gallop",
+      "tumbling_gallop",
+      "drifting_gallop"
+    ],
+    "5_gallop": [
+      "tumbling_gallop",
+      "forceful_charger"
+    ],
+    "triptych": [
+      "pale_horse",
+      "whirling_wind",
+      "conservation_law"
+    ]
+  },
+  "clusters": {
+    "2": [
+      "power_strider",
+      "crab_walker",
+      "cpg_oscillator",
+      "drift_explorer",
+      "dynamic_balancer",
+      "temporal_dancer",
+      "super_gait"
+    ],
+    "4": [
+      "spinner",
+      "dead_inert",
+      "villainous_shuffle",
+      "circular_wander",
+      "oeis_recursive_oscillator",
+      "character_wise_elder",
+      "oeis_divisor_chaotic",
+      "yaw_spinner",
+      "dasher"
+    ],
+    "3": [
+      "chaotic_exploratory",
+      "the_interpolator",
+      "semantic_invariant",
+      "gentle_ambler",
+      "agitated_scrambler",
+      "hop",
+      "drifting_gallop",
+      "celebrity_plodder"
+    ],
+    "6": [
+      "efficiency_optimizer",
+      "mathematical_precision",
+      "forceful_charger",
+      "charging_gallop",
+      "cautious_creeper",
+      "celebrity_launcher",
+      "celebrity_wanderer",
+      "theorem_combinatorial_walker",
+      "oeis_polynomial_strider"
+    ],
+    "1": [
+      "adaptive_walker",
+      "wobbler",
+      "tumbling_gallop"
+    ],
+    "5": [
+      "heroic_stride",
+      "rocking_motion",
+      "divine_presence",
+      "tragic_step",
+      "primal_rush",
+      "the_asymmetric_adapter",
+      "canceller",
+      "quantized_attractor",
+      "genre_heist_lockstep",
+      "pale_horse",
+      "whirling_wind",
+      "conservation_law"
+    ]
+  }
+}

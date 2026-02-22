@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Analytics Toolkit — Geological Cross-Section</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Sora', sans-serif;
+  }
+  #canvas-container {
+    position: relative;
+    width: 1200px;
+    height: 500px;
+  }
+  #save-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    background: rgba(16, 26, 50, 0.7);
+    border: 1px solid rgba(103, 139, 214, 0.3);
+    color: #6c7fa8;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    z-index: 10;
+    transition: all 0.2s;
+  }
+  #save-btn:hover {
+    background: rgba(16, 26, 50, 0.95);
+    color: #adc0e5;
+    border-color: rgba(103, 139, 214, 0.6);
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container">
+  <svg id="hero" width="1200" height="500"></svg>
+  <button id="save-btn">Save as PNG</button>
+</div>
+
+<script>
+(function() {
+  const W = 1200, H = 500;
+  const svg = d3.select("#hero")
+    .attr("xmlns", "http://www.w3.org/2000/svg")
+    .attr("viewBox", `0 0 ${W} ${H}`);
+
+  // ── Defs: gradients, filters, clip paths ──────────────────────────
+
+  const defs = svg.append("defs");
+
+  // Background radial gradient
+  const bgGrad = defs.append("radialGradient")
+    .attr("id", "bgGrad")
+    .attr("cx", "50%").attr("cy", "55%")
+    .attr("r", "60%");
+  bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "#101a32");
+  bgGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070c1b");
+
+  // Glow filter — cyan
+  const glowCyan = defs.append("filter")
+    .attr("id", "glowCyan")
+    .attr("x", "-50%").attr("y", "-50%")
+    .attr("width", "200%").attr("height", "200%");
+  glowCyan.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "3").attr("result", "blur");
+  glowCyan.append("feColorMatrix").attr("in", "blur").attr("type", "matrix")
+    .attr("values", "0 0 0 0 0.325  0 0 0 0 0.776  0 0 0 0 1  0 0 0 0.6 0").attr("result", "colorBlur");
+  const glowMerge = glowCyan.append("feMerge");
+  glowMerge.append("feMergeNode").attr("in", "colorBlur");
+  glowMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+  // Soft glow filter for stratum borders
+  const glowLine = defs.append("filter")
+    .attr("id", "glowLine")
+    .attr("x", "-5%").attr("y", "-200%")
+    .attr("width", "110%").attr("height", "500%");
+  glowLine.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "4");
+
+  // Glow for sky shapes
+  const glowSky = defs.append("filter")
+    .attr("id", "glowSky")
+    .attr("x", "-100%").attr("y", "-100%")
+    .attr("width", "300%").attr("height", "300%");
+  glowSky.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "1.5");
+
+  // Mountain peak gradient
+  const peakGrad = defs.append("linearGradient")
+    .attr("id", "peakGrad")
+    .attr("x1", "0").attr("y1", "0")
+    .attr("x2", "0").attr("y2", "1");
+  peakGrad.append("stop").attr("offset", "0%").attr("stop-color", "#101a32").attr("stop-opacity", 0.9);
+  peakGrad.append("stop").attr("offset", "50%").attr("stop-color", "#101a32").attr("stop-opacity", 0.4);
+  peakGrad.append("stop").attr("offset", "100%").attr("stop-color", "#101a32").attr("stop-opacity", 0.05);
+
+  // Archetype peak highlight gradient
+  const peakHighlight = defs.append("linearGradient")
+    .attr("id", "peakHighlight")
+    .attr("x1", "0").attr("y1", "0")
+    .attr("x2", "0").attr("y2", "1");
+  peakHighlight.append("stop").attr("offset", "0%").attr("stop-color", "#53c6ff").attr("stop-opacity", 0.12);
+  peakHighlight.append("stop").attr("offset", "40%").attr("stop-color", "#53c6ff").attr("stop-opacity", 0.03);
+  peakHighlight.append("stop").attr("offset", "100%").attr("stop-color", "#53c6ff").attr("stop-opacity", 0);
+
+  // Title text shadow
+  const textShadow = defs.append("filter")
+    .attr("id", "textShadow")
+    .attr("x", "-10%").attr("y", "-10%")
+    .attr("width", "120%").attr("height", "120%");
+  textShadow.append("feGaussianBlur").attr("in", "SourceAlpha").attr("stdDeviation", "6").attr("result", "shadow");
+  textShadow.append("feOffset").attr("in", "shadow").attr("dx", "0").attr("dy", "2").attr("result", "offsetShadow");
+  const tsMerge = textShadow.append("feMerge");
+  tsMerge.append("feMergeNode").attr("in", "offsetShadow");
+  tsMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+
+  // ── Background ────────────────────────────────────────────────────
+
+  svg.append("rect")
+    .attr("width", W).attr("height", H)
+    .attr("fill", "url(#bgGrad)");
+
+
+  // ── Stratum border lines ──────────────────────────────────────────
+
+  const stratumBorders = [120, 250, 400];
+  stratumBorders.forEach(y => {
+    // Blurred background line
+    svg.append("line")
+      .attr("x1", 0).attr("y1", y)
+      .attr("x2", W).attr("y2", y)
+      .attr("stroke", "#678bd6")
+      .attr("stroke-opacity", 0.08)
+      .attr("stroke-width", 2)
+      .attr("filter", "url(#glowLine)");
+    // Crisp thin line
+    svg.append("line")
+      .attr("x1", 0).attr("y1", y)
+      .attr("x2", W).attr("y2", y)
+      .attr("stroke", "#678bd6")
+      .attr("stroke-opacity", 0.1)
+      .attr("stroke-width", 0.5);
+  });
+
+
+  // ── Layer 1: Bedrock — Raw Telemetry (y 400-500) ──────────────────
+
+  const bedrock = svg.append("g").attr("class", "bedrock");
+
+  const waveConfigs = [
+    { freq: 0.008, amp: 18, phase: 0, yBase: 440, color: "#53c6ff", opacity: 0.18, strokeW: 1.8 },
+    { freq: 0.013, amp: 12, phase: 1.2, yBase: 455, color: "#77f0cb", opacity: 0.15, strokeW: 1.4 },
+    { freq: 0.006, amp: 22, phase: 2.5, yBase: 430, color: "#53c6ff", opacity: 0.12, strokeW: 2.2 },
+    { freq: 0.019, amp: 8, phase: 0.7, yBase: 468, color: "#77f0cb", opacity: 0.13, strokeW: 1.0 },
+    { freq: 0.011, amp: 14, phase: 3.8, yBase: 448, color: "#53c6ff", opacity: 0.10, strokeW: 1.6 },
+  ];
+
+  const lineGen = d3.line().curve(d3.curveBasis);
+
+  waveConfigs.forEach(cfg => {
+    const points = [];
+    for (let x = -10; x <= W + 10; x += 4) {
+      const y = cfg.yBase + Math.sin(x * cfg.freq + cfg.phase) * cfg.amp
+                          + Math.sin(x * cfg.freq * 1.7 + cfg.phase * 0.5) * cfg.amp * 0.3;
+      points.push([x, y]);
+    }
+    bedrock.append("path")
+      .attr("d", lineGen(points))
+      .attr("fill", "none")
+      .attr("stroke", cfg.color)
+      .attr("stroke-opacity", cfg.opacity)
+      .attr("stroke-width", cfg.strokeW);
+  });
+
+  // Subtle filled area under waves for depth
+  waveConfigs.slice(0, 2).forEach(cfg => {
+    const areaGen = d3.area()
+      .curve(d3.curveBasis)
+      .x(d => d[0])
+      .y0(H)
+      .y1(d => d[1]);
+    const pts = [];
+    for (let x = -10; x <= W + 10; x += 4) {
+      const y = cfg.yBase + Math.sin(x * cfg.freq + cfg.phase) * cfg.amp
+                          + Math.sin(x * cfg.freq * 1.7 + cfg.phase * 0.5) * cfg.amp * 0.3;
+      pts.push([x, y]);
+    }
+    bedrock.append("path")
+      .attr("d", areaGen(pts))
+      .attr("fill", cfg.color)
+      .attr("fill-opacity", 0.03);
+  });
+
+
+  // ── Layer 2: Image Schemas (y 250-400) ────────────────────────────
+
+  const schemas = svg.append("g").attr("class", "image-schemas");
+  const schemaY = 330;
+  const schemaSpacing = W / 6;
+  const schemaSize = 30; // half-size
+
+  const schemaSymbols = [
+    { name: "PATH", x: schemaSpacing * 1 },
+    { name: "CYCLE", x: schemaSpacing * 2 },
+    { name: "CONTACT", x: schemaSpacing * 3 },
+    { name: "BALANCE", x: schemaSpacing * 4 },
+    { name: "FORCE", x: schemaSpacing * 5 },
+  ];
+
+  // PATH: curved arrow/ribbon
+  function drawPath(g, cx, cy) {
+    const ribbonPts = [
+      [cx - 32, cy + 8],
+      [cx - 16, cy - 14],
+      [cx + 4, cy - 6],
+      [cx + 20, cy - 18],
+      [cx + 34, cy - 4],
+    ];
+    g.append("path")
+      .attr("d", d3.line().curve(d3.curveCatmullRom.alpha(0.5))(ribbonPts))
+      .attr("fill", "none")
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-width", 2.5)
+      .attr("stroke-linecap", "round")
+      .attr("filter", "url(#glowCyan)");
+    // Arrowhead
+    const lastPt = ribbonPts[ribbonPts.length - 1];
+    const prevPt = ribbonPts[ribbonPts.length - 2];
+    const angle = Math.atan2(lastPt[1] - prevPt[1], lastPt[0] - prevPt[0]);
+    const arrLen = 8;
+    g.append("polygon")
+      .attr("points", [
+        [lastPt[0], lastPt[1]],
+        [lastPt[0] - arrLen * Math.cos(angle - 0.4), lastPt[1] - arrLen * Math.sin(angle - 0.4)],
+        [lastPt[0] - arrLen * Math.cos(angle + 0.4), lastPt[1] - arrLen * Math.sin(angle + 0.4)],
+      ].map(p => p.join(",")).join(" "))
+      .attr("fill", "#53c6ff")
+      .attr("filter", "url(#glowCyan)");
+  }
+
+  // CYCLE: concentric rings
+  function drawCycle(g, cx, cy) {
+    [22, 15, 8].forEach((r, i) => {
+      g.append("circle")
+        .attr("cx", cx).attr("cy", cy)
+        .attr("r", r)
+        .attr("fill", "none")
+        .attr("stroke", "#53c6ff")
+        .attr("stroke-width", 1.5 - i * 0.3)
+        .attr("stroke-opacity", 1 - i * 0.2)
+        .attr("filter", "url(#glowCyan)");
+    });
+  }
+
+  // CONTACT: two interlocking sawtooth shapes
+  function drawContact(g, cx, cy) {
+    const toothW = 10, toothH = 8;
+    // Top teeth (pointing down)
+    let topPath = `M${cx - 28},${cy - 2}`;
+    for (let i = 0; i < 4; i++) {
+      const bx = cx - 28 + i * toothW * 1.5;
+      topPath += ` L${bx + toothW * 0.75},${cy + toothH - 2} L${bx + toothW * 1.5},${cy - 2}`;
+    }
+    g.append("path")
+      .attr("d", topPath)
+      .attr("fill", "none")
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-width", 2)
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("filter", "url(#glowCyan)");
+    // Bottom teeth (pointing up)
+    let botPath = `M${cx - 28 + toothW * 0.75},${cy + toothH + 4}`;
+    for (let i = 0; i < 3; i++) {
+      const bx = cx - 28 + toothW * 0.75 + i * toothW * 1.5;
+      botPath += ` L${bx + toothW * 0.75},${cy + 4} L${bx + toothW * 1.5},${cy + toothH + 4}`;
+    }
+    g.append("path")
+      .attr("d", botPath)
+      .attr("fill", "none")
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-width", 2)
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("filter", "url(#glowCyan)");
+  }
+
+  // BALANCE: fulcrum triangle with arms
+  function drawBalance(g, cx, cy) {
+    // Triangle fulcrum
+    g.append("polygon")
+      .attr("points", `${cx},${cy + 18} ${cx - 12},${cy + 30} ${cx + 12},${cy + 30}`)
+      .attr("fill", "none")
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-width", 2)
+      .attr("filter", "url(#glowCyan)");
+    // Balance beam
+    g.append("line")
+      .attr("x1", cx - 28).attr("y1", cy + 18)
+      .attr("x2", cx + 28).attr("y2", cy + 18)
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-width", 2)
+      .attr("filter", "url(#glowCyan)");
+    // Symmetric weights
+    [-1, 1].forEach(side => {
+      g.append("rect")
+        .attr("x", cx + side * 22 - 6).attr("y", cy + 6)
+        .attr("width", 12).attr("height", 12)
+        .attr("rx", 2)
+        .attr("fill", "none")
+        .attr("stroke", "#53c6ff")
+        .attr("stroke-width", 1.5)
+        .attr("filter", "url(#glowCyan)");
+    });
+  }
+
+  // FORCE: radiating arrows from center
+  function drawForce(g, cx, cy) {
+    const rays = 8;
+    for (let i = 0; i < rays; i++) {
+      const angle = (i / rays) * Math.PI * 2;
+      const innerR = 7, outerR = 24;
+      const x1 = cx + Math.cos(angle) * innerR;
+      const y1 = cy + Math.sin(angle) * innerR;
+      const x2 = cx + Math.cos(angle) * outerR;
+      const y2 = cy + Math.sin(angle) * outerR;
+      g.append("line")
+        .attr("x1", x1).attr("y1", y1)
+        .attr("x2", x2).attr("y2", y2)
+        .attr("stroke", "#53c6ff")
+        .attr("stroke-width", 1.8)
+        .attr("stroke-linecap", "round")
+        .attr("filter", "url(#glowCyan)");
+      // Small arrowhead
+      const aLen = 5;
+      const tipAngle1 = angle + 0.5;
+      const tipAngle2 = angle - 0.5;
+      g.append("polyline")
+        .attr("points", [
+          [x2 - aLen * Math.cos(tipAngle1), y2 - aLen * Math.sin(tipAngle1)],
+          [x2, y2],
+          [x2 - aLen * Math.cos(tipAngle2), y2 - aLen * Math.sin(tipAngle2)],
+        ].map(p => p.join(",")).join(" "))
+        .attr("fill", "none")
+        .attr("stroke", "#53c6ff")
+        .attr("stroke-width", 1.3)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round")
+        .attr("filter", "url(#glowCyan)");
+    }
+    // Center dot
+    g.append("circle")
+      .attr("cx", cx).attr("cy", cy)
+      .attr("r", 3)
+      .attr("fill", "#53c6ff")
+      .attr("filter", "url(#glowCyan)");
+  }
+
+  const drawFns = [drawPath, drawCycle, drawContact, drawBalance, drawForce];
+
+  schemaSymbols.forEach((s, i) => {
+    const g = schemas.append("g");
+    drawFns[i](g, s.x, schemaY - 10);
+    // Label
+    g.append("text")
+      .attr("x", s.x)
+      .attr("y", schemaY + 42)
+      .attr("text-anchor", "middle")
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", 10)
+      .attr("fill", "#53c6ff")
+      .attr("fill-opacity", 0.55)
+      .text(s.name);
+  });
+
+
+  // ── Layer 3: Archetypes — Mountain Peaks (y 120-250) ──────────────
+
+  const archetypes = svg.append("g").attr("class", "archetypes");
+
+  const peaks = [
+    { name: "deleuze_fold", cx: 250, peakY: 130, baseW: 200, label_dy: -8 },
+    { name: "borges_mirror", cx: 500, peakY: 155, baseW: 180, label_dy: -8 },
+    { name: "power_strider", cx: 740, peakY: 168, baseW: 160, label_dy: -8 },
+    { name: "spinner", cx: 960, peakY: 180, baseW: 140, label_dy: -8 },
+  ];
+
+  const baselineY = 250;
+
+  peaks.forEach(pk => {
+    // Build a smooth mountain curve
+    const pts = [];
+    const halfW = pk.baseW / 2;
+    const steps = 60;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps; // 0 to 1
+      const x = pk.cx - halfW + t * pk.baseW;
+      // Gaussian-like shape
+      const norm = (t - 0.5) * 2; // -1 to 1
+      const heightFactor = Math.exp(-norm * norm * 3);
+      const y = baselineY - (baselineY - pk.peakY) * heightFactor;
+      pts.push([x, y]);
+    }
+    // Close the path along the baseline
+    pts.push([pk.cx + halfW, baselineY]);
+    pts.push([pk.cx - halfW, baselineY]);
+
+    const areaPath = d3.line().curve(d3.curveBasis)(pts.slice(0, steps + 1));
+
+    // Fill shape
+    archetypes.append("path")
+      .attr("d", areaPath + ` L${pk.cx + halfW},${baselineY} L${pk.cx - halfW},${baselineY} Z`)
+      .attr("fill", "url(#peakGrad)");
+
+    // Highlight ridge line
+    archetypes.append("path")
+      .attr("d", areaPath)
+      .attr("fill", "none")
+      .attr("stroke", "#53c6ff")
+      .attr("stroke-opacity", 0.15)
+      .attr("stroke-width", 1);
+
+    // Inner glow fill
+    archetypes.append("path")
+      .attr("d", areaPath + ` L${pk.cx + halfW},${baselineY} L${pk.cx - halfW},${baselineY} Z`)
+      .attr("fill", "url(#peakHighlight)");
+
+    // Peak label
+    archetypes.append("text")
+      .attr("x", pk.cx)
+      .attr("y", pk.peakY + pk.label_dy)
+      .attr("text-anchor", "middle")
+      .attr("font-family", "'Sora', sans-serif")
+      .attr("font-size", 10)
+      .attr("font-weight", 600)
+      .attr("fill", "#adc0e5")
+      .attr("fill-opacity", 0.55)
+      .text(pk.name);
+  });
+
+
+  // ── Layer 4: Sky — SystemViz Vocabulary (y 0-120) ─────────────────
+
+  const sky = svg.append("g").attr("class", "sky");
+
+  function drawDriver(g, x, y, s) {
+    // Lightning bolt outline
+    g.append("polygon")
+      .attr("points", [
+        [x - s * 0.3, y - s],
+        [x + s * 0.5, y - s * 0.1],
+        [x, y],
+        [x + s * 0.3, y + s],
+        [x - s * 0.5, y + s * 0.1],
+        [x, y],
+      ].map(p => p.join(",")).join(" "))
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+  }
+
+  function drawSignal(g, x, y, s) {
+    // Diamond
+    g.append("polygon")
+      .attr("points", `${x},${y - s} ${x + s * 0.7},${y} ${x},${y + s} ${x - s * 0.7},${y}`)
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+  }
+
+  function drawState(g, x, y, s) {
+    g.append("circle")
+      .attr("cx", x).attr("cy", y).attr("r", s * 0.7)
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+  }
+
+  function drawBoundary(g, x, y, s) {
+    g.append("rect")
+      .attr("x", x - s * 0.7).attr("y", y - s * 0.5)
+      .attr("width", s * 1.4).attr("height", s)
+      .attr("rx", 1)
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8)
+      .attr("stroke-dasharray", "2,2");
+  }
+
+  function drawRelation(g, x, y, s) {
+    // Two overlapping circles
+    g.append("circle")
+      .attr("cx", x - s * 0.3).attr("cy", y).attr("r", s * 0.55)
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+    g.append("circle")
+      .attr("cx", x + s * 0.3).attr("cy", y).attr("r", s * 0.55)
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+  }
+
+  function drawDomain(g, x, y, s) {
+    // Hexagon
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 - Math.PI / 6;
+      pts.push([x + Math.cos(a) * s * 0.7, y + Math.sin(a) * s * 0.7]);
+    }
+    g.append("polygon")
+      .attr("points", pts.map(p => p.join(",")).join(" "))
+      .attr("fill", "none")
+      .attr("stroke", "#adc0e5")
+      .attr("stroke-opacity", 0.3)
+      .attr("stroke-width", 0.8);
+  }
+
+  const skyDrawFns = [drawDriver, drawSignal, drawState, drawBoundary, drawRelation, drawDomain];
+
+  // Deterministic pseudo-random positions
+  function seededRandom(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return s / 2147483647;
+    };
+  }
+  const rng = seededRandom(42);
+
+  for (let i = 0; i < 18; i++) {
+    const x = 40 + rng() * (W - 80);
+    const y = 12 + rng() * 96;
+    const size = 5 + rng() * 6;
+    const fnIdx = Math.floor(rng() * skyDrawFns.length);
+    const g = sky.append("g").attr("filter", "url(#glowSky)");
+    skyDrawFns[fnIdx](g, x, y, size);
+  }
+
+
+  // ── Vertical connectors (faint dotted lines connecting layers) ────
+
+  const connectors = svg.append("g").attr("class", "connectors");
+  schemaSymbols.forEach(s => {
+    // From schema up to archetype region
+    connectors.append("line")
+      .attr("x1", s.x).attr("y1", schemaY - 40)
+      .attr("x2", s.x).attr("y2", 250)
+      .attr("stroke", "#678bd6")
+      .attr("stroke-opacity", 0.06)
+      .attr("stroke-width", 0.5)
+      .attr("stroke-dasharray", "3,6");
+    // From schema down to bedrock
+    connectors.append("line")
+      .attr("x1", s.x).attr("y1", schemaY + 50)
+      .attr("x2", s.x).attr("y2", 400)
+      .attr("stroke", "#678bd6")
+      .attr("stroke-opacity", 0.06)
+      .attr("stroke-width", 0.5)
+      .attr("stroke-dasharray", "3,6");
+  });
+
+
+  // ── Stratum labels (right edge) ───────────────────────────────────
+
+  const stratumLabels = [
+    { label: "SYSTEMVIZ", y: 60 },
+    { label: "ARCHETYPES", y: 185 },
+    { label: "IMAGE SCHEMAS", y: 325 },
+    { label: "RAW TELEMETRY", y: 450 },
+  ];
+
+  stratumLabels.forEach(sl => {
+    svg.append("text")
+      .attr("x", W - 18)
+      .attr("y", sl.y)
+      .attr("text-anchor", "end")
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", 8)
+      .attr("letter-spacing", "2px")
+      .attr("fill", "#678bd6")
+      .attr("fill-opacity", 0.25)
+      .text(sl.label);
+  });
+
+
+  // ── Title overlay ─────────────────────────────────────────────────
+
+  const title = svg.append("g").attr("class", "title");
+
+  title.append("text")
+    .attr("x", 40)
+    .attr("y", 46)
+    .attr("font-family", "'Sora', sans-serif")
+    .attr("font-size", 36)
+    .attr("font-weight", 700)
+    .attr("fill", "#eaf2ff")
+    .attr("filter", "url(#textShadow)")
+    .text("Motion Analytics Toolkit");
+
+  title.append("text")
+    .attr("x", 42)
+    .attr("y", 68)
+    .attr("font-family", "'IBM Plex Sans', sans-serif")
+    .attr("font-size", 14)
+    .attr("font-weight", 400)
+    .attr("fill", "#6c7fa8")
+    .text("Lakoff Grounding \u00B7 Image Schemas \u00B7 Wolfram CA \u00B7 SystemViz");
+
+
+  // ── Save as PNG ───────────────────────────────────────────────────
+
+  document.getElementById("save-btn").addEventListener("click", function() {
+    const svgEl = document.getElementById("hero");
+    const serializer = new XMLSerializer();
+    let svgStr = serializer.serializeToString(svgEl);
+
+    // Inline the fonts by embedding them as style
+    const fontCSS = `
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;600;700&display=swap');
+    `;
+    svgStr = svgStr.replace("<defs>", `<defs><style>${fontCSS}</style>`);
+
+    const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = W * 2;   // 2x for retina
+      canvas.height = H * 2;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function(pngBlob) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(pngBlob);
+        a.download = "motion_analytics_geological_cross_section.png";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, "image/png");
+    };
+    img.src = url;
+  });
+
+})();
+</script>
+
+</body>
+</html>

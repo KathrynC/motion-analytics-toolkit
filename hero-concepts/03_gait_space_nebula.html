@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gait Space Nebula — Motion Analytics Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  #nebula-container {
+    position: relative;
+    width: 1200px;
+    height: 500px;
+  }
+  svg { display: block; }
+  #save-btn {
+    margin-top: 18px;
+    padding: 8px 22px;
+    background: transparent;
+    border: 1px solid #6c7fa8;
+    color: #6c7fa8;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  #save-btn:hover {
+    background: #6c7fa820;
+    color: #adc0e5;
+    border-color: #adc0e5;
+  }
+</style>
+</head>
+<body>
+
+<div id="nebula-container"></div>
+<button id="save-btn">Save as PNG</button>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 1200, H = 500;
+
+  // --- Seeded PRNG (LCG) ---
+  function lcg(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      return (s >>> 0) / 0x100000000;
+    };
+  }
+  const rng = lcg(42);
+
+  // --- Cluster definitions ---
+  const clusters = [
+    { id: "power_striders", label: "Power Striders", cx: 200, cy: 110, n: 18, color: "#53c6ff", spread: 55 },
+    { id: "spinners",       label: "Spinners",       cx: 900, cy: 100, n: 15, color: "#77f0cb", spread: 50 },
+    { id: "crab_walkers",   label: "Crab Walkers",   cx: 880, cy: 290, n: 12, color: "#f5dd78", spread: 45 },
+    { id: "deleuze_fold",   label: "Deleuze Fold",   cx: 560, cy: 240, n: 20, color: "#eaf2ff", spread: 65 },
+    { id: "borges_mirror",  label: "Borges Mirror",  cx: 250, cy: 370, n: 16, color: "#ff7ea6", spread: 50 },
+    { id: "drifters",       label: "Drifters",       cx: 580, cy: 400, n: 14, color: "#ffa278", spread: 55 },
+    { id: "uncategorized",  label: "Uncategorized",  cx: 600, cy: 250, n: 21, color: "#6c7fa8", spread: 200 }
+  ];
+
+  // --- Generate points ---
+  const allPoints = [];
+  clusters.forEach(cl => {
+    for (let i = 0; i < cl.n; i++) {
+      // Box-Muller transform using our seeded RNG
+      const u1 = Math.max(1e-10, rng());
+      const u2 = rng();
+      const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+      let px = cl.cx + z0 * cl.spread;
+      let py = cl.cy + z1 * cl.spread * 0.6;
+      // Clamp within bounds with margin
+      px = Math.max(40, Math.min(W - 140, px));
+      py = Math.max(30, Math.min(H - 30, py));
+      const fitness = 0.3 + rng() * 0.7;
+      allPoints.push({
+        x: px, y: py,
+        fitness: fitness,
+        r: 2.5 + fitness * 1.5,
+        cluster: cl.id,
+        color: cl.color,
+        clusterIdx: clusters.indexOf(cl)
+      });
+    }
+  });
+
+  // --- Compute intra-cluster edges (nearest 1-2 neighbors) ---
+  const edges = [];
+  clusters.forEach(cl => {
+    const pts = allPoints.filter(p => p.cluster === cl.id);
+    pts.forEach(p => {
+      // Sort other cluster members by distance
+      const others = pts.filter(q => q !== p).map(q => ({
+        q,
+        dist: Math.hypot(p.x - q.x, p.y - q.y)
+      })).sort((a, b) => a.dist - b.dist);
+      // Connect to 1 or 2 nearest (randomly pick 1 or 2)
+      const k = rng() < 0.45 ? 1 : 2;
+      for (let i = 0; i < Math.min(k, others.length); i++) {
+        if (others[i].dist < 120) {
+          // Avoid duplicate edges
+          const existing = edges.find(e =>
+            (e.source === p && e.target === others[i].q) ||
+            (e.source === others[i].q && e.target === p)
+          );
+          if (!existing) {
+            edges.push({ source: p, target: others[i].q });
+          }
+        }
+      }
+    });
+  });
+
+  // --- SVG setup ---
+  const svg = d3.select("#nebula-container")
+    .append("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg")
+    .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+    .attr("width", W)
+    .attr("height", H)
+    .attr("viewBox", `0 0 ${W} ${H}`);
+
+  const defs = svg.append("defs");
+
+  // --- SVG Filters ---
+  // Point glow
+  const pointGlow = defs.append("filter")
+    .attr("id", "point-glow")
+    .attr("x", "-200%").attr("y", "-200%")
+    .attr("width", "500%").attr("height", "500%");
+  pointGlow.append("feGaussianBlur")
+    .attr("in", "SourceGraphic")
+    .attr("stdDeviation", "3")
+    .attr("result", "blur");
+  const pointMerge = pointGlow.append("feMerge");
+  pointMerge.append("feMergeNode").attr("in", "blur");
+  pointMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+  // Strong glow for robot
+  const robotGlow = defs.append("filter")
+    .attr("id", "robot-glow")
+    .attr("x", "-300%").attr("y", "-300%")
+    .attr("width", "700%").attr("height", "700%");
+  robotGlow.append("feGaussianBlur")
+    .attr("in", "SourceGraphic")
+    .attr("stdDeviation", "5")
+    .attr("result", "blur1");
+  robotGlow.append("feGaussianBlur")
+    .attr("in", "SourceGraphic")
+    .attr("stdDeviation", "2")
+    .attr("result", "blur2");
+  const robotMerge = robotGlow.append("feMerge");
+  robotMerge.append("feMergeNode").attr("in", "blur1");
+  robotMerge.append("feMergeNode").attr("in", "blur2");
+  robotMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+  // --- Radial gradients for cluster halos ---
+  clusters.filter(c => c.id !== "uncategorized").forEach(cl => {
+    const grad = defs.append("radialGradient")
+      .attr("id", `halo-${cl.id}`)
+      .attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
+    grad.append("stop").attr("offset", "0%").attr("stop-color", cl.color).attr("stop-opacity", 0.12);
+    grad.append("stop").attr("offset", "60%").attr("stop-color", cl.color).attr("stop-opacity", 0.05);
+    grad.append("stop").attr("offset", "100%").attr("stop-color", cl.color).attr("stop-opacity", 0);
+  });
+
+  // --- Background radial gradient ---
+  const bgGrad = defs.append("radialGradient")
+    .attr("id", "bg-radial")
+    .attr("cx", "50%").attr("cy", "50%").attr("r", "55%");
+  bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "#0e1530").attr("stop-opacity", 1);
+  bgGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070c1b").attr("stop-opacity", 1);
+
+  // --- Draw background ---
+  svg.append("rect")
+    .attr("width", W).attr("height", H)
+    .attr("fill", "#070c1b");
+
+  svg.append("rect")
+    .attr("width", W).attr("height", H)
+    .attr("fill", "url(#bg-radial)");
+
+  // --- Background noise texture ---
+  const noiseGroup = svg.append("g").attr("class", "noise");
+  const noiseRng = lcg(137);
+  for (let i = 0; i < 1800; i++) {
+    const nx = noiseRng() * W;
+    const ny = noiseRng() * H;
+    const nr = 0.3 + noiseRng() * 0.7;
+    const nop = 0.01 + noiseRng() * 0.015;
+    noiseGroup.append("circle")
+      .attr("cx", nx).attr("cy", ny)
+      .attr("r", nr)
+      .attr("fill", "#adc0e5")
+      .attr("opacity", nop);
+  }
+
+  // --- Cluster halos (nebula clouds) ---
+  const haloGroup = svg.append("g").attr("class", "halos");
+  clusters.filter(c => c.id !== "uncategorized").forEach(cl => {
+    // Compute actual cluster centroid
+    const pts = allPoints.filter(p => p.cluster === cl.id);
+    const meanX = d3.mean(pts, p => p.x);
+    const meanY = d3.mean(pts, p => p.y);
+    const haloR = cl.id === "deleuze_fold" ? 85 : 60 + rng() * 20;
+    haloGroup.append("circle")
+      .attr("cx", meanX).attr("cy", meanY)
+      .attr("r", haloR)
+      .attr("fill", `url(#halo-${cl.id})`);
+    // Second softer, larger halo
+    haloGroup.append("circle")
+      .attr("cx", meanX + (rng() - 0.5) * 15)
+      .attr("cy", meanY + (rng() - 0.5) * 10)
+      .attr("r", haloR * 1.4)
+      .attr("fill", `url(#halo-${cl.id})`)
+      .attr("opacity", 0.5);
+  });
+
+  // --- Edges (Pattern DAG) ---
+  const edgeGroup = svg.append("g").attr("class", "edges");
+  edges.forEach(e => {
+    edgeGroup.append("line")
+      .attr("x1", e.source.x).attr("y1", e.source.y)
+      .attr("x2", e.target.x).attr("y2", e.target.y)
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 0.3)
+      .attr("stroke-opacity", 0.08);
+  });
+
+  // --- Gait points ---
+  const pointGroup = svg.append("g").attr("class", "points");
+  allPoints.forEach(p => {
+    pointGroup.append("circle")
+      .attr("cx", p.x).attr("cy", p.y)
+      .attr("r", p.r)
+      .attr("fill", p.color)
+      .attr("opacity", p.cluster === "uncategorized" ? 0.4 : 0.85)
+      .attr("filter", "url(#point-glow)");
+  });
+
+  // --- 3-Link Robot Silhouette ---
+  const robotGroup = svg.append("g")
+    .attr("class", "robot")
+    .attr("filter", "url(#robot-glow)");
+
+  const robotX = 100, robotY = 250;
+  const robotColor = "#53c6ff";
+
+  // Torso (central rectangle)
+  robotGroup.append("rect")
+    .attr("x", robotX - 6).attr("y", robotY - 18)
+    .attr("width", 12).attr("height", 28)
+    .attr("rx", 2)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.95);
+
+  // Left leg (upper)
+  robotGroup.append("rect")
+    .attr("x", robotX - 5).attr("y", robotY + 10)
+    .attr("width", 6).attr("height", 18)
+    .attr("rx", 1.5)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.9)
+    .attr("transform", `rotate(-20, ${robotX - 2}, ${robotY + 10})`);
+
+  // Left leg (lower)
+  robotGroup.append("rect")
+    .attr("x", robotX - 12).attr("y", robotY + 25)
+    .attr("width", 5).attr("height", 14)
+    .attr("rx", 1.5)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.85)
+    .attr("transform", `rotate(10, ${robotX - 10}, ${robotY + 25})`);
+
+  // Right leg (upper)
+  robotGroup.append("rect")
+    .attr("x", robotX + 1).attr("y", robotY + 10)
+    .attr("width", 6).attr("height", 18)
+    .attr("rx", 1.5)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.9)
+    .attr("transform", `rotate(15, ${robotX + 4}, ${robotY + 10})`);
+
+  // Right leg (lower)
+  robotGroup.append("rect")
+    .attr("x", robotX + 8).attr("y", robotY + 24)
+    .attr("width", 5).attr("height", 14)
+    .attr("rx", 1.5)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.85)
+    .attr("transform", `rotate(-5, ${robotX + 10}, ${robotY + 24})`);
+
+  // Head dot
+  robotGroup.append("circle")
+    .attr("cx", robotX).attr("cy", robotY - 23)
+    .attr("r", 5)
+    .attr("fill", robotColor)
+    .attr("opacity", 0.95);
+
+  // --- Annotation lines from robot ---
+  const annotations = [
+    { label: "PATH: dx=0.19",     tx: 280, ty: 140, color: "#adc0e5" },
+    { label: "CYCLE: 2.1 Hz",     tx: 320, ty: 340, color: "#adc0e5" },
+    { label: "BALANCE: \u03C3=0.003", tx: 200, ty: 420, color: "#adc0e5" }
+  ];
+
+  const annoGroup = svg.append("g").attr("class", "annotations");
+  annotations.forEach(a => {
+    annoGroup.append("line")
+      .attr("x1", robotX + 10).attr("y1", robotY)
+      .attr("x2", a.tx).attr("y2", a.ty)
+      .attr("stroke", a.color)
+      .attr("stroke-width", 0.7)
+      .attr("stroke-opacity", 0.4)
+      .attr("stroke-dasharray", "4,3");
+
+    // Small terminal dot
+    annoGroup.append("circle")
+      .attr("cx", a.tx).attr("cy", a.ty)
+      .attr("r", 2)
+      .attr("fill", a.color)
+      .attr("opacity", 0.5);
+
+    annoGroup.append("text")
+      .attr("x", a.tx + 8).attr("y", a.ty + 3)
+      .attr("fill", a.color)
+      .attr("opacity", 0.65)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "9px")
+      .text(a.label);
+  });
+
+  // Fourth annotation
+  annoGroup.append("line")
+    .attr("x1", robotX + 8).attr("y1", robotY - 10)
+    .attr("x2", 400).attr("y2", 230)
+    .attr("stroke", "#adc0e5")
+    .attr("stroke-width", 0.7)
+    .attr("stroke-opacity", 0.4)
+    .attr("stroke-dasharray", "4,3");
+
+  annoGroup.append("circle")
+    .attr("cx", 400).attr("cy", 230)
+    .attr("r", 2)
+    .attr("fill", "#adc0e5")
+    .attr("opacity", 0.5);
+
+  annoGroup.append("text")
+    .attr("x", 408).attr("y", 233)
+    .attr("fill", "#adc0e5")
+    .attr("opacity", 0.65)
+    .attr("font-family", "'IBM Plex Mono', monospace")
+    .attr("font-size", "9px")
+    .text("ENERGY: 0.84 J/m");
+
+  // --- Title block (top-right) ---
+  const titleGroup = svg.append("g").attr("class", "title");
+
+  titleGroup.append("text")
+    .attr("x", W - 40).attr("y", 48)
+    .attr("text-anchor", "end")
+    .attr("fill", "#eaf2ff")
+    .attr("font-family", "'Sora', sans-serif")
+    .attr("font-weight", 700)
+    .attr("font-size", "34px")
+    .attr("letter-spacing", "-0.5px")
+    .text("Motion Analytics Toolkit");
+
+  titleGroup.append("text")
+    .attr("x", W - 40).attr("y", 70)
+    .attr("text-anchor", "end")
+    .attr("fill", "#6c7fa8")
+    .attr("font-family", "'IBM Plex Sans', sans-serif")
+    .attr("font-weight", 400)
+    .attr("font-size", "12px")
+    .attr("letter-spacing", "0.5px")
+    .text("116 Gaits \u00B7 41 Archetypes \u00B7 Behavioral Feature Space");
+
+  // --- Save as PNG ---
+  document.getElementById("save-btn").addEventListener("click", function() {
+    const svgEl = document.querySelector("svg");
+    const serializer = new XMLSerializer();
+    let svgString = serializer.serializeToString(svgEl);
+
+    // Embed fonts inline for export
+    const fontCSS = `
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700&family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400&display=swap');
+    `;
+    svgString = svgString.replace('<svg ',
+      `<svg style="font-family: 'IBM Plex Sans', sans-serif;" `);
+
+    // Create a canvas at 2x for retina
+    const scale = 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = W * scale;
+    canvas.height = H * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    const img = new Image();
+    const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    img.onload = function() {
+      ctx.fillStyle = "#070c1b";
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+
+      const a = document.createElement("a");
+      a.download = "gait_space_nebula.png";
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+    };
+    img.src = url;
+  });
+
+})();
+</script>
+</body>
+</html>

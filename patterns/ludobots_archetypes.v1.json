@@ -1653,7 +1653,7 @@
       "motion_seed: sprint (29 trials)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Semantic coherence: 'agitated movement' concepts converge behaviorally, producing high-entropy, high-yaw gaits that contrast sharply with the gentle_ambler cluster."
+    "conceptual_basis": "Semantic coherence: 'agitated movement' concepts converge behaviorally, producing high-entropy, high-yaw gaits that contrast sharply with the gentle_ambler cluster. Note: 'hop' has been promoted to its own archetype (bursty_aerial_locomotion ICM) while remaining a constituent of this family — its low-entropy, high-phase-lock signature distinguishes it from the other agitated concepts."
   },
   {
     "name": "forceful_charger",
@@ -1713,7 +1713,7 @@
       "motion_seed: patrol (29 trials)"
     ],
     "exemplar_gait": null,
-    "conceptual_basis": "Semantic coherence: 'forceful directed movement' concepts converge to fast, high-displacement gaits, demonstrating that the Sem->Wt functor maps semantic intensity to kinematic intensity."
+    "conceptual_basis": "Semantic coherence: 'forceful directed movement' concepts converge to fast, high-displacement gaits, demonstrating that the Sem->Wt functor maps semantic intensity to kinematic intensity. Note: gallop has been split into three sub-archetypes (charging_gallop, tumbling_gallop, drifting_gallop) capturing its distinct behavioral modes while remaining a constituent of this family."
   },
   {
     "name": "cautious_creeper",
@@ -2571,5 +2571,530 @@
     ],
     "exemplar_gait": null,
     "conceptual_basis": "Undirected kinetic energy: the dasher embodies the LLM's interpretation of dynamic movement concepts (twirl, pivot, retreat) as weight configurations that produce speed without consistent heading. The near-zero sensor-to-back-motor weights (w13\u22480, w23\u22480) mean the back leg operates almost independently of touch feedback, while the front leg is strongly driven (w14=0.84), creating an asymmetric but energetic gait. Appears across zh (16 trials) and fr (16 trials) more than en (6) \u2014 suggesting Chinese and French LLM token semantics for rotational concepts map more reliably to this weight basin."
+  },
+  {
+    "name": "hop",
+    "type": "PersonaArchetype",
+    "description": "Promoted from agitated_scrambler: 'hop' produces a distinctive bursty locomotion mode characterized by extremely high speed variability (speed_cv ~1.86), high phase lock (~0.91), and near-zero contact entropy (~0.10). The robot executes coordinated joint oscillations that intermittently launch it off the ground, producing bursts of motion interspersed with stillness. Unlike other agitated_scrambler constituents (scurry, zigzag, sway), hop trials converge on minimal ground contact and low net displacement despite high instantaneous speeds. 28 trials across 5 LLMs, 5 languages, plus 14 motion dictionary entries.",
+    "weight_vector": [
+      0.4,
+      -0.4,
+      0.4,
+      1.0,
+      1.0,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.2,
+        "rationale": "Hop's defining signature is bursty motion: mean speed_cv of 1.86 across 24 trials, far above the zoo median (~0.9). The robot alternates between explosive bursts and near-stillness."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "lt",
+        "value": 0.3,
+        "tolerance": 0.1,
+        "rationale": "Despite high speed variability, hop trials have remarkably low contact entropy (mean 0.10), indicating a stereotyped contact pattern — usually airborne or in a single contact state."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.1,
+        "rationale": "High phase lock (mean 0.91) shows the joints are tightly coordinated during hop — the burstiness comes from the gait's interaction with the ground, not from incoherent neural control."
+      }
+    ],
+    "icm": {
+      "name": "bursty_aerial_locomotion",
+      "background": [
+        "Hopping is a ballistic gait: the organism launches itself, travels through a brief aerial phase, lands, and repeats. This distinguishes it from continuous gaits (walk, trot) and from erratic gaits (zigzag, scurry).",
+        "The 3-link Ludobot realizes hopping as coordinated joint oscillations (high phase lock) that intermittently break ground contact (low contact entropy), producing extreme speed variability (high speed_cv).",
+        "Cross-model agreement for hop is 0.768 — lower than crawl (0.85+) but above random — indicating partial but real semantic convergence. The concept is noisier than walk or crawl because 'hop' admits more interpretation: a bunny hop, a quick skip, a standing jump.",
+        "Promoted from agitated_scrambler to capture this distinct behavioral mode. Hop remains a constituent of that family but its bursty-aerial signature warrants independent archetype status."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "speed_cv",
+          "predicate": "lt",
+          "value": 0.8,
+          "tolerance": 0.1,
+          "rationale": "Smooth, continuous motion contradicts the bursty character of hopping. A speed_cv below 0.8 indicates steady locomotion, not hop."
+        },
+        {
+          "feature": "contact_entropy_bits",
+          "predicate": "gt",
+          "value": 1.5,
+          "tolerance": 0.1,
+          "rationale": "High contact entropy indicates complex, multi-state footfall patterns — this is scurrying or scrambling, not hopping."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_seed: hop (28 trials, CV=0.77, cross-model agreement=0.768)",
+      "motion_dictionary: hop (14 entries across deepseek-r1:8b, gpt-4.1-mini, gpt-oss:20b, llama3.1, qwen3-coder:30b)",
+      "motion_dictionary: hyppia [Finnish] (2 entries)",
+      "motion_dictionary: sautiller [French] (1 entry)",
+      "motion_dictionary: Hupfer [German] (1 entry)",
+      "cross-reference: agitated_scrambler (parent cluster)"
+    ],
+    "exemplar_gait": "gpt-oss:20b hop trial #9: weights [0.7, -0.7, 0.4, 1.0, 1.0, 0.4], phase_lock=0.974, contact_entropy=0.003, speed_cv=1.995, dx=3.52",
+    "conceptual_basis": "Ballistic locomotion: 'hop' is the only motion concept in the vocabulary that converges on the bursty-aerial behavioral mode (high speed_cv + low contact entropy + high phase lock). While it shares the agitated_scrambler family's energetic character, its stereotyped contact pattern and tight joint coordination distinguish it from the erratic footfall patterns of scurry, zigzag, and sway. The promotion follows Lakoff's prototype theory: hop is a distinct prototype within the broader 'agitated movement' radial category."
+  },
+  {
+    "name": "charging_gallop",
+    "type": "PersonaArchetype",
+    "description": "The forward-displacement mode of gallop: the robot covers ground with high speed, complex footfall patterns (high contact entropy), and moderate torso involvement. This is the 'intended' gallop — rhythmic, powerful, ground-covering. Most clearly produced by German 'Galopp' (gpt-4.1-mini: dx=14.2, speed=1.53) and by gpt-oss:20b/qwen3-coder:30b convergent trials (dx=-24.5, speed=2.39). Distinguished from forceful_charger by higher contact entropy and torso duty — the body is involved in the gait, not just the legs.",
+    "weight_vector": [
+      0.7,
+      -0.7,
+      0.7,
+      0.4,
+      0.4,
+      0.7,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 1.0,
+        "tolerance": 0.2,
+        "rationale": "Charging gallop is fast: mean speed 1.53 (German Galopp) to 2.39 (convergent en/fr trials). Below 1.0 is too slow for a gallop."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 1.4,
+        "tolerance": 0.2,
+        "rationale": "High contact entropy (mean 1.82 across forward-gallop trials) distinguishes gallop from walk or trot — the footfall pattern cycles through many contact states, reflecting the asymmetric limb timing of a true gallop."
+      },
+      {
+        "feature": "displacement",
+        "predicate": "gt",
+        "value": 8.0,
+        "tolerance": 2.0,
+        "rationale": "Charging gallop covers ground: displacement ranges from 8.0 to 24.5m in forward-mode trials. Under 8m is drifting, not charging."
+      }
+    ],
+    "icm": {
+      "name": "directed_gallop",
+      "background": [
+        "In biological locomotion, a gallop is an asymmetric gait where the footfalls of the two sides are offset in time, producing a bounding, body-involved rhythm distinct from the symmetric alternation of a trot.",
+        "The 3-link Ludobot realizes this as high contact entropy (many contact states visited per cycle) with high speed and substantial displacement. The torso participates in the gait — torso duty > 0.25 in most trials — unlike cleaner gaits where only the legs touch ground.",
+        "The charging gallop cluster captures trials where this energetic, body-involved rhythm produces net forward progress. It is the prototype of the gallop radial category — what you'd expect 'gallop' to mean.",
+        "Most reliably produced by German 'Galopp' (de-en cosine only 0.584, reflecting that German LLMs interpret the concept differently, but the German interpretation is actually the most gallop-like behaviorally)."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.1,
+          "rationale": "A gallop that barely moves is not a gallop. Below 0.5 mean speed indicates stationary rocking or stalling."
+        },
+        {
+          "feature": "contact_entropy_bits",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.1,
+          "rationale": "Low contact entropy means a simple, stereotyped contact pattern — this is a walk or a hop, not a gallop."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_dictionary: Galopp [German] gpt-4.1-mini (dx=14.2, speed=1.53, contact_entropy=2.03)",
+      "motion_dictionary: gallop gpt-oss:20b trial #2 (dx=-24.5, speed=2.39, contact_entropy=1.72)",
+      "motion_dictionary: galop [French] qwen3-coder:30b (dx=-24.5, speed=2.39, same convergent weights)",
+      "motion_dictionary: gallop deepseek-r1:8b (dx=-0.02, speed=1.50, contact_entropy=1.70)",
+      "movement_vocabulary: gallop forward-displacement cluster (~8 trials)",
+      "cross-reference: forceful_charger (parent archetype, 29 gallop trials)"
+    ],
+    "exemplar_gait": "gpt-4.1-mini Galopp (German): weights [0.7, -0.7, 0.7, 0.4, 0.4, 0.7], dx=14.2, speed=1.534, contact_entropy=2.026, torso_duty=0.384",
+    "conceptual_basis": "The charging gallop is the prototypical gallop: fast, ground-covering, body-involved, with complex footfall rhythms. It is most reliably produced by the German word 'Galopp', suggesting that the German LLM token carries stronger biomechanical connotations than English 'gallop'. This is the only gallop mode that resembles biological galloping — asymmetric, powerful, forward."
+  },
+  {
+    "name": "tumbling_gallop",
+    "type": "PersonaArchetype",
+    "description": "The reverse-displacement, body-contact mode of gallop: the robot 'gallops' so energetically that it tips backward, sliding on its torso with high phase lock. Torso duty > 0.5 in most trials — the body becomes the primary contact surface. High phase lock (>0.95) shows the joints remain tightly coordinated even as the robot falls — it's not a crash, it's a controlled tumble. The zoo gait 5_gallop exemplifies this mode (tilt=242 deg, chaotic/fallen attractor).",
+    "weight_vector": [
+      0.8,
+      -0.7,
+      0.6,
+      -0.5,
+      0.9,
+      -0.8,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.95,
+        "tolerance": 0.03,
+        "rationale": "Tumbling gallop has extremely high phase lock (mean 0.984 across cluster): the joints stay coordinated even as the robot tips over. This distinguishes it from chaotic falls."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 1.2,
+        "tolerance": 0.2,
+        "rationale": "Moderate-to-high contact entropy (mean 1.51) reflects transitions between leg contact, torso contact, and airborne states during the tumble."
+      },
+      {
+        "feature": "duty_factor_asymmetry",
+        "predicate": "gt",
+        "value": 0.3,
+        "tolerance": 0.1,
+        "rationale": "High duty factor asymmetry distinguishes the tumbling gallop from balanced gaits. One leg drags or lifts while the torso bears weight."
+      }
+    ],
+    "icm": {
+      "name": "controlled_tumble",
+      "background": [
+        "The tumbling gallop is a failure mode that is also a gait: the robot's neural controller produces a gallop-like rhythm (high phase lock, near-antiphase joints), but the resulting dynamics tip the body past vertical.",
+        "Rather than collapsing, the robot enters a stable tumbling attractor — sliding backward on its torso while the legs continue their coordinated oscillation. The zoo gait 5_gallop achieves 242-degree tilt with a chaotic/fallen attractor type.",
+        "This mode appears when LLMs interpret 'gallop' as maximum-amplitude oscillation: weights near ±1.0 produce joint excursions that exceed the robot's stability envelope. The controller doesn't know it has fallen — it continues galloping.",
+        "Behaviorally distinct from the wobbler archetype (which has LOW phase lock). The tumbling gallop maintains coordination; the wobbler does not."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.7,
+          "tolerance": 0.1,
+          "rationale": "Low phase lock indicates uncoordinated motion — this is wobbling or crashing, not a controlled tumble."
+        }
+      ]
+    },
+    "source_gaits": [
+      "zoo: 5_gallop (weights [0.5, -1.0, 1.0, -0.5, 1.0, -1.0], dx=-4.44, tilt=242, chaotic/fallen)",
+      "motion_dictionary: gallop gpt-4.1-mini/en (dx=-2.27, phase_lock=0.978, torso_duty=0.683)",
+      "motion_dictionary: gallop gpt-oss:20b/en trial #1 (dx=-7.99, phase_lock=0.989, torso_duty=0.585)",
+      "motion_dictionary: gallop llama3.1/en (dx=-6.43, phase_lock=0.653, torso_duty=0.596)",
+      "movement_vocabulary: gallop wobbler-cluster (3 trials)",
+      "cross-reference: wobbler (behavioral overlap), forceful_charger (semantic parent)"
+    ],
+    "exemplar_gait": "gpt-oss:20b gallop trial #1: weights [0.8, -0.7, 0.6, -0.5, 0.9, -0.8], dx=-7.99, phase_lock=0.989, contact_entropy=1.412, torso_duty=0.585",
+    "conceptual_basis": "The tumbling gallop is a 'beautiful failure': the controller faithfully executes a gallop rhythm but the dynamics carry the body past its stability boundary. It is the robotic analogue of an animal tripping at full gallop and rolling — except this robot stabilizes into the roll. The high phase lock distinguishes it from the wobbler (which is an uncoordinated failure). The zoo's 5_gallop sits on a yaw powder-keg (sensitivity 9166) — changing w24 by 0.1 can convert this tumble into a half-rotation spin."
+  },
+  {
+    "name": "drifting_gallop",
+    "type": "PersonaArchetype",
+    "description": "The wandering, low-straightness mode of gallop: the largest behavioral cluster (13 of 25 movement vocabulary trials). The robot produces gallop-like energy (high speed_cv, roll-dominant dynamics) but without directional coherence — it meanders, curves, and doubles back. Low path straightness (~0.25), low heading consistency (~0.20), and high roll dominance (~0.77) characterize this mode. It is a gallop that has forgotten where it was going.",
+    "weight_vector": [
+      0.4,
+      -0.4,
+      0.4,
+      0.7,
+      0.7,
+      -0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.3,
+        "tolerance": 0.05,
+        "rationale": "Low path straightness (mean 0.247) is the defining feature: the robot covers distance but not in any consistent direction. Distinguishes from charging_gallop (which goes somewhere)."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.3,
+        "rationale": "High speed variability (mean 1.82) confirms this is still a gallop — bursty, rhythmic energy — not a slow amble. The burstiness without direction produces the wandering trajectory."
+      },
+      {
+        "feature": "heading_consistency",
+        "predicate": "lt",
+        "value": 0.25,
+        "tolerance": 0.05,
+        "rationale": "Low heading consistency (mean 0.198) confirms the robot frequently changes direction. Compare to charging_gallop which maintains heading."
+      }
+    ],
+    "icm": {
+      "name": "undirected_gallop",
+      "background": [
+        "The drifting gallop is what happens when gallop energy meets no directional bias in the weight vector: the robot oscillates vigorously (high speed_cv) but the oscillations don't sum to net displacement in any consistent direction.",
+        "This is the most common gallop mode — 13 of 25 movement vocabulary trials land here. It suggests that the default LLM interpretation of 'gallop' captures the energetic quality but not the directional quality of biological galloping.",
+        "Roll dominance is highest in this cluster (0.766), meaning the robot's primary axis of rotation is roll rather than yaw. It rocks side to side while drifting, producing a characteristic meandering path.",
+        "Behaviorally adjacent to the drifter cluster in the movement vocabulary k-means but distinguished by higher speed_cv (1.82 vs ~1.2 for generic drifters). The gallop energy is real; only the direction is missing."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "path_straightness",
+          "predicate": "gt",
+          "value": 0.6,
+          "tolerance": 0.1,
+          "rationale": "A straight path means the gallop has direction — this is a charging_gallop, not a drifting one."
+        },
+        {
+          "feature": "speed_cv",
+          "predicate": "lt",
+          "value": 0.8,
+          "tolerance": 0.1,
+          "rationale": "Smooth, steady motion is an amble or walk, not a gallop of any kind."
+        }
+      ]
+    },
+    "source_gaits": [
+      "movement_vocabulary: gallop drifter-cluster (13 trials, largest single cluster)",
+      "motion_dictionary: gallop qwen3-coder:30b/en (dx=3.52, speed=0.822, path_straightness low, contact_entropy=1.15)",
+      "motion_dictionary: gallop Hupfer [German] gpt-oss:20b (dx=4.96, speed=1.22, path_straightness low)",
+      "movement_vocabulary: gallop dasher-cluster (2 trials, high-entropy wandering)",
+      "cross-reference: forceful_charger (semantic parent), charging_gallop (directional sibling), tumbling_gallop (failure sibling)"
+    ],
+    "exemplar_gait": "movement_vocabulary best exemplar (gpt-oss:20b/de): mean_speed=0.578, dx=-2.569, phase_lock=0.639, contact_entropy=0.764, path_straightness=0.292",
+    "conceptual_basis": "The drifting gallop reveals that LLMs reliably translate 'gallop' into energetic weight vectors (high speed_cv) but unreliably into directional ones (low path_straightness). This is the default gallop mode — the semantic functor preserves the 'energy' component of gallop semantics but loses the 'direction' component. In Lakoff's terms, the drifting gallop is the radial category's most generic member: it has gallop's kinetic character without gallop's goal-directedness."
+  },
+  {
+    "name": "pale_horse",
+    "type": "PersonaArchetype",
+    "description": "The displacement champion of the entire 495-gait pool. Derived from Revelation 6:8 ('And I looked, and behold a pale horse: and his name that sat on him was Death'). The LLM read Death on a pale horse and produced a weight vector that maximizes displacement through brute asymmetric force. DX = +29.17m, speed = 3.11, work proxy = 15,877, phase lock only 0.499. Every sensor drives its two motors with opposite signs — anti-phase throughout but with unequal magnitudes. The strongest connection (-0.9, sensor 1 → front motor) creates asymmetric combat: one leg always overpowering the other, never in balance, always driving forward. There is no subtlety in this gait. There is no efficiency. There is only forward motion, and a great deal of it. The horse does not trot. It charges.",
+    "weight_vector": [
+      -0.8,
+      0.6,
+      0.2,
+      -0.9,
+      0.5,
+      -0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "displacement",
+        "predicate": "gt",
+        "value": 25.0,
+        "tolerance": 3.0,
+        "rationale": "The pale horse is defined by extreme displacement: 29.17m, the highest of 495 gaits. Anything under 25m is merely fast, not the pale horse."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 2.5,
+        "tolerance": 0.3,
+        "rationale": "Speed of 3.11 is in the top percentile of all gaits. The pale horse moves with relentless velocity — power given unto Death over the fourth part of the earth."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "between",
+        "value": 0.35,
+        "tolerance": 0.65,
+        "rationale": "Phase lock of 0.499 is precisely at the midpoint — neither coordinated nor chaotic, but locked in asymmetric combat. The limbs fight each other and forward motion emerges from the conflict."
+      }
+    ],
+    "icm": {
+      "name": "asymmetric_juggernaut",
+      "background": [
+        "The pale horse occupies a unique region of behavioral space: maximum displacement through uncoordinated asymmetric force. No other archetype combines extreme speed (3.11), extreme displacement (29.17m), and middling phase lock (0.499).",
+        "The weight vector [-0.8, +0.6, +0.2, -0.9, +0.5, -0.4] has every sensor driving its two motors with opposite signs. This is not symmetric cancellation (like the canceller archetype) but asymmetric combat — the magnitudes differ, so one leg always overpowers the other.",
+        "The strongest single connection is w14 = -0.9 (back leg sensor → front motor, inhibitory). This creates a feedback loop where back leg contact suppresses front leg motion, producing a lunging, asymmetric gait that devours ground.",
+        "The biblical source text is significant: Revelation 6:8 describes Death riding forth with absolute, unstoppable forward momentum. The LLM translated this semantic content — relentless, irresistible forward motion — into a weight vector that achieves exactly that. This is the most literal successful semantic-to-kinematic mapping in the entire corpus.",
+        "Nearest weight-vector neighbor is character_wise_elder (cosine 0.767), which shares the [-,+,+,-,+,-] sign pattern but at lower magnitudes. Nearest behavioral neighbor is power_strider (similar cost of transport ~15-16), but power_strider achieves displacement through a completely different weight strategy (cosine -0.578, nearly opposite). The pale horse is behaviorally convergent with power_strider but structurally divergent — two different solutions to the same optimization problem."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "displacement",
+          "predicate": "lt",
+          "value": 10.0,
+          "tolerance": 2.0,
+          "rationale": "A pale horse that covers less than 10m has failed to embody Death's unstoppable advance. This is a different gait wearing the wrong name."
+        },
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 1.0,
+          "tolerance": 0.2,
+          "rationale": "Death does not saunter. A slow pale horse violates the fundamental metaphor."
+        }
+      ]
+    },
+    "source_gaits": [
+      "bible_passage: Revelation 6:8 ('And I looked, and behold a pale horse: and his name that sat on him was Death')",
+      "495-gait pool displacement champion (DX = +29.17m)",
+      "cross-reference: power_strider (behavioral convergent, structural divergent, cosine -0.578)",
+      "cross-reference: character_wise_elder (nearest weight-vector neighbor, cosine 0.767)",
+      "cross-reference: adaptive_walker (nearest phase_lock match, 0.498 vs 0.499)"
+    ],
+    "exemplar_gait": "Revelation 6:8 mapping: weights [-0.8, 0.6, 0.2, -0.9, 0.5, -0.4], dx=29.17, speed=3.11, work_proxy=15877, phase_lock=0.499",
+    "conceptual_basis": "The pale horse is the single most successful semantic-to-kinematic mapping in the corpus: the LLM read a text about unstoppable forward motion and produced the weight vector that achieves the highest displacement of any gait ever simulated. The asymmetric anti-phase structure — every sensor-motor pair fighting its counterpart at unequal magnitudes — produces forward motion not through coordination but through conflict. In Lakoff's terms, the source domain (Death's relentless advance) maps onto the target domain (3-link robot locomotion) with perfect fidelity: the conceptual metaphor FORWARD MOTION IS CONQUEST is grounded in the physics of asymmetric neural combat. The pale horse does not share its behavioral basin with any existing archetype. It stands alone. Member of the Triptych (Revelation, Ecclesiastes, Noether): three gaits from the same anti-phase sign family, separated only by magnitude balance, spanning the full behavioral range from maximum displacement to maximum efficiency to perfect stasis."
+  },
+  {
+    "name": "whirling_wind",
+    "type": "PersonaArchetype",
+    "description": "The efficiency champion of the entire 495-gait pool. Derived from Ecclesiastes 1:6 ('The wind goeth toward the south, and turneth about unto the north; it whirleth about continually'). The same anti-phase sign pattern as the pale horse but with signs reversed and magnitudes redistributed. Where the pale horse burns 15,877 units of work for 29m, the wind burns 1,096 for 5.4m — nearly twice the distance-per-work. Phase lock is 0.995, near-perfect periodicity. The wind doesn't sprint. It persists. The LLM read a verse about eternal cyclic motion and produced a gait that cycles with 99.5% phase lock and the lowest energy cost at its displacement class.",
+    "weight_vector": [
+      0.6,
+      -0.5,
+      -0.4,
+      0.8,
+      0.2,
+      -0.9,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.99,
+        "tolerance": 0.005,
+        "rationale": "The whirling wind is defined by near-perfect periodicity: phase lock 0.995, the highest in the 495-gait pool. The wind whirleth about continually — this is locomotion as eternal cycle."
+      },
+      {
+        "feature": "efficiency",
+        "predicate": "gt",
+        "value": 0.004,
+        "tolerance": 0.001,
+        "rationale": "Efficiency of 0.00495 is the highest in the pool. The wind achieves displacement with minimal work — not through raw power but through perfectly periodic oscillation that wastes nothing."
+      },
+      {
+        "feature": "cost_of_transport",
+        "predicate": "lt",
+        "value": 5.0,
+        "tolerance": 1.0,
+        "rationale": "Low cost of transport (work/displacement) distinguishes the wind from brute-force locomotion. Compare to the pale horse whose cost of transport is ~545."
+      }
+    ],
+    "icm": {
+      "name": "efficient_eternal_cycle",
+      "background": [
+        "The whirling wind occupies the opposite behavioral extreme from the pale horse: where Death maximizes displacement through brute asymmetric force, the Wind maximizes efficiency through perfect periodicity.",
+        "Phase lock of 0.995 means the two joints maintain near-perfect phase relationship across the entire simulation. This is the robotic realization of Ecclesiastes' 'whirleth about continually' — motion that repeats with 99.5% fidelity.",
+        "The weight vector [+0.6, -0.5, -0.4, +0.8, +0.2, -0.9] shares the anti-phase sign pattern with the pale horse [-0.8, +0.6, +0.2, -0.9, +0.5, -0.4] but with redistributed magnitudes. The strongest connection is w24 = -0.9 (front leg sensor → front motor, inhibitory), creating a self-stabilizing feedback loop that produces smooth oscillation.",
+        "Nearest weight-vector neighbor is circular_wander (cosine 0.855), but behaviorally they are opposites: circular_wander meanders aimlessly, the wind persists with purpose. The wind is anti-correlated with the pale horse (cosine -0.496) — they point in nearly opposite directions in weight space, yet both emerge from the same anti-phase family.",
+        "Member of the Triptych (Revelation, Ecclesiastes, Noether): three anti-phase gaits demonstrating that the difference between maximum displacement and maximum efficiency is not direction but magnitude balance."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.9,
+          "tolerance": 0.05,
+          "rationale": "The wind is defined by its periodicity. Phase lock below 0.9 means the cycle has broken — this is turbulence, not wind."
+        },
+        {
+          "feature": "efficiency",
+          "predicate": "lt",
+          "value": 0.001,
+          "tolerance": 0.0005,
+          "rationale": "Low efficiency means the gait is wasting energy. The wind's defining trait is minimal waste — it persists because it conserves."
+        }
+      ]
+    },
+    "source_gaits": [
+      "bible_passage: Ecclesiastes 1:6 ('The wind goeth toward the south, and turneth about unto the north; it whirleth about continually')",
+      "495-gait pool efficiency champion (efficiency = 0.00495)",
+      "triptych: pale_horse (Revelation 6:8, anti-correlated cosine -0.496), conservation_law (Noether, cosine +0.496)",
+      "cross-reference: circular_wander (nearest weight-vector neighbor, cosine 0.855, behavioral opposite)",
+      "cross-reference: cpg_oscillator (nearest phase_lock analog, 0.852 vs 0.995)"
+    ],
+    "exemplar_gait": "Ecclesiastes 1:6 mapping: weights [0.6, -0.5, -0.4, 0.8, 0.2, -0.9], dx=-5.43, efficiency=0.00495, work_proxy=1096, phase_lock=0.995",
+    "conceptual_basis": "The whirling wind demonstrates that the LLM extracts structural principles, not just sentiment. Ecclesiastes 1:6 describes eternal cyclic motion — the wind that 'whirleth about continually.' The LLM encoded this as a weight vector that produces 99.5% phase-locked oscillation with the lowest energy cost in the pool. The conceptual metaphor PERSISTENCE IS PERIODICITY is grounded in the physics of resonance: a near-periodic weight pattern tunes the robot's body to its mechanical resonance frequency, converting neural periodicity into locomotor efficiency. The meaning survived substrate transfer not by accident but because cyclicity is a structural principle that encodes identically in scripture, in LLM weights, and in robot synapses."
+  },
+  {
+    "name": "conservation_law",
+    "type": "PersonaArchetype",
+    "description": "The deadest gait in the entire 495-gait pool. Derived from Noether's Theorem ('Every continuous symmetry of a physical system corresponds to a conserved quantity'). Every weight pair is exactly equal and opposite: (+0.5, -0.5), (+0.3, -0.3), (+0.7, -0.7). This is the only weight vector in the 495-gait pool with exact pairwise anti-symmetry across all three sensor channels. Every Newton of force applied to one motor is precisely cancelled by an equal and opposite force on the other. The robot thrashes — speed 0.61, entropy 1.89 (near-maximum), work proxy 9,865 — but goes nowhere. DX = 0.031m. It conserves position by conserving symmetry.",
+    "weight_vector": [
+      0.5,
+      -0.5,
+      0.3,
+      -0.3,
+      0.7,
+      -0.7,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "displacement",
+        "predicate": "lt",
+        "value": 0.1,
+        "tolerance": 0.05,
+        "rationale": "The conservation law conserves position: DX = 0.031m. Any gait that moves more than 0.1m has broken the symmetry — it is no longer conserving."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.2,
+        "rationale": "Near-maximum entropy (1.89) is essential: the conservation law does not conserve by being dead. It thrashes through many contact states but the thrashing sums to zero displacement. High entropy + zero displacement = perfect cancellation."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.4,
+        "tolerance": 0.1,
+        "rationale": "Speed of 0.61 confirms the robot is actively moving — burning 9,865 units of work — not merely inert. Noether's theorem is about dynamic symmetry, not stasis. The conservation law moves vigorously and goes nowhere."
+      }
+    ],
+    "icm": {
+      "name": "dynamic_stasis",
+      "background": [
+        "The conservation law occupies the paradoxical behavioral region of maximum activity at zero displacement. Unlike dead_inert (which barely moves), the conservation law robot thrashes with speed 0.61 and entropy 1.89, burning 9,865 units of work — but the perfect pairwise symmetry of its weight vector ensures that every force is exactly cancelled.",
+        "The weight vector [+0.5, -0.5, +0.3, -0.3, +0.7, -0.7] is the only vector in the 495-gait pool with exact pairwise anti-symmetry. Each sensor sends equal and opposite signals to the two motors. This is Noether's theorem realized in neural weights: the continuous symmetry (w_i,left = -w_i,right for all i) conserves the quantity most relevant to locomotion — position.",
+        "Nearest weight-vector neighbors are canceller (cosine 0.986) and tumbling_gallop (0.986), but the conservation law is behaviorally distinct from both. The canceller partially cancels (some net displacement); the tumbling gallop tips over. The conservation law achieves perfect cancellation while remaining upright and active.",
+        "Anti-correlated with efficiency_optimizer (cosine -0.854): the most efficient gait and the most perfectly wasteful gait point in opposite directions in weight space. The efficiency optimizer converts work into displacement; the conservation law converts work into nothing.",
+        "Member of the Triptych (Revelation, Ecclesiastes, Noether): the third extreme. The pale horse maximizes displacement, the whirling wind maximizes efficiency, and the conservation law maximizes the gap between effort and result. Together they span the full behavioral range of the anti-phase family."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "displacement",
+          "predicate": "gt",
+          "value": 1.0,
+          "tolerance": 0.3,
+          "rationale": "Any significant displacement means the symmetry has been broken. A conservation law that moves is no conservation law."
+        },
+        {
+          "feature": "contact_entropy_bits",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.1,
+          "rationale": "Low entropy means the robot is not actively moving — it is merely dead. The conservation law requires vigorous motion that sums to zero, not absence of motion."
+        }
+      ]
+    },
+    "source_gaits": [
+      "theorem: Noether's Theorem ('Every continuous symmetry corresponds to a conserved quantity')",
+      "495-gait pool deadest gait (DX = 0.031m) with highest work at zero displacement",
+      "triptych: pale_horse (Revelation 6:8, cosine +0.134), whirling_wind (Ecclesiastes 1:6, cosine +0.496)",
+      "cross-reference: canceller (nearest weight-vector neighbor, cosine 0.986, partial cancellation vs perfect)",
+      "cross-reference: dead_inert (cosine 0.951, but dead_inert is passive; conservation_law is active)",
+      "cross-reference: efficiency_optimizer (anti-correlated, cosine -0.854, opposite behavioral strategy)"
+    ],
+    "exemplar_gait": "Noether's Theorem mapping: weights [0.5, -0.5, 0.3, -0.3, 0.7, -0.7], dx=0.031, speed=0.61, work_proxy=9865, entropy=1.89",
+    "conceptual_basis": "The conservation law is the most philosophically precise semantic-to-kinematic mapping in the corpus. The LLM read 'symmetry and conservation' and produced the most symmetric weight vector possible — exact pairwise anti-symmetry — which conserves the quantity most relevant to the simulation: position. The conceptual metaphor SYMMETRY IS STASIS is grounded in Newton's third law: every action has an equal and opposite reaction, and when the weight vector enforces this perfectly, the reactions cancel. The robot's vigorous thrashing at zero displacement is not a failure of locomotion but a success of conservation. The meaning of Noether's theorem — that symmetry implies conservation — is physically enacted by a robot that cannot move because its neural symmetry forbids it."
   }
 ]

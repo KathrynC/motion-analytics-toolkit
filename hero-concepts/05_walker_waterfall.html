@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Analytics Toolkit — Walker Waterfall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  #canvas-container {
+    position: relative;
+    width: 1200px;
+    height: 500px;
+  }
+  #walker-waterfall {
+    display: block;
+  }
+  #save-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    background: rgba(103, 139, 214, 0.15);
+    border: 1px solid rgba(103, 139, 214, 0.3);
+    color: #6c7fa8;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  #save-btn:hover {
+    background: rgba(103, 139, 214, 0.3);
+    color: #eaf2ff;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container">
+  <svg id="walker-waterfall" width="1200" height="500"></svg>
+  <button id="save-btn" onclick="savePNG()">Save as PNG</button>
+</div>
+
+<script>
+(function() {
+  const W = 1200, H = 500;
+  const svg = d3.select("#walker-waterfall");
+
+  // ── Defs: filters, gradients ────────────────────────────────────
+
+  const defs = svg.append("defs");
+
+  // Cyan glow for robot
+  const glowCyan = defs.append("filter")
+    .attr("id", "glow-cyan")
+    .attr("x", "-80%").attr("y", "-80%")
+    .attr("width", "260%").attr("height", "260%");
+  glowCyan.append("feGaussianBlur")
+    .attr("in", "SourceGraphic").attr("stdDeviation", "5").attr("result", "blur");
+  glowCyan.append("feColorMatrix")
+    .attr("in", "blur").attr("type", "matrix")
+    .attr("values", "0 0 0 0 0.325  0 0 0 0 0.776  0 0 0 0 1  0 0 0 0.5 0")
+    .attr("result", "colorBlur");
+  glowCyan.append("feMerge").selectAll("feMergeNode")
+    .data(["colorBlur", "SourceGraphic"]).enter()
+    .append("feMergeNode").attr("in", d => d);
+
+  // Soft glow for particles
+  const glowSoft = defs.append("filter")
+    .attr("id", "glow-soft")
+    .attr("x", "-100%").attr("y", "-100%")
+    .attr("width", "300%").attr("height", "300%");
+  glowSoft.append("feGaussianBlur")
+    .attr("in", "SourceGraphic").attr("stdDeviation", "2").attr("result", "blur");
+  glowSoft.append("feMerge").selectAll("feMergeNode")
+    .data(["blur", "SourceGraphic"]).enter()
+    .append("feMergeNode").attr("in", d => d);
+
+  // Title shadow
+  const titleShadow = defs.append("filter")
+    .attr("id", "title-shadow")
+    .attr("x", "-20%").attr("y", "-20%")
+    .attr("width", "140%").attr("height", "140%");
+  titleShadow.append("feGaussianBlur")
+    .attr("in", "SourceGraphic").attr("stdDeviation", "2").attr("result", "blur");
+  titleShadow.append("feComposite")
+    .attr("in", "SourceGraphic").attr("in2", "blur").attr("operator", "over");
+
+  // Badge glow
+  const glowGreen = defs.append("filter")
+    .attr("id", "glow-green")
+    .attr("x", "-60%").attr("y", "-60%")
+    .attr("width", "220%").attr("height", "220%");
+  glowGreen.append("feGaussianBlur")
+    .attr("in", "SourceGraphic").attr("stdDeviation", "3").attr("result", "blur");
+  glowGreen.append("feMerge").selectAll("feMergeNode")
+    .data(["blur", "SourceGraphic"]).enter()
+    .append("feMergeNode").attr("in", d => d);
+
+  // Background gradient
+  const bgGrad = defs.append("linearGradient")
+    .attr("id", "bg-grad")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+  bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "#070c1b");
+  bgGrad.append("stop").attr("offset", "40%").attr("stop-color", "#0d1528");
+  bgGrad.append("stop").attr("offset", "60%").attr("stop-color", "#0d1528");
+  bgGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070c1b");
+
+  // ── Background ────────────────────────────────────────────────
+
+  svg.append("rect")
+    .attr("width", W).attr("height", H)
+    .attr("fill", "url(#bg-grad)");
+
+  // Faint grid
+  const gridGroup = svg.append("g").attr("class", "grid");
+  const gridSpacing = 40;
+  for (let x = 0; x <= W; x += gridSpacing) {
+    gridGroup.append("line")
+      .attr("x1", x).attr("y1", 0).attr("x2", x).attr("y2", H)
+      .attr("stroke", "#ffffff").attr("stroke-width", 0.2).attr("opacity", 0.03);
+  }
+  for (let y = 0; y <= H; y += gridSpacing) {
+    gridGroup.append("line")
+      .attr("x1", 0).attr("y1", y).attr("x2", W).attr("y2", y)
+      .attr("stroke", "#ffffff").attr("stroke-width", 0.2).attr("opacity", 0.03);
+  }
+
+  // ── Title ─────────────────────────────────────────────────────
+
+  svg.append("text")
+    .attr("x", 50).attr("y", 42)
+    .attr("fill", "#eaf2ff")
+    .attr("font-family", "Sora, sans-serif")
+    .attr("font-weight", 700)
+    .attr("font-size", "30px")
+    .attr("filter", "url(#title-shadow)")
+    .text("Motion Analytics Toolkit");
+
+  svg.append("text")
+    .attr("x", 52).attr("y", 62)
+    .attr("fill", "#6c7fa8")
+    .attr("font-family", "'IBM Plex Sans', sans-serif")
+    .attr("font-weight", 400)
+    .attr("font-size", "12px")
+    .text("Grounding Pipeline \u00B7 Telemetry to Verdict");
+
+  // ── Helper: draw 3-link walker ────────────────────────────────
+
+  function drawWalker(group, cx, cy, torsoAngle, backLegAngle, frontLegAngle, opts) {
+    const {stroke, strokeWidth, opacity, glowFilter} = Object.assign({
+      stroke: "#53c6ff", strokeWidth: 2, opacity: 1, glowFilter: null
+    }, opts);
+
+    const g = group.append("g")
+      .attr("opacity", opacity);
+
+    if (glowFilter) g.attr("filter", glowFilter);
+
+    const torsoW = 80, torsoH = 25;
+    const legW = 70, legH = 15;
+    const headR = 8;
+    const jointR = 5;
+
+    // Torso center at (cx, cy), rotated
+    const torsoRad = torsoAngle * Math.PI / 180;
+
+    // Torso corners (centered)
+    const tg = g.append("g")
+      .attr("transform", `translate(${cx}, ${cy}) rotate(${torsoAngle})`);
+
+    tg.append("rect")
+      .attr("x", -torsoW / 2).attr("y", -torsoH / 2)
+      .attr("width", torsoW).attr("height", torsoH)
+      .attr("rx", 6).attr("ry", 6)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+
+    // Head at top-front of torso
+    const headLocalX = torsoW / 2 - 5;
+    const headLocalY = -torsoH / 2 - headR - 3;
+    tg.append("circle")
+      .attr("cx", headLocalX).attr("cy", headLocalY)
+      .attr("r", headR)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+
+    // Joint positions in local torso space (bottom edge)
+    const backJointLocalX = -torsoW / 2 + 10;
+    const backJointLocalY = torsoH / 2;
+    const frontJointLocalX = torsoW / 2 - 10;
+    const frontJointLocalY = torsoH / 2;
+
+    // Back leg joint
+    tg.append("circle")
+      .attr("cx", backJointLocalX).attr("cy", backJointLocalY)
+      .attr("r", jointR)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+
+    // Front leg joint
+    tg.append("circle")
+      .attr("cx", frontJointLocalX).attr("cy", frontJointLocalY)
+      .attr("r", jointR)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+
+    // Back leg: pivot from backJoint, angled relative to vertical
+    const blg = tg.append("g")
+      .attr("transform", `translate(${backJointLocalX}, ${backJointLocalY}) rotate(${backLegAngle})`);
+    blg.append("rect")
+      .attr("x", -legH / 2).attr("y", 0)
+      .attr("width", legH).attr("height", legW)
+      .attr("rx", 4).attr("ry", 4)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+
+    // Front leg
+    const flg = tg.append("g")
+      .attr("transform", `translate(${frontJointLocalX}, ${frontJointLocalY}) rotate(${frontLegAngle})`);
+    flg.append("rect")
+      .attr("x", -legH / 2).attr("y", 0)
+      .attr("width", legH).attr("height", legW)
+      .attr("rx", 4).attr("ry", 4)
+      .attr("fill", "none")
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth);
+  }
+
+  // ── Robot area ────────────────────────────────────────────────
+
+  const robotGroup = svg.append("g");
+  const robotCX = 180, robotCY = 240;
+
+  // Ground line
+  robotGroup.append("line")
+    .attr("x1", 40).attr("y1", 420).attr("x2", 300).attr("y2", 420)
+    .attr("stroke", "#6c7fa8").attr("stroke-width", 0.5)
+    .attr("stroke-dasharray", "6,4").attr("opacity", 0.35);
+
+  // Ghost walkers (motion trail / chronophotography)
+  drawWalker(robotGroup, robotCX - 60, robotCY, 8, 20, -25, {
+    opacity: 0.08, strokeWidth: 1.5
+  });
+  drawWalker(robotGroup, robotCX - 35, robotCY - 2, 9, 10, -10, {
+    opacity: 0.2, strokeWidth: 1.5
+  });
+
+  // Primary walker
+  drawWalker(robotGroup, robotCX, robotCY, 10, -30, 15, {
+    opacity: 1, strokeWidth: 2, glowFilter: "url(#glow-cyan)"
+  });
+
+  // ── Stage separators and headers ──────────────────────────────
+
+  const stages = [
+    { x: 340, label: "Telemetry" },
+    { x: 510, label: "Schemas" },
+    { x: 680, label: "Features" },
+    { x: 860, label: "Archetypes" },
+    { x: 1040, label: "Verdict" }
+  ];
+
+  // Thin separators between stages
+  const sepPositions = [300, 425, 595, 770, 950, 1140];
+  sepPositions.forEach(x => {
+    svg.append("line")
+      .attr("x1", x).attr("y1", 80).attr("x2", x).attr("y2", 460)
+      .attr("stroke", "#ffffff").attr("stroke-width", 0.5).attr("opacity", 0.08);
+  });
+
+  // Stage headers
+  stages.forEach(s => {
+    svg.append("text")
+      .attr("x", s.x).attr("y", 105)
+      .attr("fill", "#eaf2ff")
+      .attr("font-family", "Sora, sans-serif")
+      .attr("font-weight", 600)
+      .attr("font-size", "11px")
+      .attr("text-anchor", "middle")
+      .text(s.label);
+  });
+
+  // ── Stage 1: Telemetry — sine wave snippets ───────────────────
+
+  const telemetryGroup = svg.append("g");
+  const telX = 340, telYStart = 145;
+
+  function drawSineSnippet(group, cx, cy, amplitude, freq, phaseShift, width, color, opacity) {
+    const points = [];
+    const steps = 60;
+    const halfW = width / 2;
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * Math.PI * freq;
+      const x = cx - halfW + (i / steps) * width;
+      const y = cy + Math.sin(t + phaseShift) * amplitude;
+      points.push([x, y]);
+    }
+    const line = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveBasis);
+    group.append("path")
+      .attr("d", line(points))
+      .attr("fill", "none")
+      .attr("stroke", color)
+      .attr("stroke-width", 1.2)
+      .attr("opacity", opacity);
+  }
+
+  const telWaves = [
+    { dy: 0, amp: 8, freq: 4, phase: 0 },
+    { dy: 50, amp: 6, freq: 6, phase: 1.2 },
+    { dy: 100, amp: 10, freq: 3, phase: 2.5 },
+    { dy: 155, amp: 5, freq: 7, phase: 0.7 },
+    { dy: 210, amp: 7, freq: 5, phase: 3.8 }
+  ];
+
+  telWaves.forEach(w => {
+    drawSineSnippet(telemetryGroup, telX, telYStart + w.dy, w.amp, w.freq, w.phase, 80, "#adc0e5", 0.40);
+  });
+
+  // Tiny axis labels
+  const telLabels = ["joint_0_x", "joint_0_y", "joint_1_x", "joint_1_y", "torso_vx"];
+  telLabels.forEach((lbl, i) => {
+    svg.append("text")
+      .attr("x", telX - 48).attr("y", telYStart + telWaves[i].dy + 3)
+      .attr("fill", "#6c7fa8").attr("opacity", 0.4)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "6.5px")
+      .text(lbl);
+  });
+
+  // ── Stage 2: Schemas — five image schema icons ────────────────
+
+  const schemaGroup = svg.append("g");
+  const schX = 510;
+  const schemaColors = ["#53c6ff", "#77f0cb", "#f5dd78", "#f0a050", "#ff7ea6"];
+  const schemaNames = ["PATH", "CYCLE", "CONTACT", "BALANCE", "FORCE"];
+  const schemaYPositions = [155, 210, 265, 320, 375];
+
+  // PATH icon: curved arrow
+  function drawPathIcon(g, cx, cy, color) {
+    const ig = g.append("g").attr("transform", `translate(${cx}, ${cy})`);
+    const arc = d3.arc().innerRadius(0).outerRadius(10).startAngle(0).endAngle(Math.PI * 1.2);
+    ig.append("path")
+      .attr("d", "M-10,4 Q-4,-8 10,-2")
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1.5);
+    // arrowhead
+    ig.append("path")
+      .attr("d", "M8,-5 L10,-2 L6,-1")
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1.2);
+  }
+
+  // CYCLE icon: concentric rings
+  function drawCycleIcon(g, cx, cy, color) {
+    [8, 5].forEach(r => {
+      g.append("circle")
+        .attr("cx", cx).attr("cy", cy).attr("r", r)
+        .attr("fill", "none").attr("stroke", color)
+        .attr("stroke-width", 1.2).attr("opacity", r === 5 ? 0.6 : 1);
+    });
+    // Small dot at center
+    g.append("circle")
+      .attr("cx", cx).attr("cy", cy).attr("r", 1.5)
+      .attr("fill", color).attr("opacity", 0.8);
+  }
+
+  // CONTACT icon: zigzag
+  function drawContactIcon(g, cx, cy, color) {
+    const pts = [[-10, 3], [-5, -5], [0, 5], [5, -5], [10, 3]];
+    const line = d3.line().x(d => cx + d[0]).y(d => cy + d[1]);
+    g.append("path")
+      .attr("d", line(pts))
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1.5);
+  }
+
+  // BALANCE icon: fulcrum triangle + bar
+  function drawBalanceIcon(g, cx, cy, color) {
+    // Fulcrum triangle
+    g.append("path")
+      .attr("d", `M${cx},${cy + 8} L${cx - 6},${cy + 2} L${cx + 6},${cy + 2} Z`)
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1.2);
+    // Balance bar
+    g.append("line")
+      .attr("x1", cx - 10).attr("y1", cy - 1).attr("x2", cx + 10).attr("y2", cy - 1)
+      .attr("stroke", color).attr("stroke-width", 1.5);
+    // Weights
+    g.append("circle")
+      .attr("cx", cx - 9).attr("cy", cy - 4).attr("r", 2.5)
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1);
+    g.append("circle")
+      .attr("cx", cx + 9).attr("cy", cy - 4).attr("r", 2.5)
+      .attr("fill", "none").attr("stroke", color).attr("stroke-width", 1);
+  }
+
+  // FORCE icon: starburst
+  function drawForceIcon(g, cx, cy, color) {
+    const nRays = 8;
+    for (let i = 0; i < nRays; i++) {
+      const angle = (i / nRays) * Math.PI * 2;
+      const len = (i % 2 === 0) ? 10 : 6;
+      g.append("line")
+        .attr("x1", cx).attr("y1", cy)
+        .attr("x2", cx + Math.cos(angle) * len)
+        .attr("y2", cy + Math.sin(angle) * len)
+        .attr("stroke", color).attr("stroke-width", 1.2);
+    }
+    g.append("circle")
+      .attr("cx", cx).attr("cy", cy).attr("r", 2)
+      .attr("fill", color).attr("opacity", 0.8);
+  }
+
+  const schemaDrawFns = [drawPathIcon, drawCycleIcon, drawContactIcon, drawBalanceIcon, drawForceIcon];
+
+  schemaYPositions.forEach((sy, i) => {
+    schemaDrawFns[i](schemaGroup, schX, sy, schemaColors[i]);
+    // Label
+    schemaGroup.append("text")
+      .attr("x", schX + 20).attr("y", sy + 4)
+      .attr("fill", schemaColors[i])
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "8px")
+      .attr("opacity", 0.7)
+      .text(schemaNames[i]);
+  });
+
+  // ── Stage 3: Features — horizontal bar chart ──────────────────
+
+  const featGroup = svg.append("g");
+  const featX = 630;
+
+  const features = [
+    { name: "straightness", value: 0.82, color: "#53c6ff" },
+    { name: "phase_lock", value: 0.71, color: "#53c6ff" },
+    { name: "cost_of_transport", value: 0.45, color: "#53c6ff" },
+    { name: "cycle_count", value: 0.93, color: "#53c6ff" },
+    { name: "symmetry_index", value: 0.67, color: "#ff7ea6" },
+    { name: "energy_ratio", value: 0.58, color: "#ff7ea6" },
+    { name: "gait_regularity", value: 0.88, color: "#53c6ff" },
+    { name: "ground_contact", value: 0.39, color: "#ff7ea6" }
+  ];
+
+  const barMaxW = 65, barH = 8, barGap = 27;
+  const featYStart = 145;
+
+  features.forEach((f, i) => {
+    const y = featYStart + i * barGap;
+
+    // Label
+    featGroup.append("text")
+      .attr("x", featX).attr("y", y - 4)
+      .attr("fill", "#6c7fa8")
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "7px")
+      .text(f.name);
+
+    // Bar background
+    featGroup.append("rect")
+      .attr("x", featX).attr("y", y)
+      .attr("width", barMaxW).attr("height", barH)
+      .attr("rx", 2)
+      .attr("fill", "#ffffff").attr("opacity", 0.04);
+
+    // Bar fill
+    featGroup.append("rect")
+      .attr("x", featX).attr("y", y)
+      .attr("width", barMaxW * f.value).attr("height", barH)
+      .attr("rx", 2)
+      .attr("fill", f.color).attr("opacity", 0.55);
+
+    // Value label
+    featGroup.append("text")
+      .attr("x", featX + barMaxW + 5).attr("y", y + barH - 1)
+      .attr("fill", f.color)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "6.5px")
+      .attr("opacity", 0.5)
+      .text(f.value.toFixed(2));
+  });
+
+  // ── Stage 4: Archetypes — circles/badges ──────────────────────
+
+  const archGroup = svg.append("g");
+  const archX = 860;
+
+  const archetypes = [
+    { name: "deleuze_fold", match: 0.94, r: 18, color: "#53c6ff" },
+    { name: "borges_mirror", match: 0.72, r: 14, color: "#f5dd78" },
+    { name: "power_strider", match: 0.61, r: 12, color: "#77f0cb" },
+    { name: "spinner", match: 0.35, r: 10, color: "#ff7ea6" }
+  ];
+
+  const archYPositions = [175, 245, 310, 375];
+
+  archetypes.forEach((a, i) => {
+    const y = archYPositions[i];
+    const opacity = 0.25 + a.match * 0.65;
+
+    // Outer ring
+    archGroup.append("circle")
+      .attr("cx", archX).attr("cy", y).attr("r", a.r)
+      .attr("fill", "none")
+      .attr("stroke", a.color)
+      .attr("stroke-width", 1.5)
+      .attr("opacity", opacity);
+
+    // Inner glow dot
+    archGroup.append("circle")
+      .attr("cx", archX).attr("cy", y).attr("r", a.r * 0.35)
+      .attr("fill", a.color)
+      .attr("opacity", opacity * 0.4);
+
+    // Match percentage inside
+    archGroup.append("text")
+      .attr("x", archX).attr("y", y + 3)
+      .attr("text-anchor", "middle")
+      .attr("fill", a.color)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "7px")
+      .attr("opacity", opacity)
+      .text((a.match * 100).toFixed(0) + "%");
+
+    // Name label below
+    archGroup.append("text")
+      .attr("x", archX).attr("y", y + a.r + 12)
+      .attr("text-anchor", "middle")
+      .attr("fill", a.color)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", "7.5px")
+      .attr("opacity", opacity * 0.8)
+      .text(a.name);
+  });
+
+  // ── Stage 5: Verdict — stacked badges ─────────────────────────
+
+  const verdictGroup = svg.append("g");
+  const vX = 1040;
+
+  const verdicts = [
+    { label: "grounded", color: "#77f0cb", active: true },
+    { label: "partial", color: "#f5dd78", active: false },
+    { label: "violated", color: "#ff7ea6", active: false }
+  ];
+
+  const vYStart = 200;
+  const vGap = 65;
+  const badgeW = 90, badgeH = 28;
+
+  verdicts.forEach((v, i) => {
+    const y = vYStart + i * vGap;
+    const opacity = v.active ? 1.0 : 0.2;
+    const g = verdictGroup.append("g");
+
+    if (v.active) g.attr("filter", "url(#glow-green)");
+
+    // Badge rectangle
+    g.append("rect")
+      .attr("x", vX - badgeW / 2).attr("y", y - badgeH / 2)
+      .attr("width", badgeW).attr("height", badgeH)
+      .attr("rx", 5)
+      .attr("fill", v.color)
+      .attr("opacity", v.active ? 0.15 : 0.05)
+      .attr("stroke", v.color)
+      .attr("stroke-width", v.active ? 1.5 : 0.8)
+      .attr("stroke-opacity", opacity);
+
+    // Badge label
+    g.append("text")
+      .attr("x", vX).attr("y", y + 4)
+      .attr("text-anchor", "middle")
+      .attr("fill", v.color)
+      .attr("font-family", "Sora, sans-serif")
+      .attr("font-weight", 600)
+      .attr("font-size", "12px")
+      .attr("opacity", opacity)
+      .text(v.label);
+  });
+
+  // ── Flow particles between stages ─────────────────────────────
+
+  const particleGroup = svg.append("g");
+
+  // Particle flow specifications: [fromX, toX, color transitions]
+  const flowSpecs = [
+    { x0: 280, x1: 310, colors: ["#adc0e5"], sizeStart: 4, sizeEnd: 3.5 },
+    { x0: 390, x1: 450, colors: ["#adc0e5", "#53c6ff", "#77f0cb"], sizeStart: 3.5, sizeEnd: 3 },
+    { x0: 560, x1: 610, colors: ["#53c6ff", "#77f0cb", "#f5dd78", "#ff7ea6"], sizeStart: 3, sizeEnd: 2.5 },
+    { x0: 730, x1: 810, colors: ["#53c6ff", "#f5dd78", "#77f0cb", "#ff7ea6"], sizeStart: 2.5, sizeEnd: 2 },
+    { x0: 920, x1: 990, colors: ["#77f0cb", "#53c6ff"], sizeStart: 2, sizeEnd: 1.8 }
+  ];
+
+  // Seeded pseudo-random for reproducibility
+  let seed = 42;
+  function seededRandom() {
+    seed = (seed * 16807 + 0) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
+
+  flowSpecs.forEach(spec => {
+    const nParticles = 6 + Math.floor(seededRandom() * 3);
+    for (let i = 0; i < nParticles; i++) {
+      const t = seededRandom();
+      const x = spec.x0 + t * (spec.x1 - spec.x0);
+      const yBase = 150 + seededRandom() * 240;
+      const color = spec.colors[Math.floor(seededRandom() * spec.colors.length)];
+      const r = spec.sizeStart + t * (spec.sizeEnd - spec.sizeStart);
+      const trailLen = 6 + seededRandom() * 8;
+
+      // Trail line (behind particle, to the left)
+      particleGroup.append("line")
+        .attr("x1", x - trailLen).attr("y1", yBase)
+        .attr("x2", x).attr("y2", yBase)
+        .attr("stroke", color)
+        .attr("stroke-width", r * 0.6)
+        .attr("opacity", 0.15)
+        .attr("stroke-linecap", "round");
+
+      // Particle dot
+      particleGroup.append("circle")
+        .attr("cx", x).attr("cy", yBase).attr("r", r)
+        .attr("fill", color)
+        .attr("opacity", 0.45 + seededRandom() * 0.3)
+        .attr("filter", "url(#glow-soft)");
+    }
+  });
+
+  // ── Curved spline connections from robot to stage 1 ───────────
+
+  const connGroup = svg.append("g");
+
+  // Draw several curved paths from robot area to telemetry stage
+  const connColors = ["#53c6ff", "#adc0e5", "#77f0cb"];
+  const connYOffsets = [-40, 0, 50, 110, 160];
+
+  connYOffsets.forEach((dy, i) => {
+    const startX = 250;
+    const startY = 210 + dy;
+    const endX = 300;
+    const endY = 145 + i * 55;
+    const cpX = 275;
+
+    connGroup.append("path")
+      .attr("d", `M${startX},${startY} Q${cpX},${(startY + endY) / 2} ${endX},${endY}`)
+      .attr("fill", "none")
+      .attr("stroke", connColors[i % connColors.length])
+      .attr("stroke-width", 0.6)
+      .attr("opacity", 0.15)
+      .attr("stroke-dasharray", "3,4");
+  });
+
+  // ── Flowing connector curves between adjacent stages ──────────
+
+  const stageConnectors = [
+    { x0: 390, x1: 470 },  // Telemetry -> Schemas
+    { x0: 555, x1: 620 },  // Schemas -> Features
+    { x0: 720, x1: 810 },  // Features -> Archetypes
+    { x0: 915, x1: 990 }   // Archetypes -> Verdict
+  ];
+
+  stageConnectors.forEach((conn, ci) => {
+    const nLines = 4;
+    for (let i = 0; i < nLines; i++) {
+      const yStart = 170 + i * 65 + seededRandom() * 20;
+      const yEnd = 175 + i * 60 + seededRandom() * 25;
+      const cpX = (conn.x0 + conn.x1) / 2;
+      const cpY = (yStart + yEnd) / 2 + (seededRandom() - 0.5) * 30;
+
+      const colors = ["#53c6ff", "#77f0cb", "#f5dd78", "#ff7ea6", "#adc0e5"];
+      const color = colors[(ci + i) % colors.length];
+
+      connGroup.append("path")
+        .attr("d", `M${conn.x0},${yStart} Q${cpX},${cpY} ${conn.x1},${yEnd}`)
+        .attr("fill", "none")
+        .attr("stroke", color)
+        .attr("stroke-width", 0.5)
+        .attr("opacity", 0.12)
+        .attr("stroke-dasharray", "2,3");
+    }
+  });
+
+  // ── Animated particles along flow paths ───────────────────────
+
+  // Create animated particles that travel along spline paths
+  function createAnimatedParticle(pathD, color, duration, delay, size) {
+    const pathEl = svg.append("path")
+      .attr("d", pathD)
+      .attr("fill", "none")
+      .attr("stroke", "none");
+
+    const totalLength = pathEl.node().getTotalLength();
+
+    const particle = particleGroup.append("circle")
+      .attr("r", size)
+      .attr("fill", color)
+      .attr("opacity", 0.6)
+      .attr("filter", "url(#glow-soft)");
+
+    function animate() {
+      particle
+        .attr("opacity", 0)
+        .transition()
+        .delay(delay)
+        .duration(200)
+        .attr("opacity", 0.6)
+        .transition()
+        .duration(duration)
+        .ease(d3.easeLinear)
+        .attrTween("cx", function() {
+          return function(t) {
+            return pathEl.node().getPointAtLength(t * totalLength).x;
+          };
+        })
+        .attrTween("cy", function() {
+          return function(t) {
+            return pathEl.node().getPointAtLength(t * totalLength).y;
+          };
+        })
+        .transition()
+        .duration(300)
+        .attr("opacity", 0)
+        .on("end", animate);
+    }
+
+    animate();
+  }
+
+  // Long flowing paths across the full pipeline
+  const flowPaths = [
+    { d: "M260,220 Q340,180 430,190 Q520,200 610,210 Q720,180 810,200 Q920,190 1000,200", color: "#53c6ff", dur: 6000, size: 2.5 },
+    { d: "M260,260 Q340,280 430,260 Q520,240 610,270 Q720,290 810,270 Q920,250 1000,260", color: "#77f0cb", dur: 7000, size: 2.2 },
+    { d: "M260,300 Q340,320 430,310 Q520,290 610,330 Q720,320 810,340 Q920,310 1000,320", color: "#f5dd78", dur: 5500, size: 2 },
+    { d: "M260,340 Q340,360 430,350 Q520,380 610,360 Q720,350 810,370 Q920,360 1000,350", color: "#ff7ea6", dur: 8000, size: 1.8 },
+    { d: "M260,190 Q340,160 430,170 Q520,150 610,160 Q720,170 810,155 Q920,170 1000,165", color: "#adc0e5", dur: 6500, size: 2 },
+    { d: "M260,380 Q340,400 430,390 Q520,410 610,400 Q720,380 810,395 Q920,390 1000,385", color: "#53c6ff", dur: 7500, size: 1.8 },
+  ];
+
+  flowPaths.forEach((fp, i) => {
+    createAnimatedParticle(fp.d, fp.color, fp.dur, i * 800, fp.size);
+    // Second particle staggered
+    createAnimatedParticle(fp.d, fp.color, fp.dur, i * 800 + fp.dur * 0.4, fp.size * 0.8);
+  });
+
+  // ── Bottom annotation ─────────────────────────────────────────
+
+  svg.append("text")
+    .attr("x", W / 2).attr("y", 470)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#6c7fa8")
+    .attr("font-family", "'IBM Plex Mono', monospace")
+    .attr("font-size", "8px")
+    .attr("opacity", 0.35)
+    .text("semantic_input \u2192 telemetry \u2192 image_schemas \u2192 feature_extraction \u2192 archetype_matching \u2192 grounding_verdict");
+
+  // ── Save as PNG ───────────────────────────────────────────────
+
+  window.savePNG = function() {
+    const svgEl = document.getElementById("walker-waterfall");
+    const serializer = new XMLSerializer();
+    let source = serializer.serializeToString(svgEl);
+
+    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+
+    const fontCSS = `
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;600;700&display=swap');
+    `;
+    const styleEl = `<style>${fontCSS}</style>`;
+    source = source.replace('</defs>', `${styleEl}</defs>`);
+
+    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = W * 2;
+      canvas.height = H * 2;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+
+      canvas.toBlob(function(pngBlob) {
+        const a = document.createElement("a");
+        a.download = "walker_waterfall.png";
+        a.href = URL.createObjectURL(pngBlob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, "image/png");
+    };
+    img.src = url;
+  };
+
+})();
+</script>
+</body>
+</html>

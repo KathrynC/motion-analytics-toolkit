@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Analytics Toolkit — Five Schema Rosette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  #canvas-container {
+    position: relative;
+    width: 1200px;
+    height: 500px;
+  }
+  #save-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    background: rgba(103, 139, 214, 0.15);
+    border: 1px solid rgba(103, 139, 214, 0.3);
+    color: #6c7fa8;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  #save-btn:hover {
+    background: rgba(103, 139, 214, 0.3);
+    color: #eaf2ff;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container">
+  <svg id="rosette" width="1200" height="500"></svg>
+  <button id="save-btn" onclick="savePNG()">Save as PNG</button>
+</div>
+
+<script>
+(function() {
+  const W = 1200, H = 500;
+  const cx = W / 2, cy = 215;
+  const armLength = 160;
+  const svg = d3.select("#rosette");
+
+  // ── Defs: filters, gradients ──────────────────────────────────
+
+  const defs = svg.append("defs");
+
+  // Glow filter
+  const glow = defs.append("filter")
+    .attr("id", "glow")
+    .attr("x", "-50%").attr("y", "-50%")
+    .attr("width", "200%").attr("height", "200%");
+  glow.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "3").attr("result", "blur");
+  glow.append("feComposite").attr("in", "SourceGraphic").attr("in2", "blur").attr("operator", "over");
+
+  // Stronger glow for center
+  const glowStrong = defs.append("filter")
+    .attr("id", "glow-strong")
+    .attr("x", "-80%").attr("y", "-80%")
+    .attr("width", "260%").attr("height", "260%");
+  glowStrong.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "5").attr("result", "blur");
+  glowStrong.append("feComposite").attr("in", "SourceGraphic").attr("in2", "blur").attr("operator", "over");
+
+  // Title drop shadow
+  const shadow = defs.append("filter")
+    .attr("id", "text-shadow")
+    .attr("x", "-10%").attr("y", "-10%")
+    .attr("width", "120%").attr("height", "130%");
+  shadow.append("feGaussianBlur").attr("in", "SourceAlpha").attr("stdDeviation", "2").attr("result", "blur");
+  shadow.append("feOffset").attr("in", "blur").attr("dx", "0").attr("dy", "1").attr("result", "offset");
+  shadow.append("feMerge").selectAll("feMergeNode").data(["offset", "SourceGraphic"])
+    .enter().append("feMergeNode").attr("in", d => d);
+
+  // Radial background gradient
+  const bgGrad = defs.append("radialGradient")
+    .attr("id", "bg-gradient")
+    .attr("cx", "50%").attr("cy", "43%").attr("r", "55%");
+  bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "#101a32");
+  bgGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070c1b");
+
+  // Schema definitions
+  const schemas = [
+    { name: "PATH",    angle: 90,  color: "#53c6ff" },
+    { name: "CYCLE",   angle: 162, color: "#77f0cb" },
+    { name: "CONTACT", angle: 234, color: "#f5dd78" },
+    { name: "BALANCE", angle: 306, color: "#ffa278" },
+    { name: "FORCE",   angle: 18,  color: "#ff7ea6" }
+  ];
+
+  // Arm gradient defs
+  schemas.forEach((s, i) => {
+    const angleRad = (s.angle - 90) * Math.PI / 180;
+    const grad = defs.append("linearGradient")
+      .attr("id", `arm-grad-${i}`)
+      .attr("x1", "0%").attr("y1", "0%")
+      .attr("x2", "100%").attr("y2", "0%")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", cx).attr("y1", cy)
+      .attr("x2", cx + Math.cos(angleRad) * armLength)
+      .attr("y2", cy + Math.sin(angleRad) * armLength);
+    grad.append("stop").attr("offset", "0%").attr("stop-color", "#53c6ff");
+    grad.append("stop").attr("offset", "100%").attr("stop-color", s.color);
+  });
+
+  // Helper: polar to cartesian
+  function polar(angle, r) {
+    const rad = (angle - 90) * Math.PI / 180;
+    return [cx + Math.cos(rad) * r, cy + Math.sin(rad) * r];
+  }
+
+  // ── Background ────────────────────────────────────────────────
+
+  svg.append("rect").attr("width", W).attr("height", H).attr("fill", "url(#bg-gradient)");
+
+  // Faint concentric circles
+  [50, 100, 150, 200].forEach(r => {
+    svg.append("circle")
+      .attr("cx", cx).attr("cy", cy).attr("r", r)
+      .attr("fill", "none").attr("stroke", "#678bd6")
+      .attr("stroke-width", 0.3).attr("opacity", 0.05);
+  });
+
+  // ── Connecting pentagon geometry ──────────────────────────────
+
+  const outerPts = schemas.map(s => polar(s.angle, armLength));
+  const innerPts = schemas.map((s, i) => polar(s.angle + 36, armLength * 0.5));
+
+  // Outer pentagon
+  const pentLine = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveLinearClosed);
+  svg.append("path")
+    .attr("d", pentLine(outerPts))
+    .attr("fill", "none").attr("stroke", "#678bd6")
+    .attr("stroke-width", 0.5).attr("opacity", 0.2);
+
+  // Inner rotated pentagon
+  svg.append("path")
+    .attr("d", pentLine(innerPts))
+    .attr("fill", "none").attr("stroke", "#678bd6")
+    .attr("stroke-width", 0.5).attr("opacity", 0.15);
+
+  // Star lines connecting outer to inner
+  schemas.forEach((s, i) => {
+    const next = (i + 1) % 5;
+    const prev = (i + 4) % 5;
+    svg.append("line")
+      .attr("x1", outerPts[i][0]).attr("y1", outerPts[i][1])
+      .attr("x2", innerPts[i][0]).attr("y2", innerPts[i][1])
+      .attr("stroke", "#678bd6").attr("stroke-width", 0.4).attr("opacity", 0.12);
+    svg.append("line")
+      .attr("x1", outerPts[i][0]).attr("y1", outerPts[i][1])
+      .attr("x2", innerPts[prev][0]).attr("y2", innerPts[prev][1])
+      .attr("stroke", "#678bd6").attr("stroke-width", 0.4).attr("opacity", 0.12);
+  });
+
+  // ── Arms ──────────────────────────────────────────────────────
+
+  schemas.forEach((s, i) => {
+    const angleRad = (s.angle - 90) * Math.PI / 180;
+    const tipX = cx + Math.cos(angleRad) * armLength;
+    const tipY = cy + Math.sin(angleRad) * armLength;
+
+    // Tapered arm ribbon
+    const perpX = -Math.sin(angleRad);
+    const perpY = Math.cos(angleRad);
+    const baseW = 4, tipW = 1.5;
+    const pts = [
+      [cx + perpX * baseW, cy + perpY * baseW],
+      [tipX + perpX * tipW, tipY + perpY * tipW],
+      [tipX - perpX * tipW, tipY - perpY * tipW],
+      [cx - perpX * baseW, cy - perpY * baseW]
+    ];
+    svg.append("polygon")
+      .attr("points", pts.map(p => p.join(",")).join(" "))
+      .attr("fill", `url(#arm-grad-${i})`).attr("opacity", 0.7);
+
+    // Draw motif at tip
+    const g = svg.append("g")
+      .attr("transform", `translate(${tipX},${tipY})`)
+      .attr("filter", "url(#glow)");
+
+    drawMotif(g, s, angleRad);
+
+    // Label
+    const labelDist = 38;
+    const lx = tipX + Math.cos(angleRad) * labelDist;
+    const ly = tipY + Math.sin(angleRad) * labelDist;
+    svg.append("text")
+      .attr("x", lx).attr("y", ly)
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .attr("fill", s.color)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-weight", 500)
+      .attr("font-size", "11px")
+      .attr("letter-spacing", "0.5px")
+      .text(s.name);
+  });
+
+  // ── Motif drawing functions ───────────────────────────────────
+
+  function drawMotif(g, schema, angleRad) {
+    const rot = (schema.angle - 90) * 1; // degrees from vertical
+    switch(schema.name) {
+      case "PATH": drawPath(g, schema.color); break;
+      case "CYCLE": drawCycle(g, schema.color); break;
+      case "CONTACT": drawContact(g, schema.color, rot); break;
+      case "BALANCE": drawBalance(g, schema.color, rot); break;
+      case "FORCE": drawForce(g, schema.color); break;
+    }
+  }
+
+  function drawPath(g, color) {
+    // Sinuous S-curve ribbon/arrow
+    const pathData = d3.path();
+    pathData.moveTo(-18, 12);
+    pathData.bezierCurveTo(-12, 4, -4, -8, 0, -14);
+    pathData.bezierCurveTo(4, -20, 12, -12, 18, -18);
+    g.append("path")
+      .attr("d", pathData.toString())
+      .attr("fill", "none").attr("stroke", color)
+      .attr("stroke-width", 2).attr("stroke-linecap", "round")
+      .attr("opacity", 0.9);
+
+    // Arrow head at end
+    g.append("polygon")
+      .attr("points", "18,-18 14,-12 20,-13")
+      .attr("fill", color).attr("opacity", 0.9);
+
+    // Waypoint dots
+    const waypoints = [[-16, 10], [-8, 0], [-2, -10], [6, -14], [14, -16]];
+    waypoints.forEach(([wx, wy]) => {
+      g.append("circle")
+        .attr("cx", wx).attr("cy", wy).attr("r", 1.3)
+        .attr("fill", color).attr("opacity", 0.6);
+    });
+  }
+
+  function drawCycle(g, color) {
+    // 3 concentric circles
+    [16, 11, 6].forEach((r, i) => {
+      g.append("circle")
+        .attr("cx", 0).attr("cy", 0).attr("r", r)
+        .attr("fill", "none").attr("stroke", color)
+        .attr("stroke-width", 1.2)
+        .attr("opacity", 0.9 - i * 0.25);
+    });
+
+    // Tick marks on outermost circle like a clock
+    for (let t = 0; t < 12; t++) {
+      const a = (t * 30) * Math.PI / 180;
+      const x1 = Math.cos(a) * 15, y1 = Math.sin(a) * 15;
+      const x2 = Math.cos(a) * 18, y2 = Math.sin(a) * 18;
+      g.append("line")
+        .attr("x1", x1).attr("y1", y1)
+        .attr("x2", x2).attr("y2", y2)
+        .attr("stroke", color).attr("stroke-width", 0.8)
+        .attr("opacity", 0.5);
+    }
+  }
+
+  function drawContact(g, color, rot) {
+    // Two interlocking zigzag shapes meeting at horizontal line
+    const teeth = 5;
+    const w = 32, h = 8;
+    const hw = w / 2;
+    const toothW = w / teeth;
+
+    // Horizontal contact line
+    g.append("line")
+      .attr("x1", -hw).attr("y1", 0)
+      .attr("x2", hw).attr("y2", 0)
+      .attr("stroke", color).attr("stroke-width", 0.6).attr("opacity", 0.4);
+
+    // Upper zigzag (filled teeth)
+    for (let t = 0; t < teeth; t++) {
+      const x = -hw + t * toothW;
+      const filled = t % 2 === 0;
+      const pts = `${x},0 ${x + toothW/2},${-h} ${x + toothW},0`;
+      g.append("polygon")
+        .attr("points", pts)
+        .attr("fill", filled ? color : "none")
+        .attr("stroke", color)
+        .attr("stroke-width", 0.8)
+        .attr("opacity", filled ? 0.7 : 0.5);
+    }
+
+    // Lower zigzag (inverted, alternating fill)
+    for (let t = 0; t < teeth; t++) {
+      const x = -hw + t * toothW;
+      const filled = t % 2 === 1;
+      const pts = `${x},0 ${x + toothW/2},${h} ${x + toothW},0`;
+      g.append("polygon")
+        .attr("points", pts)
+        .attr("fill", filled ? color : "none")
+        .attr("stroke", color)
+        .attr("stroke-width", 0.8)
+        .attr("opacity", filled ? 0.7 : 0.5);
+    }
+  }
+
+  function drawBalance(g, color, rot) {
+    // Triangle fulcrum
+    g.append("polygon")
+      .attr("points", "0,8 -6,16 6,16")
+      .attr("fill", color).attr("opacity", 0.6);
+
+    // Beam with slight tilt (2-3 degrees)
+    const tiltAngle = 2.5 * Math.PI / 180;
+    const beamHW = 22;
+    const beamG = g.append("g")
+      .attr("transform", `rotate(${2.5})`);
+
+    beamG.append("line")
+      .attr("x1", -beamHW).attr("y1", 6)
+      .attr("x2", beamHW).attr("y2", 6)
+      .attr("stroke", color).attr("stroke-width", 2)
+      .attr("stroke-linecap", "round").attr("opacity", 0.85);
+
+    // End circles (weights)
+    beamG.append("circle")
+      .attr("cx", -beamHW).attr("cy", 6).attr("r", 4)
+      .attr("fill", color).attr("opacity", 0.7);
+    beamG.append("circle")
+      .attr("cx", beamHW).attr("cy", 6).attr("r", 3.5)
+      .attr("fill", color).attr("opacity", 0.5);
+
+    // Fulcrum vertical line
+    g.append("line")
+      .attr("x1", 0).attr("y1", 6).attr("x2", 0).attr("y2", 16)
+      .attr("stroke", color).attr("stroke-width", 1).attr("opacity", 0.5);
+  }
+
+  function drawForce(g, color) {
+    // Radiating arrows from center (starburst)
+    const numArrows = 6;
+    const center = [0, 0];
+    const lengths = [16, 13, 18, 11, 15, 14];
+
+    for (let i = 0; i < numArrows; i++) {
+      const a = (i * 360 / numArrows + 15) * Math.PI / 180;
+      const len = lengths[i];
+      const ex = Math.cos(a) * len, ey = Math.sin(a) * len;
+
+      // Arrow shaft
+      g.append("line")
+        .attr("x1", 0).attr("y1", 0)
+        .attr("x2", ex).attr("y2", ey)
+        .attr("stroke", color).attr("stroke-width", 1.5)
+        .attr("stroke-linecap", "round").attr("opacity", 0.8);
+
+      // Arrow head
+      const headLen = 4;
+      const headAngle = 0.4;
+      const hx1 = ex - Math.cos(a - headAngle) * headLen;
+      const hy1 = ey - Math.sin(a - headAngle) * headLen;
+      const hx2 = ex - Math.cos(a + headAngle) * headLen;
+      const hy2 = ey - Math.sin(a + headAngle) * headLen;
+      g.append("polygon")
+        .attr("points", `${ex},${ey} ${hx1},${hy1} ${hx2},${hy2}`)
+        .attr("fill", color).attr("opacity", 0.8);
+    }
+
+    // Center dot
+    g.append("circle")
+      .attr("cx", 0).attr("cy", 0).attr("r", 2.5)
+      .attr("fill", color).attr("opacity", 0.9);
+  }
+
+  // ── Center robot ──────────────────────────────────────────────
+
+  const robotG = svg.append("g")
+    .attr("transform", `translate(${cx},${cy})`)
+    .attr("filter", "url(#glow-strong)");
+
+  // Dim cyan orbit circle
+  svg.append("circle")
+    .attr("cx", cx).attr("cy", cy).attr("r", 35)
+    .attr("fill", "none").attr("stroke", "#53c6ff")
+    .attr("stroke-width", 0.7).attr("opacity", 0.25);
+
+  // 3-link robot silhouette: torso + 2 legs, mid-stride pose
+  const robotColor = "#53c6ff";
+
+  // Torso (central rectangle, slight forward lean)
+  robotG.append("rect")
+    .attr("x", -6).attr("y", -20)
+    .attr("width", 12).attr("height", 40)
+    .attr("rx", 2).attr("ry", 2)
+    .attr("fill", robotColor).attr("opacity", 0.9)
+    .attr("transform", "rotate(5)");
+
+  // Left leg (angled back — trailing)
+  robotG.append("rect")
+    .attr("x", -4).attr("y", 0)
+    .attr("width", 8).attr("height", 30)
+    .attr("rx", 2).attr("ry", 2)
+    .attr("fill", robotColor).attr("opacity", 0.75)
+    .attr("transform", "translate(-4,16) rotate(-20)");
+
+  // Right leg (angled forward — leading)
+  robotG.append("rect")
+    .attr("x", -4).attr("y", 0)
+    .attr("width", 8).attr("height", 30)
+    .attr("rx", 2).attr("ry", 2)
+    .attr("fill", robotColor).attr("opacity", 0.75)
+    .attr("transform", "translate(4,16) rotate(15)");
+
+  // ── Title ─────────────────────────────────────────────────────
+
+  svg.append("text")
+    .attr("x", cx).attr("y", H - 52)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#eaf2ff")
+    .attr("font-family", "'Sora', sans-serif")
+    .attr("font-weight", 700)
+    .attr("font-size", "32px")
+    .attr("letter-spacing", "0.5px")
+    .attr("filter", "url(#text-shadow)")
+    .text("Motion Analytics Toolkit");
+
+  svg.append("text")
+    .attr("x", cx).attr("y", H - 28)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#6c7fa8")
+    .attr("font-family", "'IBM Plex Sans', sans-serif")
+    .attr("font-weight", 400)
+    .attr("font-size", "13px")
+    .attr("letter-spacing", "1px")
+    .text("Five Image Schemas \u00B7 Lakoff Grounding");
+
+  // ── Save as PNG ───────────────────────────────────────────────
+
+  window.savePNG = function() {
+    const svgEl = document.getElementById("rosette");
+    const serializer = new XMLSerializer();
+    let source = serializer.serializeToString(svgEl);
+
+    // Embed fonts inline via a foreignObject workaround: use image rendering
+    // Add XML declaration and namespace
+    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+
+    // Inline the Google Font CSS as a style block
+    const fontCSS = `
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Sora:wght@400;700&display=swap');
+    `;
+    const styleEl = `<style>${fontCSS}</style>`;
+    source = source.replace('</defs>', `${styleEl}</defs>`);
+
+    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = W * 2;  // 2x for retina
+      canvas.height = H * 2;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+
+      canvas.toBlob(function(pngBlob) {
+        const a = document.createElement("a");
+        a.download = "schema_rosette.png";
+        a.href = URL.createObjectURL(pngBlob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, "image/png");
+    };
+    img.src = url;
+  };
+
+})();
+</script>
+</body>
+</html>

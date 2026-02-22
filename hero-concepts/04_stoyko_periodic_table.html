@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Analytics Toolkit — Stoyko Periodic Table Strip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  #banner-container {
+    position: relative;
+  }
+  #save-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: rgba(103, 139, 214, 0.15);
+    border: 1px solid rgba(103, 139, 214, 0.35);
+    color: #adc0e5;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  #save-btn:hover {
+    background: rgba(103, 139, 214, 0.3);
+    border-color: rgba(103, 139, 214, 0.6);
+  }
+</style>
+</head>
+<body>
+
+<div id="banner-container">
+  <button id="save-btn">SAVE AS PNG</button>
+  <svg id="banner"></svg>
+</div>
+
+<script>
+(function() {
+  const W = 1200, H = 500;
+
+  // Category definitions
+  const categories = [
+    { id: 'DRIVER',   color: '#53c6ff', x: 0 },
+    { id: 'SIGNAL',   color: '#77f0cb', x: 0 },
+    { id: 'STATE',    color: '#f5dd78', x: 0 },
+    { id: 'BOUNDARY', color: '#ffa278', x: 0 },
+    { id: 'RELATION', color: '#ff7ea6', x: 0 },
+    { id: 'DOMAIN',   color: '#d3b3ff', x: 0 }
+  ];
+
+  // Evenly space across banner
+  const spacing = W / (categories.length + 1);
+  categories.forEach((c, i) => { c.x = spacing * (i + 1); });
+  const shapeY = 258;
+  const shapeSize = 35; // radius / half-size
+
+  const svg = d3.select('#banner')
+    .attr('width', W)
+    .attr('height', H)
+    .attr('xmlns', 'http://www.w3.org/2000/svg');
+
+  // ---- DEFS: filters, gradients ----
+  const defs = svg.append('defs');
+
+  // Glow filters per category
+  categories.forEach(c => {
+    const filter = defs.append('filter')
+      .attr('id', `glow-${c.id}`)
+      .attr('x', '-50%').attr('y', '-50%')
+      .attr('width', '200%').attr('height', '200%');
+    filter.append('feGaussianBlur')
+      .attr('in', 'SourceGraphic')
+      .attr('stdDeviation', 4)
+      .attr('result', 'blur');
+    filter.append('feColorMatrix')
+      .attr('in', 'blur')
+      .attr('type', 'matrix')
+      .attr('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.3 0')
+      .attr('result', 'glowColor');
+    const merge = filter.append('feMerge');
+    merge.append('feMergeNode').attr('in', 'glowColor');
+    merge.append('feMergeNode').attr('in', 'SourceGraphic');
+  });
+
+  // Background gradient band
+  const bgGrad = defs.append('linearGradient')
+    .attr('id', 'shelf-gradient')
+    .attr('x1', '0').attr('y1', '0')
+    .attr('x2', '0').attr('y2', '1');
+  bgGrad.append('stop').attr('offset', '0%').attr('stop-color', '#070c1b');
+  bgGrad.append('stop').attr('offset', '35%').attr('stop-color', '#101a32');
+  bgGrad.append('stop').attr('offset', '65%').attr('stop-color', '#101a32');
+  bgGrad.append('stop').attr('offset', '100%').attr('stop-color', '#070c1b');
+
+  // ---- BACKGROUND ----
+  svg.append('rect')
+    .attr('width', W).attr('height', H)
+    .attr('fill', '#070c1b');
+
+  // Shelf band
+  svg.append('rect')
+    .attr('x', 0).attr('y', 190)
+    .attr('width', W).attr('height', 130)
+    .attr('fill', 'url(#shelf-gradient)');
+
+  // ---- HORIZONTAL RULES ----
+  const ruleColor = 'rgba(103, 139, 214, 0.15)';
+  svg.append('line')
+    .attr('x1', 40).attr('y1', 202)
+    .attr('x2', W - 40).attr('y2', 202)
+    .attr('stroke', ruleColor).attr('stroke-width', 1);
+  svg.append('line')
+    .attr('x1', 40).attr('y1', 318)
+    .attr('x2', W - 40).attr('y2', 318)
+    .attr('stroke', ruleColor).attr('stroke-width', 1);
+
+  // ---- CONNECTING LINES between shapes ----
+  for (let i = 0; i < categories.length - 1; i++) {
+    svg.append('line')
+      .attr('x1', categories[i].x + shapeSize + 8)
+      .attr('y1', shapeY)
+      .attr('x2', categories[i + 1].x - shapeSize - 8)
+      .attr('y2', shapeY)
+      .attr('stroke', 'rgba(255,255,255,0.15)')
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', '3,4');
+  }
+
+  // ---- TITLE ----
+  svg.append('text')
+    .attr('x', W / 2).attr('y', 105)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#eaf2ff')
+    .attr('font-family', 'Sora, sans-serif')
+    .attr('font-weight', 700)
+    .attr('font-size', 48)
+    .attr('letter-spacing', '8px')
+    .text('MOTION ANALYTICS');
+
+  svg.append('text')
+    .attr('x', W / 2).attr('y', 142)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#adc0e5')
+    .attr('font-family', 'Sora, sans-serif')
+    .attr('font-weight', 500)
+    .attr('font-size', 28)
+    .attr('letter-spacing', '12px')
+    .text('TOOLKIT');
+
+  // ---- SUBTITLE ----
+  svg.append('text')
+    .attr('x', W / 2).attr('y', 365)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#6c7fa8')
+    .attr('font-family', "'IBM Plex Sans', sans-serif")
+    .attr('font-weight', 400)
+    .attr('font-size', 12)
+    .attr('letter-spacing', '1px')
+    .text('SystemViz Visual Vocabulary \u00B7 72 Elements \u00B7 6 Categories');
+
+  // ---- CATEGORY SHAPES + LABELS ----
+  const shapeGroup = svg.append('g').attr('class', 'shapes');
+
+  categories.forEach(cat => {
+    const g = shapeGroup.append('g')
+      .attr('transform', `translate(${cat.x}, ${shapeY})`);
+
+    const fillOpacity = 0.05;
+    const strokeWidth = 1.5;
+
+    // Draw outer shape
+    switch (cat.id) {
+      case 'DRIVER': {
+        // Upward-pointing chevron / arrow
+        const s = shapeSize;
+        const pts = [
+          [0, -s],
+          [s, -s * 0.1],
+          [s * 0.5, s * 0.1],
+          [s * 0.5, s],
+          [-s * 0.5, s],
+          [-s * 0.5, s * 0.1],
+          [-s, -s * 0.1]
+        ];
+        g.append('polygon')
+          .attr('points', pts.map(p => p.join(',')).join(' '))
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('filter', `url(#glow-${cat.id})`);
+        break;
+      }
+      case 'SIGNAL': {
+        // Diamond / rhombus
+        const s = shapeSize;
+        const pts = [[0, -s], [s, 0], [0, s], [-s, 0]];
+        g.append('polygon')
+          .attr('points', pts.map(p => p.join(',')).join(' '))
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('filter', `url(#glow-${cat.id})`);
+        break;
+      }
+      case 'STATE': {
+        // Rounded rectangle / pill
+        g.append('rect')
+          .attr('x', -shapeSize).attr('y', -shapeSize * 0.7)
+          .attr('width', shapeSize * 2).attr('height', shapeSize * 1.4)
+          .attr('rx', shapeSize * 0.55).attr('ry', shapeSize * 0.55)
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('filter', `url(#glow-${cat.id})`);
+        break;
+      }
+      case 'BOUNDARY': {
+        // Dashed rectangle
+        g.append('rect')
+          .attr('x', -shapeSize).attr('y', -shapeSize * 0.75)
+          .attr('width', shapeSize * 2).attr('height', shapeSize * 1.5)
+          .attr('rx', 3).attr('ry', 3)
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('stroke-dasharray', '6,3')
+          .attr('filter', `url(#glow-${cat.id})`);
+        break;
+      }
+      case 'RELATION': {
+        // Two overlapping circles (Venn)
+        const offset = shapeSize * 0.4;
+        g.append('circle')
+          .attr('cx', -offset).attr('cy', 0).attr('r', shapeSize * 0.7)
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('filter', `url(#glow-${cat.id})`);
+        g.append('circle')
+          .attr('cx', offset).attr('cy', 0).attr('r', shapeSize * 0.7)
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth);
+        break;
+      }
+      case 'DOMAIN': {
+        // Hexagon
+        const s = shapeSize;
+        const hex = d3.range(6).map(i => {
+          const angle = (Math.PI / 3) * i - Math.PI / 2;
+          return [s * Math.cos(angle), s * Math.sin(angle)];
+        });
+        g.append('polygon')
+          .attr('points', hex.map(p => p.join(',')).join(' '))
+          .attr('fill', cat.color).attr('fill-opacity', fillOpacity)
+          .attr('stroke', cat.color).attr('stroke-width', strokeWidth)
+          .attr('filter', `url(#glow-${cat.id})`);
+        break;
+      }
+    }
+
+    // Draw inner icons
+    const iconG = g.append('g').attr('class', 'icons');
+    const ic = cat.color;
+    const iw = 0.8; // icon stroke width
+
+    switch (cat.id) {
+      case 'DRIVER': {
+        // Lightning bolt
+        const lb = iconG.append('g').attr('transform', 'translate(-14, -6)');
+        lb.append('polyline')
+          .attr('points', '3,-10 -2,0 3,-1 -1,10')
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw)
+          .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+
+        // Spiral
+        const spiral = iconG.append('g').attr('transform', 'translate(2, -2)');
+        const spiralPath = d3.path();
+        for (let t = 0; t < 5 * Math.PI; t += 0.1) {
+          const r = 1 + t * 0.6;
+          const x = r * Math.cos(t);
+          const y = r * Math.sin(t);
+          if (t === 0) spiralPath.moveTo(x, y);
+          else spiralPath.lineTo(x, y);
+        }
+        spiral.append('path')
+          .attr('d', spiralPath.toString())
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw * 0.7);
+
+        // Wave
+        const wave = iconG.append('g').attr('transform', 'translate(14, 6)');
+        const wavePath = d3.path();
+        wavePath.moveTo(-8, 0);
+        wavePath.bezierCurveTo(-5, -6, -2, -6, 0, 0);
+        wavePath.bezierCurveTo(2, 6, 5, 6, 8, 0);
+        wave.append('path')
+          .attr('d', wavePath.toString())
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw);
+        break;
+      }
+      case 'SIGNAL': {
+        // Arrow loop (feedback)
+        const fb = iconG.append('g').attr('transform', 'translate(-10, -6)');
+        const fbPath = d3.path();
+        fbPath.arc(0, 0, 5, -Math.PI * 0.8, Math.PI * 0.5, false);
+        fb.append('path')
+          .attr('d', fbPath.toString())
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw)
+          .attr('marker-end', 'none');
+        fb.append('polygon')
+          .attr('points', '3,4 6,2 3,6')
+          .attr('fill', ic).attr('fill-opacity', 0.8);
+
+        // Eye (monitor)
+        const eye = iconG.append('g').attr('transform', 'translate(0, 2)');
+        const eyePath = d3.path();
+        eyePath.moveTo(-6, 0);
+        eyePath.bezierCurveTo(-3, -5, 3, -5, 6, 0);
+        eyePath.bezierCurveTo(3, 5, -3, 5, -6, 0);
+        eye.append('path')
+          .attr('d', eyePath.toString())
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw);
+        eye.append('circle')
+          .attr('cx', 0).attr('cy', 0).attr('r', 2)
+          .attr('fill', ic).attr('fill-opacity', 0.6);
+
+        // Pulse line
+        const pulse = iconG.append('g').attr('transform', 'translate(10, 8)');
+        pulse.append('polyline')
+          .attr('points', '-8,0 -4,0 -2,-5 0,5 2,-3 4,0 8,0')
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw)
+          .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+        break;
+      }
+      case 'STATE': {
+        // Equilibrium circle
+        iconG.append('circle')
+          .attr('cx', -16).attr('cy', 0).attr('r', 4)
+          .attr('fill', ic).attr('fill-opacity', 0.2)
+          .attr('stroke', ic).attr('stroke-width', iw);
+
+        // Phase transition dots
+        const phase = iconG.append('g').attr('transform', 'translate(0, 0)');
+        [-4, -1, 2, 5].forEach((dx, i) => {
+          phase.append('circle')
+            .attr('cx', dx).attr('cy', 0)
+            .attr('r', 1.5)
+            .attr('fill', ic)
+            .attr('fill-opacity', 0.3 + i * 0.2);
+        });
+
+        // Mountain peak (tipping point)
+        const mt = iconG.append('g').attr('transform', 'translate(16, 0)');
+        mt.append('polyline')
+          .attr('points', '-7,5 -2,-4 0,-5 2,-4 7,5')
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw)
+          .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+        break;
+      }
+      case 'BOUNDARY': {
+        // Container outline
+        const cont = iconG.append('g').attr('transform', 'translate(-16, 0)');
+        cont.append('rect')
+          .attr('x', -5).attr('y', -5)
+          .attr('width', 10).attr('height', 10)
+          .attr('rx', 1)
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw);
+
+        // Bridge shape
+        const br = iconG.append('g').attr('transform', 'translate(0, 0)');
+        const brPath = d3.path();
+        brPath.moveTo(-7, 4);
+        brPath.lineTo(-7, 0);
+        brPath.arc(0, 0, 7, Math.PI, 0, false);
+        brPath.lineTo(7, 4);
+        br.append('path')
+          .attr('d', brPath.toString())
+          .attr('fill', 'none').attr('stroke', ic).attr('stroke-width', iw);
+
+        // Barrier line
+        const bar = iconG.append('g').attr('transform', 'translate(16, 0)');
+        bar.append('line')
+          .attr('x1', 0).attr('y1', -7)
+          .attr('x2', 0).attr('y2', 7)
+          .attr('stroke', ic).attr('stroke-width', iw + 0.5);
+        bar.append('line')
+          .attr('x1', -4).attr('y1', -7)
+          .attr('x2', 4).attr('y2', -7)
+          .attr('stroke', ic).attr('stroke-width', iw);
+        bar.append('line')
+          .attr('x1', -4).attr('y1', 7)
+          .attr('x2', 4).attr('y2', 7)
+          .attr('stroke', ic).attr('stroke-width', iw);
+        break;
+      }
+      case 'RELATION': {
+        // Cluster dots
+        const cl = iconG.append('g').attr('transform', 'translate(-10, -4)');
+        [[-2,-2],[2,-1],[0,2],[-3,1],[3,2]].forEach(([dx,dy]) => {
+          cl.append('circle')
+            .attr('cx', dx).attr('cy', dy).attr('r', 1.4)
+            .attr('fill', ic).attr('fill-opacity', 0.7);
+        });
+
+        // Coupling links
+        const cp = iconG.append('g').attr('transform', 'translate(2, 4)');
+        cp.append('line')
+          .attr('x1', -4).attr('y1', -2)
+          .attr('x2', 4).attr('y2', -2)
+          .attr('stroke', ic).attr('stroke-width', iw);
+        cp.append('line')
+          .attr('x1', -4).attr('y1', 2)
+          .attr('x2', 4).attr('y2', 2)
+          .attr('stroke', ic).attr('stroke-width', iw);
+        cp.append('line')
+          .attr('x1', -2).attr('y1', -2)
+          .attr('x2', 2).attr('y2', 2)
+          .attr('stroke', ic).attr('stroke-width', iw * 0.7);
+        cp.append('line')
+          .attr('x1', 2).attr('y1', -2)
+          .attr('x2', -2).attr('y2', 2)
+          .attr('stroke', ic).attr('stroke-width', iw * 0.7);
+
+        // Network nodes
+        const net = iconG.append('g').attr('transform', 'translate(10, -4)');
+        const nodes = [[-3,-3],[3,-3],[0,4]];
+        nodes.forEach(([nx,ny]) => {
+          net.append('circle')
+            .attr('cx', nx).attr('cy', ny).attr('r', 1.6)
+            .attr('fill', ic).attr('fill-opacity', 0.8);
+        });
+        // edges
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            net.append('line')
+              .attr('x1', nodes[i][0]).attr('y1', nodes[i][1])
+              .attr('x2', nodes[j][0]).attr('y2', nodes[j][1])
+              .attr('stroke', ic).attr('stroke-width', iw * 0.6)
+              .attr('stroke-opacity', 0.5);
+          }
+        }
+        break;
+      }
+      case 'DOMAIN': {
+        // Topology web
+        const tw = iconG.append('g').attr('transform', 'translate(-12, -3)');
+        const twNodes = [[0,0],[-4,-4],[4,-4],[4,4],[-4,4]];
+        twNodes.forEach(([nx,ny]) => {
+          tw.append('circle')
+            .attr('cx', nx).attr('cy', ny).attr('r', 1)
+            .attr('fill', ic).attr('fill-opacity', 0.6);
+        });
+        for (let i = 1; i < twNodes.length; i++) {
+          tw.append('line')
+            .attr('x1', twNodes[0][0]).attr('y1', twNodes[0][1])
+            .attr('x2', twNodes[i][0]).attr('y2', twNodes[i][1])
+            .attr('stroke', ic).attr('stroke-width', iw * 0.5)
+            .attr('stroke-opacity', 0.4);
+        }
+
+        // Concentric rings (nesting)
+        const cr = iconG.append('g').attr('transform', 'translate(0, 0)');
+        [3, 6, 9].forEach(r => {
+          cr.append('circle')
+            .attr('cx', 0).attr('cy', 0).attr('r', r)
+            .attr('fill', 'none').attr('stroke', ic)
+            .attr('stroke-width', iw * 0.6)
+            .attr('stroke-opacity', 0.4);
+        });
+
+        // Grid (zone)
+        const grid = iconG.append('g').attr('transform', 'translate(14, -2)');
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            grid.append('rect')
+              .attr('x', col * 4 - 6).attr('y', row * 4 - 4)
+              .attr('width', 3).attr('height', 3)
+              .attr('fill', ic).attr('fill-opacity', 0.15 + Math.random() * 0.2)
+              .attr('stroke', ic).attr('stroke-width', iw * 0.4)
+              .attr('stroke-opacity', 0.3);
+          }
+        }
+        break;
+      }
+    }
+
+    // Category label below shape
+    g.append('text')
+      .attr('x', 0).attr('y', shapeSize + 24)
+      .attr('text-anchor', 'middle')
+      .attr('fill', cat.color)
+      .attr('font-family', "'IBM Plex Mono', monospace")
+      .attr('font-weight', 500)
+      .attr('font-size', 10)
+      .attr('letter-spacing', '2px')
+      .text(cat.id);
+  });
+
+  // ---- SCATTERED DOTS (72-element vocabulary) ----
+  const rng = d3.randomLcg(42);
+  const randFloat = (lo, hi) => lo + rng() * (hi - lo);
+
+  // Upper margin dots
+  for (let i = 0; i < 14; i++) {
+    const cat = categories[Math.floor(rng() * categories.length)];
+    svg.append('circle')
+      .attr('cx', randFloat(60, W - 60))
+      .attr('cy', randFloat(165, 195))
+      .attr('r', randFloat(1, 2.2))
+      .attr('fill', cat.color)
+      .attr('fill-opacity', randFloat(0.15, 0.35));
+  }
+
+  // Lower margin dots
+  for (let i = 0; i < 14; i++) {
+    const cat = categories[Math.floor(rng() * categories.length)];
+    svg.append('circle')
+      .attr('cx', randFloat(60, W - 60))
+      .attr('cy', randFloat(325, 355))
+      .attr('r', randFloat(1, 2.2))
+      .attr('fill', cat.color)
+      .attr('fill-opacity', randFloat(0.15, 0.35));
+  }
+
+  // Very top/bottom sparse dots
+  for (let i = 0; i < 6; i++) {
+    const cat = categories[Math.floor(rng() * categories.length)];
+    svg.append('circle')
+      .attr('cx', randFloat(80, W - 80))
+      .attr('cy', randFloat(400, 470))
+      .attr('r', randFloat(0.8, 1.8))
+      .attr('fill', cat.color)
+      .attr('fill-opacity', randFloat(0.1, 0.25));
+  }
+
+  // ---- SAVE AS PNG ----
+  document.getElementById('save-btn').addEventListener('click', function() {
+    const svgEl = document.getElementById('banner');
+    const serializer = new XMLSerializer();
+    let svgStr = serializer.serializeToString(svgEl);
+
+    // Inline the fonts for the PNG
+    const fontCSS = `
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap');
+    `;
+
+    // Embed font CSS into SVG
+    const styleEl = '<style>' + fontCSS + '</style>';
+    svgStr = svgStr.replace('>', '>' + styleEl);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W * 2;  // 2x for retina
+    canvas.height = H * 2;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+
+    const img = new Image();
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    img.onload = function() {
+      ctx.fillStyle = '#070c1b';
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+
+      const a = document.createElement('a');
+      a.download = '04_stoyko_periodic_table.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = url;
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Analytics — Gait Archetype Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #eaf2ff;
+    padding: 20px 0;
+  }
+  #atlas { display: block; }
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0;
+    background: rgba(7,12,27,0.95); border: 1px solid rgba(103,139,214,0.4);
+    border-radius: 8px; padding: 10px 14px; max-width: 320px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
+    color: #eaf2ff; transition: opacity 0.15s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .tooltip .tt-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .tooltip .tt-icm { color: #6c7fa8; font-size: 11px; margin-bottom: 6px; }
+  .tooltip .tt-desc { color: #adc0e5; font-size: 11px; margin-bottom: 6px; line-height: 1.4; }
+  .tooltip .tt-features { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #77f0cb; }
+  .tooltip .tt-features span { color: #6c7fa8; }
+  .tooltip .tt-gaits { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #ffa278; margin-top: 4px; }
+  #save-btn {
+    margin-top: 12px; background: rgba(103,139,214,0.15);
+    border: 1px solid rgba(103,139,214,0.3); color: #6c7fa8;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 5px 14px; cursor: pointer; border-radius: 4px;
+  }
+  #save-btn:hover { background: rgba(103,139,214,0.3); color: #eaf2ff; }
+  .legend-row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<svg id="atlas" width="1200" height="700"></svg>
+<div class="tooltip" id="tooltip"></div>
+<button id="save-btn">Save as PNG</button>
+
+<script>
+(function() {
+  const W = 1200, H = 700;
+  const svg = d3.select("#atlas");
+  const defs = svg.append("defs");
+  const tooltip = d3.select("#tooltip");
+
+  // ── Real Stoyko SVG category shape paths (from systemviz-source1-1-2) ──
+  const STOYKO = {
+    // A-DRIVER: egg/teardrop, viewBox 0 0 101.8 101.8
+    DRIVER: { vb: [0,0,101.8,101.8], path: "M50.9,0C39.6,0,0.2,39.5,0,50.9c-0.2,11.9,40.5,50.9,50.9,50.9c10.1,0,51.2-38.9,50.9-50.9C101.6,39.7,62.4,0,50.9,0z" },
+    // B-SIGNAL: 4-pointed astroid, viewBox 0 0 99.8 99.8
+    SIGNAL: { vb: [0,0,99.8,99.8], path: "M99.8,22.5C99.8,10.1,89.7,0,77.3,0C65,0.1,57.1,5.9,49.9,5.9c-7.2,0-15.1-5.7-27.4-5.9C10.1,0,0,10.1,0,22.5c0.1,12.3,5.9,20.2,5.9,27.4C5.9,57.1,0.1,65,0,77.3c0,12.4,10.1,22.5,22.5,22.5c12.3-0.1,20.2-5.9,27.4-5.9c7.2,0,15.1,5.7,27.4,5.9c12.4,0,22.5-10.1,22.5-22.5c-0.1-12.3-5.9-20.2-5.9-27.4C93.9,42.7,99.7,34.8,99.8,22.5z" },
+    // C-STATE: rounded cushion, viewBox 0 0 101.8 101.8
+    STATE: { vb: [0,0,101.8,101.8], path: "M92.4,20.7c-1.8-2.6-4.8-3.8-7.7-3.6c0.2-2.9-1-5.9-3.6-7.7C72.2,3.3,61.8,0,50.9,0C40.1,0,29.6,3.3,20.7,9.5c-2.6,1.8-3.8,4.8-3.6,7.7c-2.9-0.2-5.9,1-7.7,3.6C3.3,29.6,0,40.1,0,50.9s3.3,21.3,9.5,30.2c1.6,2.4,4.3,3.6,7,3.6c0.2,0,0.5,0,0.7-0.1c-0.2,2.9,1,5.9,3.6,7.7c8.9,6.2,19.4,9.5,30.2,9.5c10.8,0,21.3-3.3,30.2-9.5c2.6-1.8,3.8-4.7,3.6-7.7c0.2,0,0.5,0.1,0.7,0.1c2.7,0,5.3-1.3,7-3.6c6.2-8.9,9.5-19.4,9.5-30.2S98.6,29.6,92.4,20.7z" },
+    // D-BOUNDARY: concave square, viewBox 0 0 93.1 93.1
+    BOUNDARY: { vb: [0,0,93.1,93.1], path: "M93,86.1c-3.3-26.3-3.3-52.9,0-79.2h0c0.2-1.9-0.3-4-1.6-5.3c-1.3-1.3-3.4-1.8-5.3-1.6c-26.3,3.3-52.9,3.3-79.2,0l0,0C5-0.2,2.9,0.3,1.6,1.6C0.3,3-0.2,5,0.1,6.9c3.3,26.3,3.3,52.9,0,79.2c-0.2,1.9,0.3,4,1.6,5.3C3,92.8,5,93.3,6.9,93c26.3-3.3,52.9-3.3,79.2,0v0c1.9,0.2,4-0.3,5.3-1.6C92.8,90.1,93.3,88.1,93,86.1z" },
+    // E-RELATION: upward triangle, viewBox 0 0 95.1 103.8
+    RELATION: { vb: [0,0,95.1,103.8], path: "M47.6,0C-1.3,13.8-6.4,66.3,5.2,91c12.1,8.1,26.6,12.8,42.3,12.8h0c15.7,0,30.2-4.7,42.3-12.8C101.5,66.3,96.4,13.8,47.6,0z" },
+    // F-DOMAIN: vertical hexagon, viewBox 0 0 96.3 105.9
+    DOMAIN: { vb: [0,0,96.3,105.9], path: "M93.7,26.5C88.5,21.6,81,16.1,72.2,11C63.4,5.8,54.9,2,48.2,0c-6.8,2-15.3,5.8-24.1,11C15.3,16.1,7.8,21.6,2.6,26.5C1,33.4,0,42.7,0,52.9s1,19.6,2.6,26.5l0,0c5.1,4.9,12.7,10.4,21.5,15.5c8.8,5.1,17.3,8.9,24.1,11c6.8-2,15.3-5.8,24.1-11c8.8-5.1,16.3-10.6,21.5-15.5l0,0c1.6-6.9,2.6-16.2,2.6-26.5S95.3,33.4,93.7,26.5z" },
+  };
+
+  // ── Source groups: map each group to a Stoyko shape + color ──
+  const GROUPS = {
+    simulation:  { label: "Simulation-Grounded", color: "#53c6ff", shape: "DRIVER",   count: 11 },
+    literary:    { label: "Literary / Cultural",  color: "#ff7ea6", shape: "SIGNAL",   count: 9 },
+    motion_word: { label: "Motion-Word Seeded",   color: "#77f0cb", shape: "STATE",    count: 8 },
+    character:   { label: "Character / Celebrity", color: "#ffa278", shape: "BOUNDARY", count: 5 },
+    math:        { label: "Math-Seeded",           color: "#d3b3ff", shape: "RELATION", count: 5 },
+    meta:        { label: "Interpolation / Meta",  color: "#f5dd78", shape: "DOMAIN",   count: 3 },
+  };
+
+  // ── Real archetype data (48 archetypes from ludobots_archetypes.v1.json) ──
+  const DATA = [
+    {n:"power_strider",g:"simulation",w:[-0.3,-1,-.3,1,.3,1],fv:[.689,0,0,.385,27.05,.045,.694,15.5,0,.067],gaits:["5_pelton","10_tesla_3phase","18_curie"],icm:"Propulsive Efficiency",desc:"High-speed, low asymmetry. Balanced propulsion with strong forward momentum.",gc:2},
+    {n:"spinner",g:"simulation",w:[-.5,-.7,1,.5,-.7,-.7],fv:[.105,0,0,.545,-13.09,.037,.739,355.37,0,.014],gaits:["47_spinner_6synapse","46_spinner_crosswired","44_spinner_champion"],icm:"Spinner ICM",desc:"Rotational motion with high yaw. Cost of transport: 355 (highest of all archetypes).",gc:2},
+    {n:"crab_walker",g:"simulation",w:[-.3,-.85,-.26,.85,.26,.85],fv:[.705,0,0,.435,6.04,.019,.589,14.17,0,.074],gaits:["52_curie_crab","53_rucker_landcrab","55_skew_crab"],icm:"Crab Walker ICM",desc:"Lateral displacement with moderate straightness and low duty factor asymmetry.",gc:2},
+    {n:"cpg_oscillator",g:"simulation",w:[-.7,-.5,-.3,.3,.5,.7],fv:[.904,0,0,.852,-31.87,.063,.312,4.34,0,.058],gaits:["21_noether_cpg","5_bouncer"],icm:"Rhythmic Oscillation",desc:"Highest straightness (0.904) and phase lock (0.852). Lowest cost of transport after efficiency_optimizer.",gc:2},
+    {n:"drift_explorer",g:"simulation",w:[-.7,-.7,-.7,.7,.7,.7],fv:[.262,0,0,.764,12.01,.066,.026,151.66,0,.029],gaits:["70_grunbaum_defect","85_foucault_panopticon"],icm:"Spatial Exploration",desc:"Lowest straightness (0.262) and flight fraction (0.026). Mostly ground-contact, meandering path.",gc:2},
+    {n:"chaotic_exploratory",g:"simulation",w:[.3,.85,.26,-.85,-.26,-.85],fv:[.551,0,0,.708,-60.72,.027,.176,24.65,0,.041],gaits:["76_dick_ubik","51_curie_spinner"],icm:"Chaotic Exploratory ICM",desc:"Most negative symmetry index (-60.7). Erratic, unpredictable motion with high entropy.",gc:2},
+    {n:"dead_inert",g:"simulation",w:[.01,-.01,.01,-.01,.01,-.01],fv:[.888,0,0,.989,.1,.001,.350,11.11,0,.023],gaits:["62_cage_433","7_fuller_dymaxion"],icm:"Dead Inert ICM",desc:"Highest phase lock (0.989), near-zero symmetry index. Minimal motion, near-perfect synchrony.",gc:2},
+    {n:"efficiency_optimizer",g:"simulation",w:[0,1,-1,0,-1,1],fv:[.846,0,0,.926,-18.69,.073,.116,3.04,0,.082],gaits:["5_bouncer","93_borges_mirror"],icm:"Energy Efficiency",desc:"Lowest cost of transport (3.04). Most efficient locomotion of all archetypes.",gc:2},
+    {n:"dynamic_balancer",g:"simulation",w:[-.5,-.8,-.5,.5,.8,.5],fv:[.671,0,0,.897,-96.83,.157,.265,36.94,0,.075],gaits:["80_deleuze_fold","1_original"],icm:"Stability Through Symmetry",desc:"Most extreme symmetry index (-96.8) and highest duty factor asymmetry (0.157).",gc:2},
+    {n:"temporal_dancer",g:"simulation",w:[-.866,-.5,0,0,.5,.866],fv:[.573,0,0,.683,-40.67,.038,.691,13.06,0,.078],gaits:["10_tesla_3phase","15_noether","63_cage_prepared"],icm:"Rhythmic Variation",desc:"High temporal complexity with variable speed. High flight fraction (0.691).",gc:2},
+    {n:"adaptive_walker",g:"simulation",w:[.252,-1.498,-.641,.973,1.583,1.208],fv:[.905,0,0,.498,73.06,.111,.704,9.04,0,.116],gaits:["56_evolved_crab_v2","58_evolved_crab_positive_v2"],icm:"Environmental Adaptation",desc:"Highest efficiency (0.116) and most positive symmetry index (73.1). Evolved, not designed.",gc:2},
+    {n:"heroic_stride",g:"literary",w:[.7,.4,.1,-.1,.2,0],fv:null,gaits:["motion_verbs","oeis_sequences"],icm:"balanced_symmetry",desc:"Confident, purposeful gait with high symmetry. Associated with protagonists.",gc:2},
+    {n:"villainous_shuffle",g:"literary",w:[-.6,-.3,-.2,.5,-.1,.3],fv:null,gaits:["dark_matter","oeis_sequences"],icm:"asymmetric_displacement",desc:"Erratic, asymmetrical walk with low phase locking. Associated with antagonists.",gc:2},
+    {n:"rocking_motion",g:"literary",w:[.2,.5,.6,-.3,.4,.1],fv:null,gaits:["dark_matter","mathematicians"],icm:"repetitive_oscillation",desc:"Oscillating, rhythmic gait associated with instability or introspection.",gc:2},
+    {n:"circular_wander",g:"literary",w:[.1,-.2,-.3,.4,-.1,-.2],fv:null,gaits:["dark_matter","bible_passages"],icm:"aimless_displacement",desc:"Meandering, circular path indicating aimless wandering or confusion.",gc:2},
+    {n:"mathematical_precision",g:"literary",w:[.4,1,-.7,-.1,.7,.4],fv:null,gaits:["oeis_sequences","mathematicians"],icm:"ordered_structure",desc:"Highly structured, ordered gait reflecting mathematical or logical thinking.",gc:2},
+    {n:"divine_presence",g:"literary",w:[.8,.6,.5,-.2,.3,.2],fv:null,gaits:["bible_passages","motion_verbs"],icm:"transcendent_motion",desc:"Grand, expansive gait associated with divine or transcendent figures.",gc:2},
+    {n:"pale_horse",g:"literary",w:[-.8,.6,.2,-.9,.5,-.4],fv:null,gaits:["Revelation 6:8","displacement champion (DX=29.17m)"],icm:"asymmetric_juggernaut",desc:"Displacement champion: DX=29.17m, speed=3.11, phase_lock=0.499. Brute asymmetric force. Death does not trot. It charges.",gc:3},
+    {n:"whirling_wind",g:"literary",w:[.6,-.5,-.4,.8,.2,-.9],fv:null,gaits:["Ecclesiastes 1:6","efficiency champion (0.00495)"],icm:"efficient_eternal_cycle",desc:"Efficiency champion: phase_lock=0.995, work=1096 for 5.4m. Anti-correlated with pale_horse (cosine -0.496). The wind doesn't sprint. It persists.",gc:3},
+    {n:"conservation_law",g:"math",w:[.5,-.5,.3,-.3,.7,-.7],fv:null,gaits:["Noether's Theorem","deadest gait (DX=0.031m)"],icm:"dynamic_stasis",desc:"Perfect pairwise anti-symmetry: (+0.5,-0.5),(+0.3,-0.3),(+0.7,-0.7). Speed=0.61, entropy=1.89, work=9865. Thrashes vigorously, goes nowhere.",gc:3},
+    {n:"tragic_step",g:"literary",w:[.4,.7,.7,-.4,.7,-.4],fv:null,gaits:["motion_verbs","romeo_and_juliet"],icm:"emotional_displacement",desc:"Slow, melancholic gait with high entropy, indicating sorrow or loss.",gc:2},
+    {n:"primal_rush",g:"literary",w:[.5,.3,.2,-.4,.6,.5],fv:null,gaits:["dark_matter","motion_verbs"],icm:"instinctive_motion",desc:"Fast, aggressive gait associated with raw emotion or primal instincts.",gc:2},
+    {n:"canceller",g:"literary",w:[.5,-.5,.3,-.3,.5,-.5],fv:null,gaits:["dark_matter_cancellers"],icm:"self_negation",desc:"Opposing motor drives cancel out, producing near-zero net displacement.",gc:2},
+    {n:"gentle_ambler",g:"motion_word",w:[.6,.8,.4,-.5,-.7,-.3],fv:null,gaits:["amble","glide","roam","saunter","drift"],icm:"leisurely_locomotion",desc:"Relaxed, unhurried locomotion. 61 trials across 5 motion words.",gc:2},
+    {n:"agitated_scrambler",g:"motion_word",w:[.6,.6,.6,-.6,-.6,-.6],fv:null,gaits:["bounce","hop","scurry","zigzag","sway","trot","sprint"],icm:"agitated_locomotion",desc:"Energetic, irregular locomotion. 166 trials across 7 motion words.",gc:2},
+    {n:"forceful_charger",g:"motion_word",w:[.7,.7,0,-.7,0,.7],fv:null,gaits:["charge","gallop","drag","retreat","patrol"],icm:"directed_force",desc:"Powerful, directed locomotion. 141 trials across 5 motion words.",gc:2},
+    {n:"cautious_creeper",g:"motion_word",w:[.6,.2,.2,.3,-.4,.4],fv:null,gaits:["forward_walk","saunter","waddle"],icm:"cautious_locomotion",desc:"Slow, careful locomotion. 31 trials across 3 motion words.",gc:2},
+    {n:"yaw_spinner",g:"motion_word",w:[-.547,.672,.581,.581,-.356,.944],fv:null,gaits:["dash","twirl","stomp","scurry","sprint"],icm:"yaw_spinner_icm",desc:"High-speed rotational with strong negative yaw. 4 grounding criteria.",gc:4},
+    {n:"wobbler",g:"motion_word",w:[.76,-.73,.395,.85,.805,.23],fv:null,gaits:["dash","sprint","gallop","charge"],icm:"wobbler_icm",desc:"Fast backward-moving with low phase-lock. 4 grounding criteria.",gc:4},
+    {n:"dasher",g:"motion_word",w:[-.545,.555,.079,.839,-.075,.461],fv:null,gaits:["twirl","retreat","scurry","pivot"],icm:"dasher_icm",desc:"Fast, high-entropy with moderate coordination and minimal yaw.",gc:3},
+    {n:"hop",g:"motion_word",w:[.4,-.4,.4,1.0,1.0,.4],fv:null,gaits:["hop (28 trials)","agitated_scrambler (parent)"],icm:"bursty_aerial_locomotion",desc:"Bursty ballistic gait: speed_cv ~1.86, near-zero contact entropy, high phase lock. Promoted from agitated_scrambler.",gc:3},
+    {n:"charging_gallop",g:"motion_word",w:[.7,-.7,.7,.4,.4,.7],fv:null,gaits:["Galopp [de] (dx=14.2)","gallop convergent (dx=-24.5)","forceful_charger (parent)"],icm:"directed_gallop",desc:"Forward-displacement gallop: fast (speed>1.0), high contact entropy (>1.4), ground-covering. The prototypical gallop.",gc:3},
+    {n:"tumbling_gallop",g:"motion_word",w:[.8,-.7,.6,-.5,.9,-.8],fv:null,gaits:["5_gallop (tilt=242°)","gallop reverse trials","wobbler (overlap)"],icm:"controlled_tumble",desc:"Reverse gallop: tips backward, slides on torso with phase_lock>0.95. A controlled failure mode.",gc:3},
+    {n:"drifting_gallop",g:"motion_word",w:[.4,-.4,.4,.7,.7,-.4],fv:null,gaits:["gallop drifter-cluster (13 trials)","default LLM gallop mode"],icm:"undirected_gallop",desc:"Wandering gallop: high energy (speed_cv ~1.82) but path_straightness ~0.25. A gallop that forgot where it was going.",gc:3},
+    {n:"quantized_attractor",g:"motion_word",w:[.1,.4,.4,-.1,.4,.4],fv:null,gaits:["character_seed (397/8000 trials)"],icm:"token_quantization_collapse",desc:"Model collapse: LLM quantizes weights to coarse grid {-0.1, 0, 0.1, 0.4}.",gc:2},
+    {n:"celebrity_launcher",g:"character",w:[.76,.24,-.57,-.4,.7,.83],fv:null,gaits:["Cleopatra","Messi","Gandhi","Meryl Streep","Pelosi"],icm:"dynamic_persona_projection",desc:"High displacement cluster. LLM assigns high w24 (>0.7) to diverse celebrities.",gc:2},
+    {n:"celebrity_plodder",g:"character",w:[.76,.86,.5,-.42,-.64,-.34],fv:null,gaits:["Tom Brady","Michael Jordan","Steve Bannon","Churchill"],icm:"stable_persona_projection",desc:"High phase lock cluster. Sports figures and authority figures converge here.",gc:2},
+    {n:"celebrity_wanderer",g:"character",w:[.74,.24,-.54,-.45,.67,.12],fv:null,gaits:["Peter Thiel","Jack Dorsey","Neil Gaiman","Johnny Depp"],icm:"unconventional_persona_projection",desc:"Low phase lock (<0.35). 'Unconventional/unpredictable' celebrities cluster here.",gc:2},
+    {n:"genre_heist_lockstep",g:"character",w:[-.06,.33,.47,-.16,.43,-.09],fv:null,gaits:["Money Heist","Ocean's 11"],icm:"precision_under_pressure",desc:"Slowest mean speed of all character archetypes. Heist thriller precision.",gc:2},
+    {n:"character_wise_elder",g:"character",w:[-.4,.7,.1,-.1,.4,0],fv:null,gaits:["Richard Webber","Prof. Oak","Hawkeye Pierce"],icm:"paternal_authority_projection",desc:"Elder/authority TV characters. LLM projects paternal authority into gait.",gc:2},
+    {n:"semantic_invariant",g:"math",w:[.6,.2,.5,-.4,-.8,-.3],fv:null,gaits:["places (87/100)","politics (50/100)","bible (44/100)","verbs (39/100)"],icm:"semantic_insensitivity_collapse",desc:"Model collapse: qwen3-coder converges to same weights regardless of semantic input.",gc:2},
+    {n:"theorem_combinatorial_walker",g:"math",w:[.6,.2,-.4,-.6,-.2,.4],fv:null,gaits:["Van der Waerden","Hales-Jewett","Menger","Ramsey"],icm:"combinatorial_convergence",desc:"Ramsey-theoretic theorems converge to identical weights, distinct from all collapse attractors.",gc:2},
+    {n:"oeis_recursive_oscillator",g:"math",w:[.03,.7,.23,.23,.17,.13],fv:null,gaits:["Fibonacci","Lucas","Pell","Tribonacci","Padovan"],icm:"recursive_structure_resonance",desc:"Recursive sequences produce highest phase lock among all mathematical families.",gc:2},
+    {n:"oeis_polynomial_strider",g:"math",w:[.3,.5,.1,0,-.2,.5],fv:null,gaits:["Squares","Triangular","Pentagonal","Oblong"],icm:"mathematical_simplicity_embodiment",desc:"Polynomial sequences (2nd finite diff = 0) produce the straightest paths.",gc:2},
+    {n:"oeis_divisor_chaotic",g:"math",w:[-.2,.4,-.3,.1,0,.2],fv:null,gaits:["d(n)","sigma(n)","abundant","deficient"],icm:"arithmetic_irregularity_embodiment",desc:"Divisor-related sequences produce highest contact entropy of all math families.",gc:2},
+    {n:"the_interpolator",g:"meta",w:[.75,.85,.65,-.45,-.25,-.55],fv:null,gaits:["Archetype interpolation","Super-gaits"],icm:"adaptive_convergence",desc:"Smooth, adaptive bridging of disparate states through weight-space midpoints.",gc:2},
+    {n:"the_asymmetric_adapter",g:"meta",w:[.7,.2,.8,-.5,.6,-.3],fv:null,gaits:["Archetype interpolation","Super-gaits"],icm:"directional_adaptation",desc:"Asymmetric adaptation: thrives in environments requiring directional responsiveness.",gc:2},
+    {n:"super_gait",g:"meta",w:[-.939,-.385,.458,-.183,.137,.321],fv:null,gaits:["Interp Super (t=0.52)","Novelty Champion"],icm:"emergent_optimization",desc:"Interpolation champion: extreme speed from weight-space midpoints between high-performers.",gc:3},
+  ];
+
+  // ── PCA on 6D weight vectors ──
+  function pca2d(data) {
+    const n = data.length;
+    const d = 6;
+    const W = data.map(a => a.w.slice(0, d));
+
+    // Center
+    const mean = Array(d).fill(0);
+    W.forEach(w => w.forEach((v, i) => mean[i] += v / n));
+    const C = W.map(w => w.map((v, i) => v - mean[i]));
+
+    // Covariance matrix
+    const cov = Array.from({length: d}, () => Array(d).fill(0));
+    for (let i = 0; i < d; i++)
+      for (let j = 0; j < d; j++)
+        for (let k = 0; k < n; k++)
+          cov[i][j] += C[k][i] * C[k][j] / (n - 1);
+
+    // Power iteration for top 2 eigenvectors
+    function powerIter(mat, deflated) {
+      let v = Array(d).fill(0).map(() => Math.random());
+      const norm = arr => Math.sqrt(arr.reduce((s, x) => s + x * x, 0));
+      const normalize = arr => { const n = norm(arr); return arr.map(x => x / n); };
+      v = normalize(v);
+      for (let iter = 0; iter < 200; iter++) {
+        let nv = Array(d).fill(0);
+        for (let i = 0; i < d; i++)
+          for (let j = 0; j < d; j++)
+            nv[i] += (deflated || mat)[i][j] * v[j];
+        v = normalize(nv);
+      }
+      let Av = Array(d).fill(0);
+      for (let i = 0; i < d; i++)
+        for (let j = 0; j < d; j++)
+          Av[i] += (deflated || mat)[i][j] * v[j];
+      const eigenvalue = v.reduce((s, vi, i) => s + vi * Av[i], 0);
+      return { vec: v, val: eigenvalue };
+    }
+
+    const pc1 = powerIter(cov);
+    // Deflate
+    const deflated = cov.map((row, i) => row.map((v, j) => v - pc1.val * pc1.vec[i] * pc1.vec[j]));
+    const pc2 = powerIter(cov, deflated);
+
+    // Project
+    return C.map(c => ({
+      x: c.reduce((s, v, i) => s + v * pc1.vec[i], 0),
+      y: c.reduce((s, v, i) => s + v * pc2.vec[i], 0),
+    }));
+  }
+
+  const projected = pca2d(DATA);
+
+  // Scale to SVG coordinates
+  const margin = { top: 100, right: 50, bottom: 60, left: 50 };
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+
+  const xExt = d3.extent(projected, d => d.x);
+  const yExt = d3.extent(projected, d => d.y);
+  const xScale = d3.scaleLinear().domain([xExt[0] - 0.2, xExt[1] + 0.2]).range([margin.left, W - margin.right]);
+  const yScale = d3.scaleLinear().domain([yExt[0] - 0.2, yExt[1] + 0.2]).range([H - margin.bottom, margin.top]);
+
+  // ── SVG Filters ──
+  Object.entries(GROUPS).forEach(([key, g]) => {
+    const f = defs.append("filter")
+      .attr("id", `glow-${key}`)
+      .attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
+    f.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", "3").attr("result", "blur");
+    f.append("feComposite").attr("in", "SourceGraphic").attr("in2", "blur").attr("operator", "over");
+  });
+
+  // Background
+  const bgGrad = defs.append("radialGradient").attr("id", "bgGrad")
+    .attr("cx", "50%").attr("cy", "50%").attr("r", "60%");
+  bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "#101a32");
+  bgGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070c1b");
+  svg.append("rect").attr("width", W).attr("height", H).attr("fill", "url(#bgGrad)");
+
+  // ── Title ──
+  svg.append("text").attr("x", 40).attr("y", 38)
+    .attr("font-family", "'Sora', sans-serif").attr("font-weight", 700).attr("font-size", 28).attr("fill", "#eaf2ff")
+    .text("Gait Archetype Atlas");
+  svg.append("text").attr("x", 40).attr("y", 58)
+    .attr("font-family", "'IBM Plex Sans', sans-serif").attr("font-size", 13).attr("fill", "#6c7fa8")
+    .text("48 archetypes from 116 gaits · PCA of 6D weight vectors · 11 simulation-grounded");
+  svg.append("text").attr("x", 40).attr("y", 74)
+    .attr("font-family", "'IBM Plex Sans', sans-serif").attr("font-size", 12).attr("fill", "#6c7fa8")
+    .text("Stoyko SystemViz shapes mark source type · Filled nodes have measured feature vectors");
+
+  // ── Legend ──
+  const legend = svg.append("g").attr("transform", `translate(${W - 240}, 18)`);
+  let ly = 0;
+  Object.entries(GROUPS).forEach(([key, g]) => {
+    const row = legend.append("g").attr("transform", `translate(0, ${ly})`);
+    // Stoyko shape as legend swatch
+    const s = STOYKO[g.shape];
+    const vbW = s.vb[2], vbH = s.vb[3];
+    const scale = 12 / Math.max(vbW, vbH);
+    row.append("path").attr("d", s.path)
+      .attr("transform", `translate(0,0) scale(${scale})`)
+      .attr("fill", g.color).attr("fill-opacity", 0.7)
+      .attr("stroke", g.color).attr("stroke-width", 1 / scale);
+    row.append("text").attr("x", 18).attr("y", 9)
+      .attr("font-family", "'IBM Plex Sans', sans-serif").attr("font-size", 11).attr("fill", "#adc0e5")
+      .text(`${g.label} (${g.count})`);
+    ly += 18;
+  });
+
+  // ── Shared-gait edges ──
+  const overlaps = {
+    "10_tesla_3phase": ["power_strider","temporal_dancer"],
+    "5_bouncer": ["cpg_oscillator","efficiency_optimizer"],
+    "motion_verbs": ["heroic_stride","divine_presence","tragic_step","primal_rush"],
+    "dark_matter": ["villainous_shuffle","rocking_motion","circular_wander","primal_rush"],
+    "oeis_sequences": ["heroic_stride","villainous_shuffle","mathematical_precision"],
+    "mathematicians": ["rocking_motion","mathematical_precision"],
+    "bible_passages": ["circular_wander","divine_presence","pale_horse","whirling_wind"],
+    "triptych": ["pale_horse","whirling_wind","conservation_law"],
+    "hop_promotion": ["hop","agitated_scrambler"],
+    "gallop_family": ["charging_gallop","tumbling_gallop","drifting_gallop"],
+    "gallop_charger": ["charging_gallop","forceful_charger"],
+    "gallop_wobbler": ["tumbling_gallop","wobbler"],
+  };
+
+  const nameToIdx = {};
+  DATA.forEach((d, i) => nameToIdx[d.n] = i);
+
+  const edges = svg.append("g").attr("class", "edges");
+  Object.entries(overlaps).forEach(([gait, archs]) => {
+    for (let i = 0; i < archs.length; i++) {
+      for (let j = i + 1; j < archs.length; j++) {
+        const a = nameToIdx[archs[i]], b = nameToIdx[archs[j]];
+        if (a !== undefined && b !== undefined) {
+          edges.append("line")
+            .attr("x1", xScale(projected[a].x)).attr("y1", yScale(projected[a].y))
+            .attr("x2", xScale(projected[b].x)).attr("y2", yScale(projected[b].y))
+            .attr("stroke", "#678bd6").attr("stroke-opacity", 0.12).attr("stroke-width", 0.8)
+            .attr("stroke-dasharray", "3,4");
+        }
+      }
+    }
+  });
+
+  // ── Archetype nodes ──
+  const nodes = svg.append("g").attr("class", "nodes");
+
+  DATA.forEach((d, i) => {
+    const cx = xScale(projected[i].x);
+    const cy = yScale(projected[i].y);
+    const g = GROUPS[d.g];
+    const s = STOYKO[g.shape];
+    const isGrounded = d.fv !== null;
+    const nodeSize = isGrounded ? 22 : 14;
+    const vbW = s.vb[2], vbH = s.vb[3];
+    const scale = nodeSize / Math.max(vbW, vbH);
+
+    const node = nodes.append("g")
+      .attr("transform", `translate(${cx - nodeSize/2}, ${cy - nodeSize/2})`)
+      .attr("cursor", "pointer")
+      .on("mouseenter", function(event) {
+        d3.select(this).select("path")
+          .transition().duration(150)
+          .attr("fill-opacity", isGrounded ? 0.9 : 0.6)
+          .attr("stroke-width", 2 / scale);
+
+        let html = `<div class="tt-name" style="color:${g.color}">${d.n.replace(/_/g, ' ')}</div>`;
+        html += `<div class="tt-icm">ICM: ${d.icm} · ${g.label}</div>`;
+        html += `<div class="tt-desc">${d.desc}</div>`;
+        if (d.fv) {
+          const labels = ['straightness','_','_','phase_lock','symmetry_idx','duty_asym','flight_frac','cost_of_transport','_','efficiency'];
+          html += '<div class="tt-features">';
+          d.fv.forEach((v, j) => {
+            if (labels[j] !== '_' && v !== 0) html += `${labels[j]}: <span>${v.toFixed(3)}</span><br>`;
+          });
+          html += '</div>';
+        }
+        html += `<div class="tt-gaits">${d.gaits.slice(0, 4).join(', ')}${d.gaits.length > 4 ? '...' : ''}</div>`;
+
+        tooltip.html(html).style("opacity", 1)
+          .style("left", (event.pageX + 14) + "px")
+          .style("top", (event.pageY - 10) + "px");
+      })
+      .on("mouseleave", function() {
+        d3.select(this).select("path")
+          .transition().duration(150)
+          .attr("fill-opacity", isGrounded ? 0.6 : 0.2)
+          .attr("stroke-width", 1.2 / scale);
+        tooltip.style("opacity", 0);
+      });
+
+    node.append("path").attr("d", s.path)
+      .attr("transform", `scale(${scale})`)
+      .attr("fill", g.color)
+      .attr("fill-opacity", isGrounded ? 0.6 : 0.2)
+      .attr("stroke", g.color)
+      .attr("stroke-width", 1.2 / scale)
+      .attr("filter", isGrounded ? `url(#glow-${d.g})` : null);
+
+    // Label for simulation-grounded archetypes
+    if (isGrounded) {
+      nodes.append("text")
+        .attr("x", cx).attr("y", cy + nodeSize / 2 + 12)
+        .attr("text-anchor", "middle")
+        .attr("font-family", "'IBM Plex Mono', monospace")
+        .attr("font-size", 8).attr("fill", g.color).attr("fill-opacity", 0.7)
+        .text(d.n.replace(/_/g, ' '));
+    }
+  });
+
+  // ── Axis labels ──
+  svg.append("text").attr("x", W / 2).attr("y", H - 16)
+    .attr("text-anchor", "middle")
+    .attr("font-family", "'IBM Plex Mono', monospace").attr("font-size", 10)
+    .attr("fill", "#6c7fa8").attr("fill-opacity", 0.6)
+    .text("PC1 — Weight-space principal component 1");
+  svg.append("text")
+    .attr("transform", `translate(16, ${H / 2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .attr("font-family", "'IBM Plex Mono', monospace").attr("font-size", 10)
+    .attr("fill", "#6c7fa8").attr("fill-opacity", 0.6)
+    .text("PC2 — Weight-space principal component 2");
+
+  // ── Feature callouts for extreme archetypes ──
+  const callouts = [
+    { name: "efficiency_optimizer", text: "CoT: 3.04 (most efficient)", anchor: "start", dx: 16, dy: -4 },
+    { name: "spinner", text: "CoT: 355.4 (highest cost)", anchor: "end", dx: -16, dy: -4 },
+    { name: "adaptive_walker", text: "η: 0.116 (highest efficiency)", anchor: "start", dx: 16, dy: 4 },
+    { name: "dead_inert", text: "φ: 0.989 (highest phase lock)", anchor: "end", dx: -16, dy: 12 },
+    { name: "cpg_oscillator", text: "straightness: 0.904", anchor: "start", dx: 16, dy: -8 },
+  ];
+
+  callouts.forEach(c => {
+    const idx = nameToIdx[c.name];
+    if (idx === undefined) return;
+    const cx = xScale(projected[idx].x);
+    const cy = yScale(projected[idx].y);
+    svg.append("text")
+      .attr("x", cx + c.dx).attr("y", cy + c.dy)
+      .attr("text-anchor", c.anchor)
+      .attr("font-family", "'IBM Plex Mono', monospace")
+      .attr("font-size", 9).attr("fill", "#77f0cb").attr("fill-opacity", 0.65)
+      .text(c.text);
+    svg.append("line")
+      .attr("x1", cx + (c.dx > 0 ? 12 : -12)).attr("y1", cy)
+      .attr("x2", cx + c.dx).attr("y2", cy + c.dy - 3)
+      .attr("stroke", "#77f0cb").attr("stroke-opacity", 0.3).attr("stroke-width", 0.5);
+  });
+
+  // ── Save as PNG ──
+  document.getElementById("save-btn").addEventListener("click", function() {
+    const svgEl = document.getElementById("atlas");
+    const serializer = new XMLSerializer();
+    let source = serializer.serializeToString(svgEl);
+    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/))
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    const fontCSS = `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap');`;
+    source = source.replace('</defs>', `<style>${fontCSS}</style></defs>`);
+    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = W * 2; canvas.height = H * 2;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function(pngBlob) {
+        const a = document.createElement("a");
+        a.download = "archetype_atlas.png";
+        a.href = URL.createObjectURL(pngBlob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, "image/png");
+    };
+    img.src = url;
+  });
+})();
+</script>
+</body>
+</html>
