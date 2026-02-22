@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gait Archetype Atlas — Weight Hypergraph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #070c1b;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #eaf2ff;
+    padding: 20px 0;
+  }
+  #controls {
+    display: flex; gap: 16px; margin: 10px 0 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  }
+  #controls label { color: #6c7fa8; cursor: pointer; }
+  #controls input[type="checkbox"] { margin-right: 4px; }
+  #controls select {
+    background: rgba(103,139,214,0.15); border: 1px solid rgba(103,139,214,0.3);
+    color: #eaf2ff; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 2px 6px; border-radius: 3px;
+  }
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0;
+    background: rgba(7,12,27,0.95); border: 1px solid rgba(103,139,214,0.4);
+    border-radius: 8px; padding: 10px 14px; max-width: 360px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
+    color: #eaf2ff; transition: opacity 0.15s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .tooltip .tt-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .tooltip .tt-sign { font-family: 'IBM Plex Mono', monospace; font-size: 13px; margin-bottom: 4px; letter-spacing: 2px; }
+  .tooltip .tt-desc { color: #adc0e5; font-size: 11px; line-height: 1.4; margin-bottom: 6px; }
+  .tooltip .tt-weights { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #77f0cb; }
+  .tooltip .tt-icm { color: #d3b3ff; font-size: 11px; font-style: italic; margin-bottom: 4px; }
+  .tooltip .tt-src { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #ffa278; margin-top: 4px; }
+  .tooltip .tt-balance { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6c7fa8; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<svg id="graph" width="1400" height="900"></svg>
+<div id="controls">
+  <label>Edges: </label>
+  <select id="edge-mode">
+    <option value="sign">Sign-pattern family</option>
+    <option value="channel">Strongest channel match</option>
+    <option value="balance">Magnitude balance similarity</option>
+    <option value="triptych">Triptych (anti-phase family)</option>
+  </select>
+  <label><input type="checkbox" id="show-glyphs" checked> Weight glyphs</label>
+  <label><input type="checkbox" id="show-labels" checked> Labels</label>
+  <label><input type="checkbox" id="show-hyper"> Hyperedge hulls</label>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function() {
+  const W = 1400, H = 900;
+  const svg = d3.select("#graph");
+  const tooltip = d3.select("#tooltip");
+
+  // ── Archetype data (48 archetypes) ──
+  const DATA = [
+    {n:"power_strider",g:"simulation",w:[-0.3,-1,-.3,1,.3,1],icm:"Propulsive Efficiency",src:["5_pelton","10_tesla_3phase","18_curie"],desc:"High-speed, low asymmetry.",gc:2},
+    {n:"spinner",g:"simulation",w:[-.5,-.7,1,.5,-.7,-.7],icm:"Rotational Dynamics",src:["14_maelstrom"],desc:"Rotation-dominant, low displacement.",gc:2},
+    {n:"crab_walker",g:"simulation",w:[1,-.5,-.5,-.5,1,.5],icm:"Lateral Asymmetry",src:["7_sidewinder"],desc:"Lateral gait with unique limb asymmetry.",gc:2},
+    {n:"cpg_oscillator",g:"simulation",w:[0,1,-1,0,-1,1],icm:"Central Pattern Generation",src:["5_bouncer"],desc:"Central pattern generator: strict alternation.",gc:2},
+    {n:"drift_explorer",g:"simulation",w:[.5,.5,.5,-.5,.5,-.5],icm:"Stochastic Exploration",src:["19_brownian"],desc:"Moderate speed with erratic path.",gc:1},
+    {n:"chaotic_exploratory",g:"simulation",w:[.3,.85,.26,-.85,-.26,-.85],icm:"Chaotic Locomotion",src:["dark_matter gaits"],desc:"High workspace volume, chaotic trajectory.",gc:1},
+    {n:"dead_inert",g:"simulation",w:[.01,-.01,.01,-.01,.01,-.01],icm:"Behavioral Extinction",src:["near-zero weight gaits"],desc:"Near-zero motion.",gc:2},
+    {n:"efficiency_optimizer",g:"simulation",w:[0,1,-1,0,-1,1],icm:"Minimal Transport Cost",src:["5_bouncer variant"],desc:"Lowest cost of transport.",gc:2},
+    {n:"dynamic_balancer",g:"simulation",w:[-.5,-.8,-.5,.5,.8,.5],icm:"Postural Homeostasis",src:["12_tightrope"],desc:"Balanced COM, moderate displacement.",gc:2},
+    {n:"temporal_dancer",g:"simulation",w:[.5,-.7,-.5,.7,.5,-.5],icm:"Temporal Coordination",src:["10_tesla_3phase"],desc:"Complex temporal coordination.",gc:2},
+    {n:"adaptive_walker",g:"simulation",w:[.25,-1.5,-.64,.97,1.58,1.21],icm:"Evolved Adaptation",src:["hill-climber evolved"],desc:"Evolved walker with extreme weights.",gc:2},
+    {n:"super_gait",g:"simulation",w:[-.94,-.39,.46,-.18,.14,.32],icm:"Interpolated Optimum",src:["champion interpolation"],desc:"Interpolated super-gait.",gc:0},
+    {n:"canceller",g:"simulation",w:[.5,-.5,.3,-.3,.5,-.5],icm:"Symmetric Cancellation",src:["partial anti-symmetry"],desc:"Partial symmetric cancellation.",gc:0},
+    {n:"heroic_stride",g:"literary",w:[.7,.4,.1,-.1,.2,0],icm:"Heroic Momentum",src:["motion_verbs","oeis_sequences"],desc:"Bold, purposeful forward motion.",gc:2},
+    {n:"villainous_shuffle",g:"literary",w:[-.2,.6,-.3,.2,-.1,.4],icm:"Deceptive Motion",src:["dark_matter","oeis_sequences"],desc:"Erratic, unpredictable gait.",gc:2},
+    {n:"divine_presence",g:"literary",w:[.8,.6,.5,-.2,.3,.2],icm:"Transcendent Motion",src:["bible_passages","motion_verbs"],desc:"Grand, expansive transcendent gait.",gc:2},
+    {n:"pale_horse",g:"literary",w:[-.8,.6,.2,-.9,.5,-.4],icm:"Asymmetric Juggernaut",src:["Revelation 6:8","displacement champion (DX=29.17m)"],desc:"DX=29.17m. Death does not trot. It charges.",gc:3},
+    {n:"whirling_wind",g:"literary",w:[.6,-.5,-.4,.8,.2,-.9],icm:"Efficient Eternal Cycle",src:["Ecclesiastes 1:6","efficiency champion (0.00495)"],desc:"Efficiency champion. phase_lock=0.995. It persists.",gc:3},
+    {n:"tragic_step",g:"literary",w:[.4,.7,.7,-.4,.7,-.4],icm:"Melancholic Locomotion",src:["dark_matter"],desc:"Melancholic, high entropy.",gc:2},
+    {n:"primal_rush",g:"literary",w:[.5,.3,.2,-.4,.6,.5],icm:"Instinctive Charge",src:["dark_matter","motion_verbs"],desc:"Raw energy with moderate coordination.",gc:2},
+    {n:"rocking_motion",g:"literary",w:[.2,.5,.6,-.3,.4,.1],icm:"Oscillatory Stasis",src:["dark_matter","mathematicians"],desc:"Oscillatory, limited displacement.",gc:2},
+    {n:"circular_wander",g:"literary",w:[.1,-.2,-.3,.4,-.1,-.2],icm:"Aimless Displacement",src:["dark_matter","bible_passages"],desc:"Aimless circular meandering.",gc:2},
+    {n:"gentle_ambler",g:"motion_word",w:[.5,.5,.5,-.5,-.1,-.5],icm:"Leisurely Locomotion",src:["amble","glide","roam","saunter","drift"],desc:"Leisurely, moderate-speed forward motion.",gc:2},
+    {n:"agitated_scrambler",g:"motion_word",w:[.6,.6,.6,-.6,-.6,-.6],icm:"Agitated Locomotion",src:["bounce","hop","scurry","zigzag","sway","trot","sprint"],desc:"Energetic, irregular, high entropy.",gc:2},
+    {n:"forceful_charger",g:"motion_word",w:[.7,.7,0,-.7,0,.7],icm:"Directed Force",src:["charge","gallop","drag","retreat","patrol"],desc:"Fast, high-displacement, purposeful.",gc:2},
+    {n:"cautious_creeper",g:"motion_word",w:[.6,.2,.2,.3,-.4,.4],icm:"Guarded Locomotion",src:["forward_walk","saunter","waddle"],desc:"Slow, careful, belly-close movement.",gc:2},
+    {n:"hop",g:"motion_word",w:[.4,-.4,.4,1,1,.4],icm:"Bursty Aerial Locomotion",src:["hop (28 trials)","agitated_scrambler (parent)"],desc:"Bursty ballistic: speed_cv ~1.86, phase_lock ~0.91.",gc:3},
+    {n:"charging_gallop",g:"motion_word",w:[.7,-.7,.7,.4,.4,.7],icm:"Directed Gallop",src:["Galopp [de]","gallop convergent","forceful_charger (parent)"],desc:"Forward gallop: fast, high contact entropy.",gc:3},
+    {n:"tumbling_gallop",g:"motion_word",w:[.8,-.7,.6,-.5,.9,-.8],icm:"Controlled Tumble",src:["5_gallop (tilt=242°)","wobbler (overlap)"],desc:"Reverse gallop: controlled tumble, phase_lock>0.95.",gc:3},
+    {n:"drifting_gallop",g:"motion_word",w:[.4,-.4,.4,.7,.7,-.4],icm:"Undirected Gallop",src:["gallop drifter-cluster (13 trials)"],desc:"Wandering gallop: high energy, no direction.",gc:3},
+    {n:"dasher",g:"motion_word",w:[-.545,.555,.079,.839,-.075,.461],icm:"Dasher",src:["twirl","retreat","scurry","pivot"],desc:"Fast, high-entropy, undirected.",gc:3},
+    {n:"celebrity_plodder",g:"character",w:[.76,.86,.5,-.42,-.64,-.34],icm:"Stable Persona Projection",src:["Bannon","Tom Brady","Michael Jordan","Churchill","Ted Cruz"],desc:"High phase lock, low displacement.",gc:2},
+    {n:"celebrity_launcher",g:"character",w:[.76,.24,-.57,-.40,.70,.83],icm:"Dynamic Persona Projection",src:["Cleopatra","Messi","Gandhi","Meryl Streep","Pelosi"],desc:"Fast launcher, high displacement.",gc:2},
+    {n:"celebrity_wanderer",g:"character",w:[.74,.24,-.54,-.45,.67,.12],icm:"Unconventional Persona Projection",src:["Melania Trump","Peter Thiel","Jack Dorsey","Neil Gaiman","Mitt Romney"],desc:"Desynchronized, wandering path.",gc:2},
+    {n:"character_wise_elder",g:"character",w:[-.4,.7,.1,-.1,.4,0],icm:"Sage Persona",src:["character_seed wise archetype"],desc:"Slow, deliberate wisdom-walk.",gc:2},
+    {n:"genre_heist_lockstep",g:"character",w:[-.06,.33,.47,-.16,.43,-.09],icm:"Coordinated Team",src:["heist genre seeds"],desc:"Coordinated team movement.",gc:2},
+    {n:"mathematical_precision",g:"math",w:[.4,1,-.7,-.1,.7,.4],icm:"Ordered Structure",src:["oeis_sequences","mathematicians"],desc:"Highly structured, minimal variation.",gc:2},
+    {n:"conservation_law",g:"math",w:[.5,-.5,.3,-.3,.7,-.7],icm:"Dynamic Stasis",src:["Noether's Theorem","deadest gait (DX=0.031m)"],desc:"Perfect pairwise anti-symmetry. DX=0.031m. Thrashes, goes nowhere.",gc:3},
+    {n:"oeis_recursive_oscillator",g:"math",w:[.03,.7,.23,.23,.17,.13],icm:"Recursive Oscillation",src:["OEIS recursive sequences"],desc:"Recursive oscillation pattern.",gc:1},
+    {n:"oeis_divisor_chaotic",g:"math",w:[-.2,.4,-.3,.1,0,.2],icm:"Divisor Chaos",src:["OEIS divisor sequences"],desc:"Chaotic divisor-derived dynamics.",gc:1},
+    {n:"oeis_polynomial_strider",g:"math",w:[.3,.5,.1,0,-.2,.5],icm:"Polynomial Growth",src:["OEIS polynomial sequences"],desc:"Polynomial growth pattern.",gc:2},
+    {n:"the_interpolator",g:"meta",w:[.75,.85,.65,-.45,-.25,-.55],icm:"Interpolated Archetype",src:["Dataset 7: Archetypes","Dataset 8: Super-gaits"],desc:"Midpoint between champion gaits.",gc:1},
+    {n:"the_asymmetric_adapter",g:"meta",w:[.7,.2,.8,-.5,.6,-.3],icm:"Asymmetric Adaptation",src:["Dataset 7: Archetypes","Dataset 8: Super-gaits"],desc:"Asymmetric adaptation strategy.",gc:1},
+    {n:"semantic_invariant",g:"meta",w:[.6,.6,.4,-.4,-.2,-.6],icm:"Semantic Core",src:["cross-language invariant cluster"],desc:"Semantic core preserved across transforms.",gc:1},
+    {n:"quantized_attractor",g:"literary",w:[.1,.4,.4,-.1,.4,.4],icm:"Discrete Attractor",src:["quantized weight grid"],desc:"Discrete behavioral attractor.",gc:1},
+    {n:"yaw_spinner",g:"simulation",w:[-.547,.672,.581,.581,-.356,.944],icm:"Yaw Dominance",src:["extreme yaw gaits"],desc:"Extreme yaw rotation.",gc:2},
+    {n:"wobbler",g:"simulation",w:[.76,-.73,.395,.85,.805,.23],icm:"Wobbler",src:["dash","sprint","gallop","charge"],desc:"Fast backward, low phase-lock.",gc:2},
+  ];
+
+  // ── Weight structure analysis ──
+
+  // Sign pattern: 6-bit string like "+-+-+-"
+  function signPattern(w) {
+    return w.map(v => v >= 0 ? '+' : '-').join('');
+  }
+
+  // Magnitude balance per channel: |w_i3| - |w_i4| for sensors 0,1,2
+  function channelBalance(w) {
+    return [
+      Math.abs(w[0]) - Math.abs(w[1]),  // torso channel
+      Math.abs(w[2]) - Math.abs(w[3]),  // back_leg channel
+      Math.abs(w[4]) - Math.abs(w[5]),  // front_leg channel
+    ];
+  }
+
+  // Pairwise symmetry score: how close to ±mirror are the pairs
+  function pairwiseSymmetry(w) {
+    let sum = 0;
+    for (let i = 0; i < 3; i++) {
+      sum += Math.abs(Math.abs(w[i*2]) - Math.abs(w[i*2+1]));
+    }
+    return 1 - sum / 3;  // 1 = perfect pairwise balance, 0 = maximally imbalanced
+  }
+
+  // Anti-phase score: fraction of pairs with opposite signs
+  function antiphaseScore(w) {
+    let count = 0;
+    for (let i = 0; i < 3; i++) {
+      if (w[i*2] * w[i*2+1] < 0) count++;
+    }
+    return count / 3;
+  }
+
+  // Dominant channel: which sensor has the strongest total influence
+  function dominantChannel(w) {
+    const ch = [
+      Math.abs(w[0]) + Math.abs(w[1]),
+      Math.abs(w[2]) + Math.abs(w[3]),
+      Math.abs(w[4]) + Math.abs(w[5]),
+    ];
+    const max = Math.max(...ch);
+    return ch.indexOf(max);
+  }
+
+  // Cosine similarity
+  function cosine(a, b) {
+    let dot = 0, na = 0, nb = 0;
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i] * b[i]; na += a[i]*a[i]; nb += b[i]*b[i];
+    }
+    return (na === 0 || nb === 0) ? 0 : dot / (Math.sqrt(na) * Math.sqrt(nb));
+  }
+
+  // ── Color scheme ──
+  const GROUPS = {
+    simulation:  { label: "Simulation-Grounded", color: "#53c6ff" },
+    literary:    { label: "Literary / Cultural",  color: "#ff7ea6" },
+    motion_word: { label: "Motion-Word Seeded",   color: "#77f0cb" },
+    character:   { label: "Character / Celebrity", color: "#ffa278" },
+    math:        { label: "Math-Seeded",           color: "#d3b3ff" },
+    meta:        { label: "Interpolation / Meta",  color: "#f5dd78" },
+  };
+
+  // ── Filter hidden entries ──
+  const archetypes = DATA.filter(d => !d.hide);
+
+  // Annotate each archetype with structural properties
+  archetypes.forEach(d => {
+    d.sign = signPattern(d.w);
+    d.balance = channelBalance(d.w);
+    d.symmetry = pairwiseSymmetry(d.w);
+    d.antiphase = antiphaseScore(d.w);
+    d.domChannel = dominantChannel(d.w);
+    d.totalMag = d.w.reduce((s,v) => s + Math.abs(v), 0);
+  });
+
+  // ── Group by sign pattern → hyperedges ──
+  const signGroups = {};
+  archetypes.forEach(d => {
+    if (!signGroups[d.sign]) signGroups[d.sign] = [];
+    signGroups[d.sign].push(d);
+  });
+
+  // ── Layout: force simulation using sign-pattern attraction ──
+  const nodes = archetypes.map((d, i) => ({
+    ...d, index: i,
+    x: W/2 + (Math.random() - 0.5) * W * 0.6,
+    y: H/2 + (Math.random() - 0.5) * H * 0.6,
+  }));
+
+  // Build edges based on current mode
+  function buildEdges(mode) {
+    const edges = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        let strength = 0, label = '';
+
+        if (mode === 'sign') {
+          if (a.sign === b.sign) {
+            strength = 0.8;
+            label = a.sign;
+          }
+        } else if (mode === 'channel') {
+          // Connected if they share dominant channel AND similar balance on that channel
+          if (a.domChannel === b.domChannel) {
+            const diff = Math.abs(a.balance[a.domChannel] - b.balance[a.domChannel]);
+            if (diff < 0.3) {
+              strength = 1 - diff/0.3;
+              label = ['torso','back_leg','front_leg'][a.domChannel];
+            }
+          }
+        } else if (mode === 'balance') {
+          // Balance similarity across all 3 channels
+          let diff = 0;
+          for (let c = 0; c < 3; c++) diff += Math.abs(a.balance[c] - b.balance[c]);
+          diff /= 3;
+          if (diff < 0.15) {
+            strength = 1 - diff/0.15;
+            label = 'balance';
+          }
+        } else if (mode === 'triptych') {
+          // Only anti-phase family members (all 3 pairs opposite sign)
+          if (a.antiphase === 1 && b.antiphase === 1) {
+            const symDiff = Math.abs(a.symmetry - b.symmetry);
+            strength = 0.3 + 0.7 * (1 - symDiff);
+            label = `Δsym=${symDiff.toFixed(2)}`;
+          }
+        }
+
+        if (strength > 0.1) {
+          edges.push({ source: i, target: j, strength, label });
+        }
+      }
+    }
+    return edges;
+  }
+
+  // ── Draw weight glyph: mini bipartite graph ──
+  function drawGlyph(g, w, size) {
+    const s = size;
+    const sensorY = [-s*0.6, 0, s*0.6];  // 3 sensors vertically
+    const motorY = [-s*0.3, s*0.3];       // 2 motors vertically
+    const sensorX = -s*0.4;
+    const motorX = s*0.4;
+
+    // Draw edges (weights)
+    const wIdx = [[0,1],[2,3],[4,5]]; // sensor i → [motor0_weight_idx, motor1_weight_idx]
+    for (let si = 0; si < 3; si++) {
+      for (let mi = 0; mi < 2; mi++) {
+        const wVal = w[wIdx[si][mi]];
+        const absW = Math.abs(wVal);
+        if (absW < 0.02) continue;
+        g.append("line")
+          .attr("x1", sensorX).attr("y1", sensorY[si])
+          .attr("x2", motorX).attr("y2", motorY[mi])
+          .attr("stroke", wVal > 0 ? "#77f0cb" : "#ff7ea6")
+          .attr("stroke-width", Math.max(0.5, absW * 3))
+          .attr("stroke-opacity", 0.3 + absW * 0.5);
+      }
+    }
+
+    // Sensor nodes
+    const sLabels = ['T','B','F'];
+    for (let i = 0; i < 3; i++) {
+      g.append("circle")
+        .attr("cx", sensorX).attr("cy", sensorY[i])
+        .attr("r", 2.5)
+        .attr("fill", "#6c7fa8");
+    }
+    // Motor nodes
+    for (let i = 0; i < 2; i++) {
+      g.append("rect")
+        .attr("x", motorX - 2.5).attr("y", motorY[i] - 2.5)
+        .attr("width", 5).attr("height", 5)
+        .attr("fill", "#eaf2ff").attr("rx", 1);
+    }
+  }
+
+  // ── Render ──
+  let currentEdgeMode = 'sign';
+  let simulation;
+
+  function render() {
+    svg.selectAll("*").remove();
+
+    // Background
+    svg.append("rect").attr("width", W).attr("height", H).attr("fill", "#070c1b");
+
+    // Title
+    svg.append("text").attr("x", W/2).attr("y", 30)
+      .attr("text-anchor", "middle")
+      .attr("font-family", "Sora").attr("font-weight", 700).attr("font-size", 22)
+      .attr("fill", "#eaf2ff")
+      .text("Gait Archetype Atlas — Weight Hypergraph");
+
+    svg.append("text").attr("x", W/2).attr("y", 50)
+      .attr("text-anchor", "middle")
+      .attr("font-family", "IBM Plex Mono").attr("font-size", 11)
+      .attr("fill", "#6c7fa8")
+      .text("Each node is its 3-sensor → 2-motor bipartite graph · Green = excitatory · Pink = inhibitory · Width = magnitude");
+
+    const edges = buildEdges(currentEdgeMode);
+
+    // Force simulation
+    if (simulation) simulation.stop();
+    simulation = d3.forceSimulation(nodes)
+      .force("charge", d3.forceManyBody().strength(-80))
+      .force("center", d3.forceCenter(W/2, H/2 + 30))
+      .force("collision", d3.forceCollide(30))
+      .force("link", d3.forceLink(edges.map(e => ({source: e.source, target: e.target})))
+        .distance(d => 120 - d.source?.strength * 40 || 100)
+        .strength(d => 0.1))
+      .force("x", d3.forceX(W/2).strength(0.03))
+      .force("y", d3.forceY(H/2 + 30).strength(0.03))
+      .alpha(0.8)
+      .alphaDecay(0.02);
+
+    // Container groups
+    const edgeG = svg.append("g").attr("class", "edges");
+    const hullG = svg.append("g").attr("class", "hulls");
+    const nodeG = svg.append("g").attr("class", "nodes");
+
+    // Draw hyperedge hulls if enabled
+    function drawHulls() {
+      hullG.selectAll("*").remove();
+      if (!document.getElementById("show-hyper").checked) return;
+
+      const signColors = {};
+      const hueStep = 360 / Object.keys(signGroups).length;
+      Object.keys(signGroups).forEach((sign, i) => {
+        signColors[sign] = `hsla(${i * hueStep}, 60%, 50%, 0.08)`;
+      });
+
+      Object.entries(signGroups).forEach(([sign, members]) => {
+        if (members.length < 2) return;
+        const points = members.map(m => {
+          const node = nodes.find(n => n.n === m.n);
+          return node ? [node.x, node.y] : null;
+        }).filter(Boolean);
+        if (points.length < 2) return;
+
+        if (points.length === 2) {
+          hullG.append("line")
+            .attr("x1", points[0][0]).attr("y1", points[0][1])
+            .attr("x2", points[1][0]).attr("y2", points[1][1])
+            .attr("stroke", signColors[sign] || "rgba(100,100,200,0.1)")
+            .attr("stroke-width", 8)
+            .attr("stroke-linecap", "round");
+        } else {
+          const hull = d3.polygonHull(points);
+          if (hull) {
+            hullG.append("path")
+              .attr("d", `M${hull.join("L")}Z`)
+              .attr("fill", signColors[sign] || "rgba(100,100,200,0.08)")
+              .attr("stroke", signColors[sign]?.replace('0.08', '0.2') || "rgba(100,100,200,0.15)")
+              .attr("stroke-width", 1);
+          }
+        }
+      });
+    }
+
+    simulation.on("tick", () => {
+      // Clamp positions
+      nodes.forEach(n => {
+        n.x = Math.max(50, Math.min(W - 50, n.x));
+        n.y = Math.max(70, Math.min(H - 30, n.y));
+      });
+
+      // Update edges
+      edgeG.selectAll("line").remove();
+      edges.forEach(e => {
+        const s = nodes[e.source.index ?? e.source];
+        const t = nodes[e.target.index ?? e.target];
+        if (!s || !t) return;
+        edgeG.append("line")
+          .attr("x1", s.x).attr("y1", s.y)
+          .attr("x2", t.x).attr("y2", t.y)
+          .attr("stroke", `rgba(103,139,214,${0.05 + e.strength * 0.15})`)
+          .attr("stroke-width", 0.5 + e.strength * 1.5);
+      });
+
+      // Update nodes
+      nodeG.selectAll("g.node").remove();
+      const showGlyphs = document.getElementById("show-glyphs").checked;
+      const showLabels = document.getElementById("show-labels").checked;
+
+      nodes.forEach(d => {
+        const g = nodeG.append("g")
+          .attr("class", "node")
+          .attr("transform", `translate(${d.x},${d.y})`)
+          .style("cursor", "pointer");
+
+        const col = GROUPS[d.g]?.color || "#888";
+
+        if (showGlyphs) {
+          // Draw bipartite weight glyph
+          const glyphG = g.append("g").attr("opacity", 0.9);
+          drawGlyph(glyphG, d.w, 18);
+
+          // Outer ring colored by group
+          g.append("circle")
+            .attr("r", 14)
+            .attr("fill", "none")
+            .attr("stroke", col)
+            .attr("stroke-width", 1)
+            .attr("stroke-opacity", 0.4);
+        } else {
+          g.append("circle")
+            .attr("r", 6)
+            .attr("fill", col)
+            .attr("fill-opacity", 0.7)
+            .attr("stroke", col)
+            .attr("stroke-width", 1);
+        }
+
+        if (showLabels) {
+          g.append("text")
+            .attr("y", showGlyphs ? 22 : 16)
+            .attr("text-anchor", "middle")
+            .attr("font-family", "IBM Plex Mono")
+            .attr("font-size", 8)
+            .attr("fill", col)
+            .attr("fill-opacity", 0.7)
+            .text(d.n.replace(/_/g,' '));
+        }
+
+        // Tooltip interaction
+        g.on("mouseover", (event) => {
+          const signStr = d.sign.split('').map((s,i) => {
+            const names = ['w03','w04','w13','w14','w23','w24'];
+            return `<span style="color:${s==='+' ? '#77f0cb' : '#ff7ea6'}">${s}${names[i]}</span>`;
+          }).join(' ');
+
+          const balStr = d.balance.map((b,i) => {
+            const ch = ['torso','back_leg','front_leg'][i];
+            return `${ch}: ${b >= 0 ? '→M3' : '→M4'} (${Math.abs(b).toFixed(2)})`;
+          }).join('<br>');
+
+          tooltip.html(`
+            <div class="tt-name">${d.n.replace(/_/g,' ')}</div>
+            <div class="tt-icm">ICM: ${d.icm}</div>
+            <div class="tt-sign">${signStr}</div>
+            <div class="tt-desc">${d.desc}</div>
+            <div class="tt-weights">
+              w: [${d.w.map(v => v.toFixed(2)).join(', ')}]<br>
+              anti-phase: ${(d.antiphase * 100).toFixed(0)}% · symmetry: ${d.symmetry.toFixed(3)} · mag: ${d.totalMag.toFixed(2)}
+            </div>
+            <div class="tt-balance">${balStr}</div>
+            <div class="tt-src">${d.src.join(' · ')}</div>
+          `)
+          .style("left", (event.pageX + 15) + "px")
+          .style("top", (event.pageY - 10) + "px")
+          .style("opacity", 1);
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+      });
+
+      drawHulls();
+    });
+
+    // Run for a while then stop
+    simulation.tick(200);
+    simulation.stop();
+    // Trigger one more render
+    simulation.on("tick")();
+
+    // Legend
+    const leg = svg.append("g").attr("transform", `translate(${W - 200}, 80)`);
+    leg.append("text").attr("font-family","Sora").attr("font-size",11).attr("fill","#6c7fa8").text("Source Groups");
+    Object.entries(GROUPS).forEach(([k, v], i) => {
+      const row = leg.append("g").attr("transform", `translate(0, ${18 + i * 16})`);
+      row.append("circle").attr("cx", 5).attr("cy", 0).attr("r", 4).attr("fill", v.color);
+      row.append("text").attr("x", 14).attr("y", 3).attr("font-family","IBM Plex Mono").attr("font-size",9).attr("fill","#adc0e5").text(v.label);
+    });
+
+    // Weight glyph legend
+    const wleg = svg.append("g").attr("transform", `translate(30, 80)`);
+    wleg.append("text").attr("font-family","Sora").attr("font-size",11).attr("fill","#6c7fa8").text("Weight Glyph");
+    const wg = wleg.append("g").attr("transform", "translate(30, 50)");
+    drawGlyph(wg, [0.8, -0.6, -0.4, 0.9, 0.3, -0.7], 30);
+    // Labels for legend glyph
+    const sLabels = ['S₀ (torso)','S₁ (back)','S₂ (front)'];
+    const sY = [-18, 0, 18];
+    sLabels.forEach((l,i) => {
+      wg.append("text").attr("x", -22).attr("y", sY[i] + 3).attr("text-anchor","end")
+        .attr("font-family","IBM Plex Mono").attr("font-size",7).attr("fill","#6c7fa8").text(l);
+    });
+    const mLabels = ['M₃ (back)','M₄ (front)'];
+    const mY = [-9, 9];
+    mLabels.forEach((l,i) => {
+      wg.append("text").attr("x", 20).attr("y", mY[i] + 3)
+        .attr("font-family","IBM Plex Mono").attr("font-size",7).attr("fill","#6c7fa8").text(l);
+    });
+    wleg.append("text").attr("y", 90).attr("font-family","IBM Plex Mono").attr("font-size",8).attr("fill","#77f0cb").text("green = excitatory (+)");
+    wleg.append("text").attr("y", 102).attr("font-family","IBM Plex Mono").attr("font-size",8).attr("fill","#ff7ea6").text("pink = inhibitory (−)");
+    wleg.append("text").attr("y", 114).attr("font-family","IBM Plex Mono").attr("font-size",8).attr("fill","#adc0e5").text("width = magnitude");
+
+    // Sign-pattern stats
+    const statsG = svg.append("g").attr("transform", `translate(30, ${H - 160})`);
+    statsG.append("text").attr("font-family","Sora").attr("font-size",11).attr("fill","#6c7fa8").text("Sign-Pattern Families");
+    const sorted = Object.entries(signGroups).sort((a,b) => b[1].length - a[1].length);
+    sorted.slice(0, 8).forEach(([sign, members], i) => {
+      const row = statsG.append("g").attr("transform", `translate(0, ${18 + i * 14})`);
+      row.append("text").attr("font-family","IBM Plex Mono").attr("font-size",9)
+        .attr("fill","#eaf2ff")
+        .text(`${sign}  (${members.length})`);
+      row.append("text").attr("x", 85).attr("font-family","IBM Plex Mono").attr("font-size",8)
+        .attr("fill","#6c7fa8")
+        .text(members.slice(0, 3).map(m => m.n.replace(/_/g,' ')).join(', ') + (members.length > 3 ? '…' : ''));
+    });
+  }
+
+  render();
+
+  // Controls
+  document.getElementById("edge-mode").addEventListener("change", (e) => {
+    currentEdgeMode = e.target.value;
+    render();
+  });
+  document.getElementById("show-glyphs").addEventListener("change", render);
+  document.getElementById("show-labels").addEventListener("change", render);
+  document.getElementById("show-hyper").addEventListener("change", () => {
+    // Just redraw hulls
+    simulation?.on("tick")?.();
+  });
+
+})();
+</script>
+</body>
+</html>

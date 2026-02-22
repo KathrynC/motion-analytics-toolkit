@@ -45,7 +45,12 @@ The semantic CA module includes a `WolframClassifier` that evolves a lattice und
 - **Simulation-grounded** (11 archetypes): Derived from the 116-gait zoo with real feature vectors from PyBullet telemetry.
 - **Movement vocabulary** (8 archetypes): Semantic clusters from cross-language, cross-model LLM experiments (5 LLMs, 5 languages, 495+ gaits).
 
-A data-driven D3.js visualization (`hero-concepts/06_archetype_atlas.html`) shows all 48 archetypes positioned by PCA of their 6D weight vectors, with Stoyko SystemViz category shapes and interactive tooltips.
+### Visualizations
+
+Interactive D3.js visualizations in `hero-concepts/`:
+
+- **Gait Archetype Atlas** (`06_archetype_atlas.html`): All 48 archetypes positioned by PCA of their 6D weight vectors, with Stoyko SystemViz category shapes, source-family coloring, and interactive tooltips showing grounding criteria and ICM definitions.
+- **Weight Hypergraph** (`07_weight_hypergraph.html`): Each archetype rendered as its actual 3-sensor → 2-motor bipartite weight graph (green=excitatory, pink=inhibitory, width=magnitude). Four hyperedge modes reveal structural relationships: sign-pattern family, strongest channel match, magnitude balance similarity, and triptych anti-phase family. Tooltips show ICM names, source titles, sign patterns, and per-channel balance analysis.
 
 ### SystemViz Entity Tagging
 
