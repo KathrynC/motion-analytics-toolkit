@@ -1,0 +1,2334 @@
+[
+  {
+    "name": "power_strider",
+    "type": "PersonaArchetype",
+    "description": "A high-speed gait with strong forward momentum and low duty factor asymmetry.",
+    "weight_vector": [
+      -0.3,
+      -1.0,
+      -0.3,
+      1.0,
+      0.3,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 2.5,
+        "tolerance": 0.0,
+        "rationale": "High speed defines the power strider archetype."
+      },
+      {
+        "feature": "duty_factor_asymmetry",
+        "predicate": "lt",
+        "value": 0.2,
+        "tolerance": 0.0,
+        "rationale": "Low asymmetry implies balanced propulsion."
+      }
+    ],
+    "icm": {
+      "name": "Propulsive Efficiency",
+      "background": [
+        "Power striders are characterized by high velocity and balanced mechanics.",
+        "Low asymmetry supports efficient forward motion."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "contact_entropy",
+          "predicate": "gt",
+          "value": 1.5,
+          "tolerance": 0.0,
+          "rationale": "High contact entropy indicates inefficiency."
+        }
+      ]
+    },
+    "source_gaits": [
+      "5_pelton",
+      "10_tesla_3phase",
+      "18_curie"
+    ],
+    "exemplar_gait": "5_pelton",
+    "conceptual_basis": "This archetype focuses on speed and balanced mechanics for efficient forward movement."
+  },
+  {
+    "name": "spinner",
+    "type": "PersonaArchetype",
+    "description": "A gait that emphasizes rotational motion and spinning behavior.",
+    "weight_vector": [
+      -0.5,
+      -0.7,
+      1.0,
+      0.5,
+      -0.7,
+      -0.7,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "yaw_degrees",
+        "predicate": "gt",
+        "value": 180,
+        "tolerance": 10,
+        "rationale": "Large yaw angles indicate significant spinning behavior."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.6,
+        "tolerance": 0.05,
+        "rationale": "Low straightness indicates curved or rotational path."
+      }
+    ],
+    "icm": {
+      "name": "spinner_icm",
+      "background": [
+        "Rotational motion is a key feature",
+        "Path deviation from straight line indicates spinning"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "yaw_degrees",
+          "predicate": "lt",
+          "value": 100,
+          "tolerance": 0.0,
+          "rationale": "Insufficient rotation breaks the spinner archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "47_spinner_6synapse",
+      "46_spinner_crosswired",
+      "44_spinner_champion",
+      "45_spinner_stable"
+    ],
+    "exemplar_gait": "47_spinner_6synapse",
+    "conceptual_basis": "Behavioral abstraction of systems that exhibit rotational or cyclical motion, like spinning tops or chaotic oscillators."
+  },
+  {
+    "name": "crab_walker",
+    "type": "PersonaArchetype",
+    "description": "A gait that emphasizes lateral movement and sideways displacement.",
+    "weight_vector": [
+      -0.3,
+      -0.85,
+      -0.26,
+      0.85,
+      0.26,
+      0.85,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "dy",
+        "predicate": "gt",
+        "value": 25,
+        "tolerance": 2,
+        "rationale": "High lateral displacement indicates crab-like motion."
+      },
+      {
+        "feature": "dx",
+        "predicate": "gt",
+        "value": 10,
+        "tolerance": 1,
+        "rationale": "Forward motion combined with lateral displacement defines crab-walkers."
+      }
+    ],
+    "icm": {
+      "name": "crab_walker_icm",
+      "background": [
+        "Lateral displacement is emphasized",
+        "Combination of forward and sideways motion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "dy",
+          "predicate": "lt",
+          "value": 15,
+          "tolerance": 0.0,
+          "rationale": "Insufficient lateral displacement breaks the crab-walker archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "52_curie_crab",
+      "53_rucker_landcrab",
+      "55_skew_crab"
+    ],
+    "exemplar_gait": "52_curie_crab",
+    "conceptual_basis": "Inspired by crab locomotion, where sideways movement is prioritized over forward motion."
+  },
+  {
+    "name": "cpg_oscillator",
+    "type": "PersonaArchetype",
+    "description": "A rhythmic gait characterized by consistent oscillation patterns with balanced symmetry and high phase locking.",
+    "weight_vector": [
+      -0.7,
+      -0.5,
+      -0.3,
+      0.3,
+      0.5,
+      0.7,
+      0.3,
+      -0.5,
+      0.2,
+      -0.2
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.9,
+        "tolerance": 0.0,
+        "rationale": "High phase locking indicates synchronized oscillatory behavior."
+      },
+      {
+        "feature": "symmetry_index",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.0,
+        "rationale": "High symmetry supports rhythmic oscillation."
+      }
+    ],
+    "icm": {
+      "name": "Rhythmic Oscillation",
+      "background": [
+        "Rhythmic gaits are defined by consistent temporal patterns.",
+        "Symmetry in movement is essential for oscillatory behavior."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "duty_factor_asymmetry",
+          "predicate": "gt",
+          "value": 0.3,
+          "tolerance": 0.0,
+          "rationale": "High asymmetry disrupts rhythmic oscillation."
+        }
+      ]
+    },
+    "source_gaits": [
+      "21_noether_cpg",
+      "5_bouncer"
+    ],
+    "exemplar_gait": "21_noether_cpg",
+    "conceptual_basis": "Based on the oscillatory properties of CPGs, this archetype emphasizes rhythmicity and symmetry."
+  },
+  {
+    "name": "drift_explorer",
+    "type": "PersonaArchetype",
+    "description": "A gait that explores spatial boundaries with low path straightness and high curvature complexity.",
+    "weight_vector": [
+      -0.7,
+      -0.7,
+      -0.7,
+      0.7,
+      0.7,
+      0.7,
+      0.15,
+      0,
+      0,
+      0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.4,
+        "tolerance": 0.0,
+        "rationale": "Low straightness implies exploration of space."
+      },
+      {
+        "feature": "curvature_complexity",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.0,
+        "rationale": "High curvature indicates complex spatial exploration."
+      }
+    ],
+    "icm": {
+      "name": "Spatial Exploration",
+      "background": [
+        "Exploratory gaits involve navigating complex spatial environments.",
+        "Curvature complexity reflects the richness of movement."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 2.0,
+          "tolerance": 0.0,
+          "rationale": "High speed contradicts exploratory nature."
+        }
+      ]
+    },
+    "source_gaits": [
+      "70_grunbaum_defect",
+      "85_foucault_panopticon"
+    ],
+    "exemplar_gait": "70_grunbaum_defect",
+    "conceptual_basis": "This archetype emphasizes movement through space with high curvature and low straightness."
+  },
+  {
+    "name": "chaotic_exploratory",
+    "type": "PersonaArchetype",
+    "description": "A gait that exhibits unpredictable, non-repetitive motion with high entropy.",
+    "weight_vector": [
+      0.3,
+      0.85,
+      0.26,
+      -0.85,
+      -0.26,
+      -0.85,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "contact_entropy",
+        "predicate": "gt",
+        "value": 1.6,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy indicates irregular, exploratory motion."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.1,
+        "rationale": "High coefficient of variation indicates erratic speed."
+      }
+    ],
+    "icm": {
+      "name": "chaotic_exploratory_icm",
+      "background": [
+        "Motion is irregular and unpredictable",
+        "High variability in speed and contact patterns"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "contact_entropy",
+          "predicate": "lt",
+          "value": 1.3,
+          "tolerance": 0.0,
+          "rationale": "Low entropy breaks the chaotic exploratory archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "76_dick_ubik",
+      "51_curie_spinner"
+    ],
+    "exemplar_gait": "76_dick_ubik",
+    "conceptual_basis": "Abstracted from systems that explore space unpredictably, such as chaotic oscillators or exploratory robots."
+  },
+  {
+    "name": "dead_inert",
+    "type": "PersonaArchetype",
+    "description": "A gait that shows minimal or no motion with low activity.",
+    "weight_vector": [
+      0.01,
+      -0.01,
+      0.01,
+      -0.01,
+      0.01,
+      -0.01,
+      0,
+      0,
+      0,
+      0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.5,
+        "tolerance": 0.1,
+        "rationale": "Low speed indicates inactivity or dead motion."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "gt",
+        "value": 0.9,
+        "tolerance": 0.05,
+        "rationale": "High straightness indicates lack of motion or rotation."
+      }
+    ],
+    "icm": {
+      "name": "dead_inert_icm",
+      "background": [
+        "Motion is minimal or absent",
+        "Path is nearly straight and unchanging"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 0.7,
+          "tolerance": 0.0,
+          "rationale": "Excessive speed breaks the dead inert archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "62_cage_433",
+      "7_fuller_dymaxion"
+    ],
+    "exemplar_gait": "62_cage_433",
+    "conceptual_basis": "Represents systems that are inactive or at rest, with no significant motion or behavior."
+  },
+  {
+    "name": "efficiency_optimizer",
+    "type": "PersonaArchetype",
+    "description": "A gait that minimizes energy expenditure with low contact entropy and high phase locking.",
+    "weight_vector": [
+      0.0,
+      1.0,
+      -1.0,
+      0.0,
+      -1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "contact_entropy",
+        "predicate": "lt",
+        "value": 0.5,
+        "tolerance": 0.0,
+        "rationale": "Low entropy indicates efficient movement."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.0,
+        "rationale": "High phase locking supports energy efficiency."
+      }
+    ],
+    "icm": {
+      "name": "Energy Efficiency",
+      "background": [
+        "Efficiency optimizers prioritize minimizing energy use.",
+        "Low entropy and high phase locking support this goal."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 2.0,
+          "tolerance": 0.0,
+          "rationale": "High speed implies high energy expenditure."
+        }
+      ]
+    },
+    "source_gaits": [
+      "5_bouncer",
+      "93_borges_mirror"
+    ],
+    "exemplar_gait": "5_bouncer",
+    "conceptual_basis": "This archetype focuses on minimizing energy expenditure through synchronized movement."
+  },
+  {
+    "name": "dynamic_balancer",
+    "type": "PersonaArchetype",
+    "description": "A gait that maintains balance through high symmetry and controlled speed variations.",
+    "weight_vector": [
+      -0.5,
+      -0.8,
+      -0.5,
+      0.5,
+      0.8,
+      0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "symmetry_index",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.0,
+        "rationale": "High symmetry supports balance."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "between",
+        "value": 0.3,
+        "tolerance": 0.2,
+        "rationale": "Controlled speed variation supports stability."
+      }
+    ],
+    "icm": {
+      "name": "Stability Through Symmetry",
+      "background": [
+        "Dynamic balancers maintain stability through symmetry.",
+        "Controlled speed variation enhances balance."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 2.5,
+          "tolerance": 0.0,
+          "rationale": "High speed destabilizes balance."
+        }
+      ]
+    },
+    "source_gaits": [
+      "80_deleuze_fold",
+      "1_original"
+    ],
+    "exemplar_gait": "80_deleuze_fold",
+    "conceptual_basis": "This archetype emphasizes balance through symmetry and controlled movement."
+  },
+  {
+    "name": "temporal_dancer",
+    "type": "PersonaArchetype",
+    "description": "A gait with high temporal complexity and variable speed, emphasizing rhythmic variation.",
+    "weight_vector": [
+      -0.866,
+      -0.5,
+      0.0,
+      0.0,
+      0.5,
+      0.866,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.0,
+        "rationale": "High CV indicates rhythmic variation."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "lt",
+        "value": 0.6,
+        "tolerance": 0.0,
+        "rationale": "Low phase locking supports variation."
+      }
+    ],
+    "icm": {
+      "name": "Rhythmic Variation",
+      "background": [
+        "Temporal dancers emphasize rhythmic variation.",
+        "High speed CV supports dynamic timing."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 0.8,
+          "tolerance": 0.0,
+          "rationale": "Low speed contradicts rhythmic variation."
+        }
+      ]
+    },
+    "source_gaits": [
+      "10_tesla_3phase",
+      "15_noether",
+      "63_cage_prepared"
+    ],
+    "exemplar_gait": "10_tesla_3phase",
+    "conceptual_basis": "This archetype focuses on rhythmic variation and temporal complexity."
+  },
+  {
+    "name": "adaptive_walker",
+    "type": "PersonaArchetype",
+    "description": "A gait that adapts to environmental constraints with variable speed and duty factor asymmetry.",
+    "weight_vector": [
+      0.2515753101143031,
+      -1.4976902964989567,
+      -0.6410900845427805,
+      0.9733372173225151,
+      1.5824646682114387,
+      1.2083292616061312,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 1.0,
+        "tolerance": 0.0,
+        "rationale": "High CV indicates adaptive behavior."
+      },
+      {
+        "feature": "duty_factor_asymmetry",
+        "predicate": "between",
+        "value": 0.2,
+        "tolerance": 0.2,
+        "rationale": "Moderate asymmetry allows adaptation."
+      }
+    ],
+    "icm": {
+      "name": "Environmental Adaptation",
+      "background": [
+        "Adaptive walkers adjust to changing conditions.",
+        "Variable speed and asymmetry support adaptability."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "path_straightness",
+          "predicate": "gt",
+          "value": 0.8,
+          "tolerance": 0.0,
+          "rationale": "High straightness suggests rigidity."
+        }
+      ]
+    },
+    "source_gaits": [
+      "56_evolved_crab_v2",
+      "58_evolved_crab_positive_v2"
+    ],
+    "exemplar_gait": "56_evolved_crab_v2",
+    "conceptual_basis": "This archetype focuses on adaptability and environmental responsiveness."
+  },
+  {
+    "name": "heroic_stride",
+    "type": "PersonaArchetype",
+    "description": "A confident, purposeful gait with high symmetry and steady speed, often associated with protagonists.",
+    "weight_vector": [
+      0.7,
+      0.4,
+      0.1,
+      -0.1,
+      0.2,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.1,
+        "rationale": "High phase locking indicates coordinated and stable movement."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "gt",
+        "value": 0.6,
+        "tolerance": 0.1,
+        "rationale": "Straight paths suggest determination and focus."
+      }
+    ],
+    "icm": {
+      "name": "balanced_symmetry",
+      "background": [
+        "Symmetry in motion often correlates with perceived confidence and control"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "duty_factor_asymmetry",
+          "predicate": "gt",
+          "value": 0.4,
+          "tolerance": 0.05,
+          "rationale": "Excessive asymmetry disrupts the perception of balance and control."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_verbs",
+      "oeis_sequences"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Character-driven patterns: Heroic strides are typically linear, stable, and symmetric."
+  },
+  {
+    "name": "villainous_shuffle",
+    "type": "PersonaArchetype",
+    "description": "An erratic, asymmetrical walk with low phase locking and high variability in speed and direction.",
+    "weight_vector": [
+      -0.6,
+      -0.3,
+      -0.2,
+      0.5,
+      -0.1,
+      0.3,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "lt",
+        "value": 0.4,
+        "tolerance": 0.1,
+        "rationale": "Low phase locking suggests instability and unpredictability."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 0.5,
+        "tolerance": 0.1,
+        "rationale": "High coefficient of variation in speed indicates erratic behavior."
+      }
+    ],
+    "icm": {
+      "name": "asymmetric_displacement",
+      "background": [
+        "Asymmetry in gait can signal deception or internal conflict"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "symmetry_index",
+          "predicate": "lt",
+          "value": 0.3,
+          "tolerance": 0.05,
+          "rationale": "Low symmetry index implies lack of control or moral ambiguity."
+        }
+      ]
+    },
+    "source_gaits": [
+      "dark_matter",
+      "oeis_sequences"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Cross-domain invariants: Villainous movements often show high variability and asymmetry."
+  },
+  {
+    "name": "rocking_motion",
+    "type": "PersonaArchetype",
+    "description": "A rhythmic, oscillating gait characterized by high curvature and repeated patterns, often associated with instability or introspection.",
+    "weight_vector": [
+      0.2,
+      0.5,
+      0.6,
+      -0.3,
+      0.4,
+      0.1,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "curvature_complexity",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.1,
+        "rationale": "High curvature complexity indicates complex, non-linear motion."
+      },
+      {
+        "feature": "contact_entropy",
+        "predicate": "gt",
+        "value": 1.2,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy suggests unpredictable foot placement."
+      }
+    ],
+    "icm": {
+      "name": "repetitive_oscillation",
+      "background": [
+        "Repetitive oscillatory motion is common in contemplative or unstable characters"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "workspace_volume",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.1,
+          "rationale": "Low workspace volume implies restricted movement and introspection."
+        }
+      ]
+    },
+    "source_gaits": [
+      "dark_matter",
+      "mathematicians"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Dark matter subtypes: Rockers represent internal conflict or repetitive thought."
+  },
+  {
+    "name": "circular_wander",
+    "type": "PersonaArchetype",
+    "description": "A meandering, circular path with low straightness and high contact entropy, indicating aimless wandering or confusion.",
+    "weight_vector": [
+      0.1,
+      -0.2,
+      -0.3,
+      0.4,
+      -0.1,
+      -0.2,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.2,
+        "tolerance": 0.1,
+        "rationale": "Low straightness indicates deviation from a direct path."
+      },
+      {
+        "feature": "contact_entropy",
+        "predicate": "gt",
+        "value": 1.3,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy implies unpredictable foot placement."
+      }
+    ],
+    "icm": {
+      "name": "aimless_displacement",
+      "background": [
+        "Circular patterns often reflect confusion or lack of direction"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.1,
+          "rationale": "Low mean speed suggests hesitation or lack of purpose."
+        }
+      ]
+    },
+    "source_gaits": [
+      "dark_matter",
+      "bible_passages"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Dark matter subtypes: Circlers are associated with aimless wandering or confusion."
+  },
+  {
+    "name": "mathematical_precision",
+    "type": "PersonaArchetype",
+    "description": "A highly structured, ordered gait with minimal variation in speed and symmetry, reflecting mathematical or logical thinking.",
+    "weight_vector": [
+      0.4,
+      1.0,
+      -0.7,
+      -0.1,
+      0.7,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "symmetry_index",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.1,
+        "rationale": "High symmetry index reflects ordered and predictable movement."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "lt",
+        "value": 0.2,
+        "tolerance": 0.05,
+        "rationale": "Low coefficient of variation indicates consistent speed."
+      }
+    ],
+    "icm": {
+      "name": "ordered_structure",
+      "background": [
+        "Mathematical patterns often translate into structured, predictable motion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "curvature_complexity",
+          "predicate": "gt",
+          "value": 0.6,
+          "tolerance": 0.1,
+          "rationale": "High curvature complexity suggests deviation from order."
+        }
+      ]
+    },
+    "source_gaits": [
+      "oeis_sequences",
+      "mathematicians"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Mathematical structure patterns: Prime sequences produce more ordered gaits than Fibonacci."
+  },
+  {
+    "name": "divine_presence",
+    "type": "PersonaArchetype",
+    "description": "A grand, expansive gait with high workspace volume and strong symmetry, often associated with divine or transcendent figures.",
+    "weight_vector": [
+      0.8,
+      0.6,
+      0.5,
+      -0.2,
+      0.3,
+      0.2,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "workspace_volume",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.2,
+        "rationale": "High workspace volume indicates expansive, commanding presence."
+      },
+      {
+        "feature": "symmetry_index",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.1,
+        "rationale": "High symmetry index reflects balance and transcendence."
+      }
+    ],
+    "icm": {
+      "name": "transcendent_motion",
+      "background": [
+        "Divine presence is often characterized by grandeur and symmetry"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "path_straightness",
+          "predicate": "lt",
+          "value": 0.4,
+          "tolerance": 0.1,
+          "rationale": "Low straightness suggests deviation from a focused path."
+        }
+      ]
+    },
+    "source_gaits": [
+      "bible_passages",
+      "motion_verbs"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Cross-domain invariants: Divine movements are typically expansive and symmetrical."
+  },
+  {
+    "name": "tragic_step",
+    "type": "PersonaArchetype",
+    "description": "A melancholic, slow-moving gait with high contact entropy and low symmetry, indicating sorrow or loss.",
+    "weight_vector": [
+      0.4,
+      0.7,
+      0.7,
+      -0.4,
+      0.7,
+      -0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.4,
+        "tolerance": 0.1,
+        "rationale": "Slow speed reflects sadness or contemplation."
+      },
+      {
+        "feature": "contact_entropy",
+        "predicate": "gt",
+        "value": 1.4,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy suggests emotional instability."
+      }
+    ],
+    "icm": {
+      "name": "emotional_displacement",
+      "background": [
+        "Tragic movements often show emotional turbulence and instability"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "symmetry_index",
+          "predicate": "lt",
+          "value": 0.3,
+          "tolerance": 0.05,
+          "rationale": "Low symmetry index reflects internal turmoil."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_verbs",
+      "romeo_and_juliet"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Character-driven patterns: Tragic steps are typically slow, asymmetrical, and emotionally charged."
+  },
+  {
+    "name": "primal_rush",
+    "type": "PersonaArchetype",
+    "description": "A fast, aggressive gait with high speed and low symmetry, often associated with primal instincts or raw emotion.",
+    "weight_vector": [
+      0.5,
+      0.3,
+      0.2,
+      -0.4,
+      0.6,
+      0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.1,
+        "rationale": "High mean speed indicates urgency or aggression."
+      },
+      {
+        "feature": "speed_cv",
+        "predicate": "gt",
+        "value": 0.6,
+        "tolerance": 0.1,
+        "rationale": "High coefficient of variation suggests bursts of energy."
+      }
+    ],
+    "icm": {
+      "name": "instinctive_motion",
+      "background": [
+        "Primal rushes reflect raw, uncontrolled emotion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "symmetry_index",
+          "predicate": "lt",
+          "value": 0.2,
+          "tolerance": 0.05,
+          "rationale": "Low symmetry index indicates lack of control or restraint."
+        }
+      ]
+    },
+    "source_gaits": [
+      "dark_matter",
+      "motion_verbs"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Dark matter subtypes: Primal rushes are associated with raw emotion and instinct."
+  },
+  {
+    "name": "the_interpolator",
+    "type": "PersonaArchetype",
+    "description": "An archetype representing smooth, adaptive movement patterns that bridge disparate states, characterized by high symmetry and controlled variability.",
+    "weight_vector": [
+      0.75,
+      0.85,
+      0.65,
+      -0.45,
+      -0.25,
+      -0.55,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "symmetry_index",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.05,
+        "rationale": "High symmetry indicates consistent, balanced motion patterns."
+      },
+      {
+        "feature": "curvature_complexity",
+        "predicate": "between",
+        "value": 0.6,
+        "tolerance": 0.1,
+        "rationale": "Moderate curvature complexity allows for adaptive yet predictable motion."
+      }
+    ],
+    "icm": {
+      "name": "adaptive_convergence",
+      "background": [
+        "The archetype embodies a convergence of motion styles that maintain stability while adapting to environmental demands.",
+        "It balances control and flexibility, avoiding both rigidity and chaotic motion."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "contact_entropy",
+          "predicate": "lt",
+          "value": 0.3,
+          "tolerance": 0.05,
+          "rationale": "Too low entropy suggests inflexibility and inability to adapt."
+        }
+      ]
+    },
+    "source_gaits": [
+      "Dataset 7: Archetypes",
+      "Dataset 8: Super-gaits"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "A motion style that interpolates between distinct gaits, maintaining structural coherence while adapting to external conditions."
+  },
+  {
+    "name": "the_asymmetric_adapter",
+    "type": "PersonaArchetype",
+    "description": "An archetype that thrives in environments requiring asymmetric adaptation, balancing stability with responsiveness to directional changes.",
+    "weight_vector": [
+      0.7,
+      0.2,
+      0.8,
+      -0.5,
+      0.6,
+      -0.3,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "duty_factor_asymmetry",
+        "predicate": "gt",
+        "value": 0.6,
+        "tolerance": 0.05,
+        "rationale": "High asymmetry indicates adaptive responses to directional cues."
+      },
+      {
+        "feature": "workspace_volume",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.05,
+        "rationale": "Large workspace volume implies expansive, flexible motion."
+      }
+    ],
+    "icm": {
+      "name": "directional_adaptation",
+      "background": [
+        "This archetype adapts by leveraging directional asymmetry to optimize movement in complex environments.",
+        "It avoids rigid symmetry in favor of dynamic, context-sensitive behavior."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "symmetry_index",
+          "predicate": "gt",
+          "value": 0.85,
+          "tolerance": 0.05,
+          "rationale": "Overly symmetric motion may indicate inflexibility in adapting to asymmetrical environments."
+        }
+      ]
+    },
+    "source_gaits": [
+      "Dataset 7: Archetypes",
+      "Dataset 8: Super-gaits"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "A motion archetype that uses directional asymmetry as a key strategy for adapting to environmental complexity."
+  },
+  {
+    "name": "super_gait",
+    "type": "PersonaArchetype",
+    "description": "Interpolation champion: extreme speed and displacement from weight-space midpoints between high-performers.",
+    "weight_vector": [
+      -0.939,
+      -0.385,
+      0.458,
+      -0.183,
+      0.137,
+      0.321,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 3.5,
+        "tolerance": 0.0,
+        "rationale": "Super-gaits exhibit extreme speed far beyond normal locomotion."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "gt",
+        "value": 0.9,
+        "tolerance": 0.0,
+        "rationale": "Super-gaits maintain remarkably straight trajectories despite high speed."
+      },
+      {
+        "feature": "efficiency",
+        "predicate": "gt",
+        "value": 0.008,
+        "tolerance": 0.0,
+        "rationale": "Extreme distance-per-work ratio indicates emergent optimization."
+      }
+    ],
+    "icm": {
+      "name": "emergent_optimization",
+      "background": [
+        "Super-gaits emerge from interpolation in weight space between known high-performers",
+        "The midpoint often outperforms both endpoints \u2014 a non-obvious fitness landscape property",
+        "Torso never touches ground, limbs barely contact \u2014 near-flight locomotion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 2.0,
+          "tolerance": 0.0,
+          "rationale": "Speed below 2.0 is normal locomotion, not super-gait territory."
+        }
+      ]
+    },
+    "source_gaits": [
+      "Interp Super (t=0.52)",
+      "Novelty Champion",
+      "w23-Half Variant"
+    ],
+    "exemplar_gait": "Interp Super (t=0.52)",
+    "conceptual_basis": "Emergent optimization: weight-space interpolation between champions produces gaits that surpass both parents."
+  },
+  {
+    "name": "canceller",
+    "type": "PersonaArchetype",
+    "description": "Opposing motor drives cancel out, producing near-zero net displacement despite active limb motion.",
+    "weight_vector": [
+      0.5,
+      -0.5,
+      0.3,
+      -0.3,
+      0.5,
+      -0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.5,
+        "tolerance": 0.0,
+        "rationale": "Cancellers have low net speed despite limb activity."
+      },
+      {
+        "feature": "contact_entropy",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.0,
+        "rationale": "Active limbs produce measurable contact entropy even with cancelled displacement."
+      }
+    ],
+    "icm": {
+      "name": "self_negation",
+      "background": [
+        "Motor commands to opposing joints cancel each other's net effect",
+        "The robot is active but achieves no purpose \u2014 effort without progress",
+        "Distinguished from dead_inert by having substantial limb motion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 1.0,
+          "tolerance": 0.0,
+          "rationale": "Significant speed means the cancellation has broken and motion is achieved."
+        }
+      ]
+    },
+    "source_gaits": [
+      "dark_matter_cancellers"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Self-negation: opposing drives create the illusion of effort without progress, a behavioral analogy to Sisyphean labor."
+  },
+  {
+    "name": "quantized_attractor",
+    "type": "PersonaArchetype",
+    "description": "Model collapse archetype: LLM output quantizes to a coarse grid {-0.7, -0.4, -0.1, 0.1, 0.4, 0.7, 1.0}, producing a family of ~10 attractors that collectively account for >3500 of 8000 character-seed trials. The quantization is a property of the LLM's token distribution, not the physics. Different attractors on this grid produce wildly different behaviors (backward walkers, crab-walkers, bouncers), but the grid itself is invariant across character prompts.",
+    "weight_vector": [
+      0.1, 0.4, 0.4, -0.1, 0.4, 0.4,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "weight_quantization",
+        "predicate": "near",
+        "value": 0.3,
+        "tolerance": 0.05,
+        "rationale": "All 6 weights fall on the 0.3-step grid {-0.7, -0.4, -0.1, 0.1, 0.4, 0.7, 1.0}. Grid spacing ~0.3 is the LLM's effective resolution."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.95,
+        "tolerance": 0.02,
+        "rationale": "The dominant attractor [0.1,0.4,0.4,-0.1,0.4,0.4] produces high phase lock (0.985), indicating the quantized weights accidentally land in a synchronized basin."
+      }
+    ],
+    "icm": {
+      "name": "token_quantization_collapse",
+      "background": [
+        "LLMs generate numeric tokens from a discrete vocabulary, creating implicit quantization in continuous output spaces.",
+        "When asked for 6 floating-point weights, deepseek-r1:8b and qwen3-coder:30b both converge to a coarse grid rather than exploring the full [-2,2] range.",
+        "The grid {-0.7, -0.4, -0.1, 0.1, 0.4, 0.7, 1.0} represents the model's preferred numeric tokens, not physics-informed values.",
+        "This attractor appears 397 times across 8000 character prompts (Rarity, Applejack, Twilight Sparkle, etc.) with no semantic differentiation."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "weight_unique_values",
+          "predicate": "gt",
+          "value": 10,
+          "tolerance": 0,
+          "rationale": "If weights use more than ~10 distinct values across the 6D vector, the quantization grid has been escaped."
+        }
+      ]
+    },
+    "source_gaits": [
+      "character_seed_experiment (397 of 8000 trials)",
+      "motion_seed_experiment_v2 (1 trial)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Model collapse via token quantization: the LLM's discrete token vocabulary imposes a coarse grid on continuous weight space, creating attractor basins that are properties of the language model, not the robot physics."
+  },
+  {
+    "name": "semantic_invariant",
+    "type": "PersonaArchetype",
+    "description": "Model collapse archetype: qwen3-coder:30b converges to the same weight vector [0.6, 0.2, 0.5, -0.4, -0.8, -0.3] regardless of whether the semantic input is a verb, theorem, Bible passage, geographic place, or political concept. 232 occurrences across all 5 structured-random domains. The LLM has a default 'safe' output that overrides any semantic steering, producing a barely-moving robot (speed 0.17, dx 1.2).",
+    "weight_vector": [
+      0.6, 0.2, 0.5, -0.4, -0.8, -0.3,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.2,
+        "tolerance": 0.05,
+        "rationale": "The semantic invariant produces very slow locomotion (speed 0.17), as the LLM's safe default is conservative."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.85,
+        "tolerance": 0.03,
+        "rationale": "Despite low speed, the collapsed weights maintain high phase lock (0.886), indicating synchronized but minimal motion."
+      }
+    ],
+    "icm": {
+      "name": "semantic_insensitivity_collapse",
+      "background": [
+        "When an LLM is asked to translate diverse semantic concepts into numeric parameters, it may fall back to a single default output.",
+        "This vector appears identically for 'cascade' (verb), 'Fermat's Last Theorem' (math), 'Exodus 14' (Bible), 'Machu Picchu' (place), and 'social contract' (politics).",
+        "The identical dx=1.175, dy=-0.372 across domains confirms deterministic simulation: the LLM is not varying its output at all.",
+        "Cross-domain invariance is the hallmark of a model that has learned to satisfy the output format without engaging with the input semantics."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "semantic_variance",
+          "predicate": "gt",
+          "value": 0.1,
+          "tolerance": 0,
+          "rationale": "If different semantic inputs produce measurably different weight vectors, the semantic invariance has been broken."
+        }
+      ]
+    },
+    "source_gaits": [
+      "structured_random_places (87 of 100 trials)",
+      "structured_random_politics (50 of 100 trials)",
+      "structured_random_bible (44 of 100 trials)",
+      "structured_random_verbs (39 of 100 trials)",
+      "structured_random_theorems (12 of 100 trials)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Model collapse via semantic insensitivity: the LLM's Sem->Wt functor degenerates to a constant map, projecting all semantic inputs to a single point in weight space. This is the failure mode the categorical structure framework is designed to detect."
+  },
+  {
+    "name": "gentle_ambler",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: motion words for relaxed, unhurried locomotion (amble, glide, roam, saunter, drift) converge to moderate speed (~0.7), moderate-to-straight paths, and low yaw. The Sem->Wt functor maps 'leisurely movement' concepts across languages to a consistent behavioral basin.",
+    "weight_vector": [
+      0.6, 0.8, 0.4, -0.5, -0.7, -0.3,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "between",
+        "value": 0.65,
+        "tolerance": 0.25,
+        "rationale": "Ambling-class concepts converge to 0.4-0.9 speed across all languages (en/fr/de/fi/zh)."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "gt",
+        "value": 0.5,
+        "tolerance": 0.1,
+        "rationale": "Relaxed locomotion concepts produce straighter paths (mean 0.60) than agitated ones."
+      }
+    ],
+    "icm": {
+      "name": "leisurely_locomotion",
+      "background": [
+        "The motion concepts amble, glide, roam, saunter, and drift share a semantic field: unhurried, purposeful but relaxed movement.",
+        "Across 5 languages, these concepts converge behaviorally (combined CV 0.27-0.53), indicating the LLM reliably translates 'gentle movement' semantics into similar weight vectors.",
+        "The resulting gaits are moderate-speed, moderate-entropy, with above-average path straightness — a gentle forward progression."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 1.5,
+          "tolerance": 0.1,
+          "rationale": "Speed above 1.5 breaks the 'unhurried' character of this archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_seed: amble (4 trials, CV=0.27)",
+      "motion_seed: glide (21 trials, CV=0.51)",
+      "motion_seed: roam (4 trials, CV=0.39)",
+      "motion_seed: saunter (5 trials, CV=0.45)",
+      "motion_seed: drift (27 trials, CV=0.53)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Semantic coherence: 'leisurely movement' concepts form a tight behavioral cluster across languages, demonstrating that the Sem->Wt functor preserves semantic similarity as behavioral similarity."
+  },
+  {
+    "name": "agitated_scrambler",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: motion words for energetic, irregular locomotion (bounce, hop, scurry, zigzag, sway, trot) converge to moderate speed (~1.0), high entropy (~1.5), high yaw (~96 deg), and low straightness (~0.43). The LLM reliably translates 'agitated movement' into weight vectors that produce tumbling, direction-changing gaits.",
+    "weight_vector": [
+      0.6, 0.6, 0.6, -0.6, -0.6, -0.6,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "entropy",
+        "predicate": "gt",
+        "value": 1.4,
+        "tolerance": 0.1,
+        "rationale": "Agitated concepts converge to high contact entropy (mean 1.48), indicating irregular footfall patterns."
+      },
+      {
+        "feature": "yaw_degrees",
+        "predicate": "gt",
+        "value": 80,
+        "tolerance": 15,
+        "rationale": "High yaw (mean 96 deg) indicates the robot changes direction frequently during agitated gaits."
+      }
+    ],
+    "icm": {
+      "name": "agitated_locomotion",
+      "background": [
+        "Bounce, hop, scurry, zigzag, sway, and trot share a semantic field: energetic, non-linear movement with frequent direction changes.",
+        "This 7-concept cluster contains 175 trials across 5 languages with consistent behavioral signatures.",
+        "The weight vector signature [+0.6, +0.6, +0.6, -0.6, -0.6, -0.6] represents symmetric excitation of all sensors to all motors, producing active but disorganized motion."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "path_straightness",
+          "predicate": "gt",
+          "value": 0.7,
+          "tolerance": 0.05,
+          "rationale": "A straight path contradicts the direction-changing character of agitated motion."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_seed: bounce (21 trials)",
+      "motion_seed: hop (28 trials)",
+      "motion_seed: scurry (28 trials)",
+      "motion_seed: zigzag (28 trials)",
+      "motion_seed: sway (28 trials)",
+      "motion_seed: trot (4 trials)",
+      "motion_seed: sprint (29 trials)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Semantic coherence: 'agitated movement' concepts converge behaviorally, producing high-entropy, high-yaw gaits that contrast sharply with the gentle_ambler cluster."
+  },
+  {
+    "name": "forceful_charger",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: motion words for powerful, directed locomotion (charge, gallop, drag, retreat, patrol) converge to fast speed (~1.0), moderate entropy (~1.4), above-average displacement (~8.8m), and moderate straightness. These gaits cover ground with purpose.",
+    "weight_vector": [
+      0.7, 0.7, 0.0, -0.7, 0.0, 0.7,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.85,
+        "tolerance": 0.1,
+        "rationale": "Forceful concepts converge to speeds above 0.85, reflecting purposeful forward drive."
+      },
+      {
+        "feature": "displacement",
+        "predicate": "gt",
+        "value": 7.0,
+        "tolerance": 1.0,
+        "rationale": "These gaits achieve above-average displacement (mean 8.8m), covering substantial ground."
+      }
+    ],
+    "icm": {
+      "name": "directed_force",
+      "background": [
+        "Charge, gallop, drag, retreat, and patrol share a semantic field: movement with force or determination in a specific direction.",
+        "Despite different motion types (gallop is rhythmic, drag is labored, retreat is backward), the LLM translates all into weight vectors producing high-displacement, moderate-entropy gaits.",
+        "The 5-concept cluster spans 141 trials across languages with combined CV ~0.49."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 0.4,
+          "tolerance": 0.05,
+          "rationale": "Slow speed contradicts the forceful, ground-covering character of this archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_seed: charge (28 trials)",
+      "motion_seed: gallop (29 trials)",
+      "motion_seed: drag (28 trials)",
+      "motion_seed: retreat (27 trials)",
+      "motion_seed: patrol (29 trials)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Semantic coherence: 'forceful directed movement' concepts converge to fast, high-displacement gaits, demonstrating that the Sem->Wt functor maps semantic intensity to kinematic intensity."
+  },
+  {
+    "name": "cautious_creeper",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: motion words for slow, careful locomotion (forward_walk, saunter, waddle) converge to slow speed (~0.5), low entropy (~1.2), low yaw (~40 deg), and moderate-to-high torso ground contact. The robot moves carefully with its belly close to or on the ground.",
+    "weight_vector": [
+      0.6, 0.2, 0.2, 0.3, -0.4, 0.4,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.6,
+        "tolerance": 0.1,
+        "rationale": "Cautious concepts converge to speeds below 0.6 across languages."
+      },
+      {
+        "feature": "entropy",
+        "predicate": "lt",
+        "value": 1.35,
+        "tolerance": 0.1,
+        "rationale": "Low entropy indicates predictable, careful footfall patterns."
+      }
+    ],
+    "icm": {
+      "name": "cautious_locomotion",
+      "background": [
+        "Forward_walk, saunter, and waddle share a semantic field: deliberate, careful, slow movement.",
+        "These concepts produce the lowest-speed cluster (mean 0.55) with the lowest entropy (mean 1.26), indicating stable, predictable contact patterns.",
+        "Higher torso ground contact (mean 0.38) compared to faster archetypes confirms the robot stays low and stable."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "gt",
+          "value": 1.0,
+          "tolerance": 0.1,
+          "rationale": "Speed above 1.0 breaks the cautious, careful character of this archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "motion_seed: forward_walk (22 trials, CV=0.45)",
+      "motion_seed: saunter (5 trials, CV=0.45)",
+      "motion_seed: waddle (4 trials, CV=0.28)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Semantic coherence: 'careful slow movement' concepts form the most behaviorally coherent cluster in the motion dataset, with the lowest combined CV values."
+  },
+  {
+    "name": "celebrity_launcher",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype from celebrity data: a cross-category cluster where the LLM assigns high w24 values (>0.78), producing fast (speed ~1.9), high-displacement (~29m) gaits with low phase lock. Appears for celebrities the LLM interprets as dynamic/powerful regardless of domain — Gandhi, Messi, Cleopatra, Meryl Streep, Nancy Pelosi all produce this signature.",
+    "weight_vector": [
+      0.76, 0.24, -0.57, -0.40, 0.70, 0.83,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.2,
+        "rationale": "The celebrity launcher cluster consistently produces speeds above 1.5."
+      },
+      {
+        "feature": "displacement",
+        "predicate": "gt",
+        "value": 20.0,
+        "tolerance": 3.0,
+        "rationale": "These gaits achieve 20-35m displacement, the highest in the celebrity dataset."
+      }
+    ],
+    "icm": {
+      "name": "dynamic_persona_projection",
+      "background": [
+        "The LLM maps 'powerful/dynamic' celebrity personas to a specific weight signature with high w24 (motor 4 strongly driven by sensor 2).",
+        "This cluster spans historical, sports, entertainment, and political categories — the grouping is by perceived dynamism, not by domain.",
+        "Gandhi, Messi, Cleopatra, Meryl Streep, and Pelosi share the trait of being perceived as forceful personalities, which the LLM encodes as high motor drive.",
+        "The weight vector [0.76, 0.24, -0.57, -0.40, 0.70, 0.83] produces a fast, slightly desynchronized gait — energy without elegance."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 1.0,
+          "tolerance": 0.1,
+          "rationale": "Below speed 1.0, the dynamic persona projection has failed."
+        }
+      ]
+    },
+    "source_gaits": [
+      "celebrities: Cleopatra [historical] (d=29.3m)",
+      "celebrities: Lionel Messi [sports] (d=32.1m)",
+      "celebrities: Mahatma Gandhi [historical] (d=31.3m)",
+      "celebrities: Meryl Streep [entertainment] (d=29.8m)",
+      "celebrities: Nancy Pelosi [us_politics] (d=29.7m)",
+      "celebrities: Paul Manafort [controversial] (d=34.9m)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Cross-domain semantic convergence: the LLM maps 'forceful personality' across celebrity categories to a consistent high-drive weight signature, demonstrating that the Sem->Wt functor preserves an abstract 'dynamism' dimension."
+  },
+  {
+    "name": "celebrity_plodder",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype from celebrity data: the LLM assigns high w13 (>0.8) and positive w23 to celebrities it perceives as 'steady/stable' — sports figures, administrators, and establishment politicians. Produces moderate speed (~0.6), low displacement (~4m), high phase lock (>0.9), and stable contact patterns. The robot plods methodically.",
+    "weight_vector": [
+      0.76, 0.86, 0.50, -0.42, -0.64, -0.34,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.9,
+        "tolerance": 0.05,
+        "rationale": "The plodder cluster shows highly synchronized limb motion (mean phase lock 0.95+)."
+      },
+      {
+        "feature": "entropy",
+        "predicate": "lt",
+        "value": 1.5,
+        "tolerance": 0.1,
+        "rationale": "Below-average entropy indicates stable, predictable footfall patterns."
+      }
+    ],
+    "icm": {
+      "name": "stable_persona_projection",
+      "background": [
+        "The LLM maps 'steady/establishment' celebrities to a weight pattern with strong positive w13 and w23, driving both motors symmetrically from sensors 1 and 2.",
+        "Sports figures (Tom Brady, Tiger Woods, Michael Jordan), Trump admin officials (Steve Bannon, Sean Spicer), and historical leaders (Winston Churchill) cluster here.",
+        "The common thread is perceived steadiness or institutional authority, not athletic ability or ideology.",
+        "High phase lock means the two joints move in tight coordination — methodical, synchronized motion."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.7,
+          "tolerance": 0.05,
+          "rationale": "Low phase lock indicates desynchronized motion, breaking the steady/locked character."
+        }
+      ]
+    },
+    "source_gaits": [
+      "celebrities: Tom Brady [sports] (pl=0.981, ent=2.33)",
+      "celebrities: Michael Jordan [sports] (pl=0.999, ent=1.55)",
+      "celebrities: Steve Bannon [trump_admin] (pl=1.000, ent=0.69)",
+      "celebrities: Winston Churchill [historical] (pl=0.928, ent=1.21)",
+      "celebrities: Ted Cruz [us_politics] (pl=0.993, ent=1.53)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Cross-domain semantic convergence: the LLM maps 'stable/establishment persona' to a high-phase-lock weight signature, encoding perceived steadiness as synchronized motor coordination."
+  },
+  {
+    "name": "celebrity_wanderer",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype from celebrity data: the LLM assigns near-zero w13 to celebrities it perceives as 'unconventional/unpredictable', producing desynchronized gaits (phase lock <0.4) with moderate speed and wandering paths. Tech founders, creative writers, and politically ambiguous figures cluster here.",
+    "weight_vector": [
+      0.74, 0.24, -0.54, -0.45, 0.67, 0.12,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "lt",
+        "value": 0.4,
+        "tolerance": 0.05,
+        "rationale": "The wanderer cluster shows desynchronized limb motion (mean phase lock 0.37), meaning the two legs operate semi-independently."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "between",
+        "value": 0.9,
+        "tolerance": 0.35,
+        "rationale": "Moderate speed (0.55-1.25) — active but not fast. The motion is engaged but aimless."
+      }
+    ],
+    "icm": {
+      "name": "unconventional_persona_projection",
+      "background": [
+        "The LLM maps 'unconventional/unpredictable' celebrities to weight vectors with low w13 values, which weakens the coupling between sensor 1 and motor 3.",
+        "This creates a desynchronization between the two joints — the legs move semi-independently, producing an irregular, wandering gait.",
+        "Tech founders (Peter Thiel, Jack Dorsey), creative figures (Neil Gaiman, Stephen King), and politically ambiguous figures (Mitt Romney, Melania Trump) cluster here.",
+        "The common thread is perceived unpredictability or nonconformity."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "gt",
+          "value": 0.7,
+          "tolerance": 0.05,
+          "rationale": "High phase lock indicates synchronized motion, breaking the wandering/unpredictable character."
+        }
+      ]
+    },
+    "source_gaits": [
+      "celebrities: Peter Thiel [tech] (pl=0.318)",
+      "celebrities: Jack Dorsey [tech] (pl=0.320)",
+      "celebrities: Neil Gaiman [cultural] (pl=0.107)",
+      "celebrities: Mitt Romney [us_politics] (pl=0.106)",
+      "celebrities: Melania Trump [trump_family] (pl=0.200)",
+      "celebrities: Johnny Depp [entertainment] (pl=0.343)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Cross-domain semantic convergence: the LLM maps 'unconventional personality' to a desynchronized weight signature by weakening the w13 synapse, encoding perceived unpredictability as motor desynchronization."
+  },
+  {
+    "name": "theorem_combinatorial_walker",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: Ramsey-theoretic combinatorics theorems (Van der Waerden, Hales-Jewett, Menger, Ramsey) all converge to identical weight vectors distinct from all collapse attractors. 4/4 combinatorics theorems share exactly the same weights, producing a moderate-speed forward-right walker with very high phase lock (0.994) and strong yaw rotation (-2.99 rad). This is the cleanest field-to-behavior correspondence in the entire theorems dataset.",
+    "weight_vector": [
+      0.6, 0.2, -0.4, -0.6, -0.2, 0.4,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.99,
+        "tolerance": 0.005,
+        "rationale": "Near-perfect phase lock (0.994) distinguishes this from all three collapse attractors (which have phase lock 0.886-0.996 but different behavioral profiles)."
+      },
+      {
+        "feature": "yaw_net_rad",
+        "predicate": "lt",
+        "value": -2.5,
+        "tolerance": 0.3,
+        "rationale": "Strong negative yaw (-2.99 rad, nearly a full turn) is a distinctive signature of this weight configuration."
+      }
+    ],
+    "icm": {
+      "name": "combinatorial_convergence",
+      "background": [
+        "In a dataset where 76.8% of theorem names collapse to 3 generic attractors, the 4 Ramsey-theoretic combinatorics theorems all escape collapse and converge to a unique, shared weight vector.",
+        "Van der Waerden, Hales-Jewett, Menger, and Ramsey share a mathematical theme: extremal combinatorics and partition regularity.",
+        "The LLM encodes this shared mathematical structure into identical weights, demonstrating a genuine semantic-to-behavioral mapping for this narrow mathematical field.",
+        "Topology theorems show NO field consistency (scattered everywhere), but combinatorics achieves 80% agreement (4/5 theorems)."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.9,
+          "tolerance": 0.02,
+          "rationale": "Phase lock below 0.9 would indicate the combinatorial convergence basin has been escaped."
+        }
+      ]
+    },
+    "source_gaits": [
+      "theorems: Van der Waerden's Theorem (combinatorics)",
+      "theorems: Hales-Jewett Theorem (combinatorics)",
+      "theorems: Menger's Theorem (graph theory)",
+      "theorems: Ramsey's Theorem (combinatorics)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "The only clean field-to-behavior correspondence in the theorems dataset: Ramsey-theoretic combinatorics theorems share a mathematical theme of partition regularity, and the LLM translates this shared structure into identical weight vectors, while topology theorems scatter across the full behavioral space."
+  },
+  {
+    "name": "oeis_recursive_oscillator",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: OEIS recursive sequences (Fibonacci, Lucas, Pell, Tribonacci, Padovan) produce the highest phase lock among all mathematical families (0.677), despite originating from different LLM models. The recursive structure a(n) = f(a(n-1), a(n-2), ...) maps to synchronized oscillatory gaits across all 4 LLMs. 23 trials, slow speed (0.818), moderate backward displacement.",
+    "weight_vector": [
+      0.03, 0.70, 0.23, 0.23, 0.17, 0.13,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.65,
+        "tolerance": 0.03,
+        "rationale": "Recursive sequences converge to phase lock 0.677, the highest among 13 mathematical families, suggesting the LLM encodes recursion as coordination."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.9,
+        "tolerance": 0.1,
+        "rationale": "Recursive family speed (0.818) is below population mean (0.951), reflecting the steady accumulation pattern of recursive sequences."
+      }
+    ],
+    "icm": {
+      "name": "recursive_structure_resonance",
+      "background": [
+        "Fibonacci, Lucas, Pell, Tribonacci, and Padovan all share the defining property: each term depends on previous terms via a(n) = f(a(n-1), a(n-2), ...).",
+        "Across 4 different LLMs (qwen, deepseek, gpt-oss, llama), these sequences produce the highest phase lock score (0.677) among 13 mathematical families.",
+        "The behavioral convergence occurs despite different weight vectors from different models: the LLMs reach the same behavioral basin through different weight-space paths.",
+        "High phase lock = synchronized joint oscillation, which mirrors the temporal self-referential structure of recursive definitions.",
+        "Lucas and Pell received identical weights from qwen3-coder:30b, demonstrating semantic convergence within the recursive family."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.05,
+          "rationale": "Phase lock below 0.5 would indicate the recursive resonance has been lost."
+        }
+      ]
+    },
+    "source_gaits": [
+      "OEIS: A000045 Fibonacci (N=4)",
+      "OEIS: A000032 Lucas (N=4)",
+      "OEIS: A000129 Pell (N=4)",
+      "OEIS: A000073 Tribonacci (N=4)",
+      "OEIS: A000931 Padovan (N=4)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Mathematical structure resonance: the LLM encodes the self-referential, temporally recursive structure of Fibonacci-family sequences as high motor synchronization (phase lock), mapping 'each term depends on the past' to 'each joint step depends on the other joint.' The recursive definition becomes a physical central pattern generator."
+  },
+  {
+    "name": "oeis_polynomial_strider",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: OEIS polynomial sequences (2nd finite difference = 0, including squares, triangular numbers, pentagonal numbers) produce the straightest paths (0.674), lowest contact entropy (1.279), and highest efficiency (0.00241) among all regularity classes. 42 trials across 4 LLMs. The LLM maps 'mathematically simple' to 'kinematically simple.'",
+    "weight_vector": [
+      0.3, 0.5, 0.1, 0.0, -0.2, 0.5,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "path_straightness",
+        "predicate": "gt",
+        "value": 0.65,
+        "tolerance": 0.03,
+        "rationale": "Polynomial sequences achieve 0.674 straightness vs 0.594 for irregular sequences — the straightest class."
+      },
+      {
+        "feature": "entropy",
+        "predicate": "lt",
+        "value": 1.3,
+        "tolerance": 0.05,
+        "rationale": "Lowest contact entropy (1.279) among regularity classes indicates simple, predictable footfall patterns."
+      }
+    ],
+    "icm": {
+      "name": "mathematical_simplicity_embodiment",
+      "background": [
+        "Polynomial sequences (2nd finite difference = 0) include squares (A000290), triangular numbers (A000217), pentagonal numbers (A000326), and linear sequences.",
+        "These 42 trials produce: straightness=0.674 (highest), entropy=1.279 (lowest), efficiency=0.00241 (highest) among 3 regularity classes.",
+        "Near-polynomial sequences (2nd diff < 10) are intermediate, and irregular sequences (2nd diff >= 10) have the most complex gaits.",
+        "The LLM translates 'mathematical simplicity' (low-degree polynomial growth) into 'kinematic simplicity' (straight paths, low entropy, high efficiency).",
+        "This is a graded semantic-behavioral mapping: degree of mathematical regularity correlates with degree of gait regularity."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "path_straightness",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.05,
+          "rationale": "Straightness below 0.5 would break the polynomial strider's defining characteristic of simple, direct motion."
+        }
+      ]
+    },
+    "source_gaits": [
+      "OEIS: A000290 Squares (N=4)",
+      "OEIS: A000217 Triangular numbers (N=4)",
+      "OEIS: A000326 Pentagonal numbers (N=4)",
+      "OEIS: A000012 All 1's sequence (N=2)",
+      "OEIS: A002378 Oblong numbers (N=4)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "The LLM preserves a graded regularity structure: polynomial growth → straight efficient gait, near-polynomial → intermediate, irregular → complex gait. Mathematical simplicity maps to kinematic simplicity through the Sem->Wt functor, demonstrating that the functor respects structural hierarchy, not just categorical membership."
+  },
+  {
+    "name": "genre_heist_lockstep",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype from TV character data: heist thriller characters (Money Heist, Ocean's 11) produce the slowest mean speed (0.682) AND the highest phase lock (0.883) of all 14 genre clusters. This unique 'slow but coordinated' niche has no analogue in any other genre or archetype — it is the only SLOW/COMPLEX/COORDINATED behavioral class. 7 trials, very tight cluster (speed SD=0.217, phase lock SD=0.176).",
+    "weight_vector": [
+      -0.06, 0.33, 0.47, -0.16, 0.43, -0.09,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.85,
+        "tolerance": 0.03,
+        "rationale": "Heist characters achieve phase lock 0.883, far exceeding the next genre (legal/political at 0.704). The robot walks in precise lockstep."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "lt",
+        "value": 0.75,
+        "tolerance": 0.07,
+        "rationale": "Heist characters are the slowest genre (0.682), despite being associated with action narratives. The LLM encodes 'precision under pressure' as slow, coordinated motion."
+      }
+    ],
+    "icm": {
+      "name": "precision_under_pressure",
+      "background": [
+        "Heist thriller characters (Money Heist pl=0.947, Ocean's 11 pl=0.797) form the most phase-locked genre in the entire 450-trial character_seed experiment.",
+        "The LLM interprets heist characters as requiring precision, patience, and coordination — the opposite of action hero speed.",
+        "Money Heist characters achieve pl=0.947, the single highest show-level phase lock in the dataset.",
+        "The weight signature (high w13=0.33, high w23=0.47, high w14=0.43) creates strong coupling between ALL sensors and BOTH motors, producing tight coordination.",
+        "This is the only genre that occupies the SLOW/COMPLEX/COORDINATED region of the Speed/Entropy/PhaseLock behavioral space — all other slow genres are simple, and all other coordinated genres are faster.",
+        "Genre explains only 3-4% of behavioral variance overall, but the heist_thriller cluster is a genuine outlier in the distribution."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "phase_lock",
+          "predicate": "lt",
+          "value": 0.7,
+          "tolerance": 0.05,
+          "rationale": "Phase lock below 0.7 would break the defining 'lockstep' character of heist gaits."
+        }
+      ]
+    },
+    "source_gaits": [
+      "character_seed: Money Heist (N=4, pl=0.947, speed=0.656)",
+      "character_seed: Ocean's 11 (N=3, pl=0.797, speed=0.716)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "The LLM encodes heist genre semantics as 'precision under pressure': slow, deliberate, and highly coordinated motion. This maps narrative tension (plan execution, timing, teamwork) to physical coordination (phase lock), demonstrating that the Sem->Wt functor can capture genre-level narrative structure as distinct behavioral basins."
+  },
+  {
+    "name": "character_wise_elder",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype from character-seed data: llama3.1 assigns identical weight vectors to authoritative older male mentor/authority figures across 6 unrelated TV shows. Richard Webber (Grey's Anatomy), Professor Oak (Pokemon), Hawkeye Pierce (M*A*S*H), Stan Rizzo (Mad Men), Mr. Big (Sex and the City), and Dr. Glassman (The Good Doctor) all receive [w03=-0.4, w13=0.7, w23=0.1, w04=-0.1, w14=0.4, w24=0.0], producing the fastest gait in the 8000-trial character experiment (speed=1.936, dx=+24.73).",
+    "weight_vector": [
+      -0.4, 0.7, 0.1, -0.1, 0.4, 0.0,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 1.8,
+        "tolerance": 0.15,
+        "rationale": "This weight configuration produces the fastest gait in the character experiment (speed 1.936), far exceeding population mean."
+      },
+      {
+        "feature": "phase_lock",
+        "predicate": "gt",
+        "value": 0.85,
+        "tolerance": 0.03,
+        "rationale": "High phase lock (0.885) indicates coordinated, purposeful stride — confident forward locomotion."
+      }
+    ],
+    "icm": {
+      "name": "paternal_authority_projection",
+      "background": [
+        "Across 6 shows spanning medical drama, anime, comedy, period drama, romance, and sitcom, llama3.1 consistently maps 'authoritative male mentor' to identical synapse weights.",
+        "Richard Webber (chief of surgery), Professor Oak (Pokemon professor), Hawkeye Pierce (senior surgeon), Stan Rizzo (creative director), Mr. Big (powerful businessman), and Dr. Glassman (department head) share no narrative genre — they share a narrative role.",
+        "The LLM's character representation space encodes 'paternal authority' as a distinct point, separate from other character archetypes like 'villain' or 'ingenue.'",
+        "The resulting gait — fast, straight, coordinated, high-displacement — is the physical embodiment of 'confident stride': the robot walks like someone who knows where they're going.",
+        "This is the strongest single-weight-vector semantic convergence in the 8000-trial character experiment."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 1.2,
+          "tolerance": 0.1,
+          "rationale": "Speed below 1.2 would break the commanding forward stride of this archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "character_seed: Richard Webber [Grey's Anatomy] (llama3.1)",
+      "character_seed: Professor Oak [Pokemon] (llama3.1)",
+      "character_seed: Hawkeye Pierce [M*A*S*H] (llama3.1)",
+      "character_seed: Stan Rizzo [Mad Men] (llama3.1)",
+      "character_seed: Mr. Big [Sex and the City] (llama3.1)",
+      "character_seed: Dr. Aaron Glassman [The Good Doctor] (llama3.1)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Narrative role convergence: the LLM maps the 'wise elder/mentor' narrative archetype — regardless of genre, era, or specific show — to a single point in weight space. The resulting fast, coordinated gait embodies 'confident authority.' This demonstrates that the Sem->Wt functor operates on narrative role abstractions, not surface-level character features."
+  },
+  {
+    "name": "oeis_divisor_chaotic",
+    "type": "PersonaArchetype",
+    "description": "Semantically grounded archetype: OEIS divisor-related sequences (d(n), sigma(n), abundant numbers, deficient numbers) produce the highest contact entropy (1.515 bits) and lowest path straightness (0.540) of any mathematical family. 17 trials across 4 LLMs. 35% of divisor trials land in the chaotic behavioral cluster (5x enrichment vs population base rate). The irregular, non-monotone structure of divisor functions maps to chaotic contact patterns.",
+    "weight_vector": [
+      -0.2, 0.4, -0.3, 0.1, 0.0, 0.2,
+      0.0, 0.0, 0.0, 0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "entropy",
+        "predicate": "gt",
+        "value": 1.45,
+        "tolerance": 0.07,
+        "rationale": "Divisor family achieves 1.515 bits contact entropy, the highest of 13 mathematical families — more than Fibonacci (1.306) or partition (1.392)."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.56,
+        "tolerance": 0.04,
+        "rationale": "Lowest path straightness (0.540) among families — the robot wanders rather than walking in a line."
+      }
+    ],
+    "icm": {
+      "name": "arithmetic_irregularity_embodiment",
+      "background": [
+        "Divisor functions d(n), sigma(n), and their relatives (abundant/deficient classifications) have famously irregular local behavior — d(n) depends on the prime factorization of each n.",
+        "Across 17 trials and 4 different LLMs, divisor sequences produce the most chaotic gaits: highest entropy (1.515), lowest straightness (0.540), 5x enrichment in the chaotic behavioral cluster.",
+        "The effect is robust across models: even though qwen and gpt-oss collapse many sequences to shared attractors, the divisor family consistently lands in high-entropy regions.",
+        "Divisor functions contrast sharply with Fibonacci/Lucas/Pell (smooth recursive growth → high phase lock, low entropy) — the mathematical structure maps to behavioral structure.",
+        "This extends the 'polynomial strider' finding: the Sem->Wt functor preserves a spectrum from regular (polynomial → straight, efficient) through recursive (Fibonacci → phase-locked) to irregular (divisor → chaotic)."
+      ],
+      "violation_conditions": [
+        {
+          "feature": "entropy",
+          "predicate": "lt",
+          "value": 1.2,
+          "tolerance": 0.05,
+          "rationale": "Entropy below 1.2 would indicate a transition from chaotic to regular contact patterns."
+        }
+      ]
+    },
+    "source_gaits": [
+      "OEIS: A000005 d(n) divisor function (N=4)",
+      "OEIS: A000203 sigma(n) sum-of-divisors (N=4)",
+      "OEIS: A005101 Abundant numbers (N=4)",
+      "OEIS: A005100 Deficient numbers (N=2)",
+      "OEIS: A001222 Big omega: prime factors with multiplicity (N=3)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Arithmetic irregularity embodiment: divisor functions have famously irregular local behavior (d(n) depends on prime factorization), and the LLM maps this mathematical irregularity to kinematic irregularity (high entropy, low straightness). Combined with the recursive_oscillator (regular→coordinated) and polynomial_strider (simple→straight) archetypes, this establishes a full regularity spectrum: mathematical structure grades of regular/recursive/irregular map to behavioral grades of straight/oscillatory/chaotic through the Sem->Wt functor."
+  },
+  {
+    "name": "yaw_spinner",
+    "type": "PersonaArchetype",
+    "description": "High-speed rotational gait with strong negative yaw, high contact entropy, and forward displacement. Discovered via k-means clustering of 700 movement vocabulary trials (28 concepts x 5 languages x 5 LLMs). Distinguished from the existing 'spinner' archetype by its combination of forward progress (dx=2.49) with rotation, rather than pure in-place spinning.",
+    "weight_vector": [
+      -0.547,
+      0.672,
+      0.581,
+      0.581,
+      -0.356,
+      0.944,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "yaw_net_rad",
+        "predicate": "lt",
+        "value": -1.0,
+        "tolerance": 0.2,
+        "rationale": "Strong negative yaw (z=-3.20) is the defining feature — sustained rotation during forward locomotion."
+      },
+      {
+        "feature": "dx",
+        "predicate": "gt",
+        "value": 1.5,
+        "tolerance": 0.3,
+        "rationale": "Forward displacement (z=2.46) distinguishes this from pure in-place spinners."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 0.8,
+        "tolerance": 0.05,
+        "rationale": "High contact entropy (z=2.32) indicates complex foot-ground interaction during rotation."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.3,
+        "tolerance": 0.05,
+        "rationale": "Fast movement (z=1.65) — rotation does not come at the cost of speed."
+      }
+    ],
+    "icm": {
+      "name": "yaw_spinner_icm",
+      "background": [
+        "Rotation and forward motion can coexist — this archetype spirals rather than spins in place",
+        "High contact entropy reflects the complex footfall patterns needed to maintain both rotation and forward progress",
+        "Appears across 5 languages and multiple movement concepts (dash, twirl, stomp, scurry, sprint)"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "yaw_net_rad",
+          "predicate": "gt",
+          "value": -0.5,
+          "tolerance": 0.0,
+          "rationale": "Insufficient yaw rotation breaks the spiraling archetype — becomes a simple forward walker."
+        },
+        {
+          "feature": "dx",
+          "predicate": "lt",
+          "value": 0.5,
+          "tolerance": 0.0,
+          "rationale": "Without forward displacement, this collapses to the existing 'spinner' archetype."
+        }
+      ]
+    },
+    "source_gaits": [
+      "movement_vocab: dash (3 trials)",
+      "movement_vocab: twirl (3 trials)",
+      "movement_vocab: stomp (3 trials)",
+      "movement_vocab: scurry (3 trials)",
+      "movement_vocab: sprint (2 trials)",
+      "movement_vocab: sway (2 trials)",
+      "movement_vocab: stagger (2 trials)",
+      "movement_vocab: pivot (2 trials)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Spiral locomotion archetype: LLMs interpreting energetic movement concepts (dash, twirl, sprint) across 5 languages converge on a weight configuration that produces forward-spiraling motion. The key insight is that w24 (sensor 2 → motor 4) is maximally positive (0.94) — the front touch sensor drives the front leg strongly, creating an asymmetric push that combines forward thrust with rotational torque. Cross-language functor faithfulness confirms this is a genuine behavioral attractor, not a language-specific artifact."
+  },
+  {
+    "name": "wobbler",
+    "type": "PersonaArchetype",
+    "description": "Fast backward-moving gait with low phase-lock coordination and high contact entropy. Discovered via k-means clustering of 700 movement vocabulary trials. Characterized by high speed but poor coordination — the legs work against each other, producing backward displacement (dx=-2.67) with complex contact dynamics.",
+    "weight_vector": [
+      0.760,
+      -0.730,
+      0.395,
+      0.850,
+      0.805,
+      0.230,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "dx",
+        "predicate": "lt",
+        "value": -1.5,
+        "tolerance": 0.3,
+        "rationale": "Strong backward displacement (z=-3.03) is the most distinctive feature — the robot moves fast but in reverse."
+      },
+      {
+        "feature": "phase_lock_score",
+        "predicate": "lt",
+        "value": 0.5,
+        "tolerance": 0.1,
+        "rationale": "Low phase-lock (z=-2.56) indicates the legs are poorly coordinated — working asynchronously."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy (z=2.22) reflects the complex, irregular footfall patterns of uncoordinated but energetic motion."
+      },
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.3,
+        "tolerance": 0.05,
+        "rationale": "High speed (z=1.97) despite poor coordination — energy is being expended but directed backward."
+      }
+    ],
+    "icm": {
+      "name": "wobbler_icm",
+      "background": [
+        "Speed without coordination produces reverse motion — the legs generate force but not in a consistent direction",
+        "High w03 (0.76) and w23 (0.81) mean both torso and front-leg sensors drive the back leg strongly, creating a front-heavy response pattern",
+        "Appears predominantly from high-energy concepts (dash, sprint, gallop, charge) — LLMs interpret 'fast' as 'high weights' which accidentally produces reverse locomotion"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "dx",
+          "predicate": "gt",
+          "value": 0.0,
+          "tolerance": 0.0,
+          "rationale": "Forward displacement breaks the wobbler archetype — the defining feature is backward motion."
+        },
+        {
+          "feature": "phase_lock_score",
+          "predicate": "gt",
+          "value": 0.7,
+          "tolerance": 0.0,
+          "rationale": "Good coordination eliminates the wobble — becomes a coordinated backward walker instead."
+        }
+      ]
+    },
+    "source_gaits": [
+      "movement_vocab: dash (5 trials)",
+      "movement_vocab: sprint (5 trials)",
+      "movement_vocab: gallop (3 trials)",
+      "movement_vocab: charge (2 trials)",
+      "movement_vocab: circle (1 trial)",
+      "movement_vocab: march (1 trial)",
+      "movement_vocab: stomp (1 trial)",
+      "movement_vocab: scurry (1 trial)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Paradoxical backward locomotion: LLMs interpret speed concepts by setting most weights high, but the combination of strong w03 (+0.76) and w04 (-0.73) — opposing signs for the torso sensor's drive to the two motors — creates antagonistic leg motion that propels the robot backward. This is a genuine LLM-specific behavioral mode: the semantic intent (fast forward) maps to the opposite kinematic outcome (fast backward), revealing a systematic failure mode of the Sem→Wt functor that nonetheless produces a reproducible, distinctive gait."
+  },
+  {
+    "name": "dasher",
+    "type": "PersonaArchetype",
+    "description": "Fast, high-entropy gait with moderate coordination and minimal net yaw. Discovered via k-means clustering of 700 movement vocabulary trials. The most common non-collapse high-speed archetype (56 trials), characterized by energetic but directionless locomotion — fast movement without strong rotational or directional bias.",
+    "weight_vector": [
+      -0.545,
+      0.555,
+      0.079,
+      0.839,
+      -0.075,
+      0.461,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "feature_vector": null,
+    "grounding_criteria": [
+      {
+        "feature": "mean_speed",
+        "predicate": "gt",
+        "value": 0.35,
+        "tolerance": 0.05,
+        "rationale": "Highest mean speed of all clusters (z=2.20) — this is the fastest non-rotational archetype."
+      },
+      {
+        "feature": "contact_entropy_bits",
+        "predicate": "gt",
+        "value": 0.7,
+        "tolerance": 0.1,
+        "rationale": "High contact entropy (z=2.20) indicates complex, active foot-ground interaction."
+      },
+      {
+        "feature": "path_straightness",
+        "predicate": "lt",
+        "value": 0.4,
+        "tolerance": 0.05,
+        "rationale": "Low path straightness (0.33) — fast but not directed along any consistent heading."
+      }
+    ],
+    "icm": {
+      "name": "dasher_icm",
+      "background": [
+        "Speed without directionality: the dasher is fast but wanders rather than traveling straight",
+        "Near-zero w13 (0.08) and w23 (-0.08) mean the back-leg and front-leg sensors barely influence the back motor — locomotion is driven primarily by w03/w04 (torso sensor) and w14/w24 (back-leg sensor to front motor)",
+        "Emerges from rotational movement concepts (twirl, pivot, turn_left, retreat) — LLMs interpret turning as asymmetric weights"
+      ],
+      "violation_conditions": [
+        {
+          "feature": "mean_speed",
+          "predicate": "lt",
+          "value": 0.2,
+          "tolerance": 0.0,
+          "rationale": "Slow movement breaks the dasher archetype — becomes a drifter or pacer."
+        },
+        {
+          "feature": "contact_entropy_bits",
+          "predicate": "lt",
+          "value": 0.3,
+          "tolerance": 0.0,
+          "rationale": "Low contact entropy indicates static contact patterns — the dasher requires dynamic footfalls."
+        }
+      ]
+    },
+    "source_gaits": [
+      "movement_vocab: twirl (6 trials)",
+      "movement_vocab: retreat (6 trials)",
+      "movement_vocab: scurry (4 trials)",
+      "movement_vocab: pivot (4 trials)",
+      "movement_vocab: turn_left (4 trials)",
+      "movement_vocab: zigzag (3 trials)",
+      "movement_vocab: drag (3 trials)",
+      "movement_vocab: gallop (2 trials)"
+    ],
+    "exemplar_gait": null,
+    "conceptual_basis": "Undirected kinetic energy: the dasher embodies the LLM's interpretation of dynamic movement concepts (twirl, pivot, retreat) as weight configurations that produce speed without consistent heading. The near-zero sensor-to-back-motor weights (w13≈0, w23≈0) mean the back leg operates almost independently of touch feedback, while the front leg is strongly driven (w14=0.84), creating an asymmetric but energetic gait. Appears across zh (16 trials) and fr (16 trials) more than en (6) — suggesting Chinese and French LLM token semantics for rotational concepts map more reliably to this weight basin."
+  }
+]
