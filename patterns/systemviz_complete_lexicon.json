@@ -1,0 +1,1053 @@
+{
+  "schema_version": "1.0.0",
+  "build_date": "2026-02-23",
+  "project": {
+    "name": "SystemViz",
+    "author": "Peter Stoyko",
+    "url": "https://systemviz.com",
+    "license": "Creative Commons Attribution 4.0 International (Free Culture)",
+    "description": "A research project exploring how visuals can enhance systems thinking, especially as it relates to inter-disciplinary, collaborative design.",
+    "book": "How Small Players Change Big Systems (Peter Stoyko, forthcoming)",
+    "pillars": [
+      {
+        "id": "visual_vocabulary",
+        "name": "Visual Vocabulary of Systems",
+        "version": "1.3.0",
+        "total_elements": 200,
+        "total_icons": 330,
+        "description": "A codex of the main elements and dynamics of systems, assembled from an extensive review of natural sciences, social sciences, design, and managerial disciplines. Each item has an illustrative icon.",
+        "awards": ["IIID Award (top-tier, International Institute for Information Design)"]
+      },
+      {
+        "id": "pattern_atlas",
+        "name": "Pattern Atlas of System Vulnerabilities",
+        "total_patterns": 30,
+        "levels_of_scale": 4,
+        "description": "Uses the 'tangle' metaphor to explain weaknesses inherent to elaborate human-made systems, identifying ~30 types of systemic vulnerability across four levels of scale."
+      },
+      {
+        "id": "anatomy_codex",
+        "name": "Anatomy of System Notations",
+        "total_devices": 65,
+        "source_notations": 70,
+        "description": "A comprehensive inventory (codex) of graphical devices used in visual system notations, drawn from 70 existing notations.",
+        "presented_at": "RSD Symposium"
+      },
+      {
+        "id": "escalade",
+        "name": "ESCALADE Information-Design Framework",
+        "total_criteria": 8,
+        "description": "Eight marquee criteria for improving system diagrams, maps, notations, and other graphics. Explained in a series of slide-notes with additional tips and considerations.",
+        "presented_at": "19th IIID VisionPlus Conference, Vienna, Austria"
+      }
+    ]
+  },
+
+  "visual_vocabulary": {
+    "description": "The core lexicon of system elements and dynamics. 6 categories, 56 terms with full definitions from the published vocabulary, plus 30 CA-extension terms developed for the mito-aging simulator project.",
+    "note_on_coverage": "The full VV v1.3.0 contains 200 elements. This lexicon includes all 56 core terms with published definitions, 30 project-specific CA extensions, and 15 additional VV terms identified from version notes (definitions pending, site currently offline).",
+    "categories": {
+      "driver": {
+        "description": "The active cause of some happening within the system.",
+        "lakoff_layer": "linking",
+        "terms": {
+          "control_point": {
+            "definition": "Contact between a subject and object whereby power or influence can be exerted.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "conduit": {
+            "definition": "A path along which actors are expected to move.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "amplifier": {
+            "definition": "A combination of factors or process that increases the magnitude of an effect.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "repeller": {
+            "definition": "An object that pushes other objects away from itself.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping"]
+          },
+          "enabler": {
+            "definition": "A contributory cause; can encourage change.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "dampener": {
+            "definition": "A combination of factors or process that reduces the magnitude of an effect.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "cycle": {
+            "definition": "A repeating process or iterative effort towards a goal.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "genator": {
+            "definition": "The original impetus or trigger of a sequence of events.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "cascade": {
+            "definition": "A sequence of knock-on effects; a chain reaction.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "inflection": {
+            "definition": "A turning point or critical juncture.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "equifinality": {
+            "definition": "Multiple activities lead to the same outcome.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "side_effect": {
+            "definition": "An unintended consequence of an action on a different part of the system.",
+            "sentiment": "negative",
+            "sources": ["mapping"],
+            "note": "Not in published VV lexicon; inferred from simulator mapping"
+          }
+        }
+      },
+      "signal": {
+        "description": "Communication that can potentially trigger some action.",
+        "lakoff_layer": "grounded",
+        "terms": {
+          "framing": {
+            "definition": "Interpretive paradigm which makes the system understandable.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "monitor": {
+            "definition": "Active scanning of a process or domain to compare with an expected state.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "indicator": {
+            "definition": "Indirect or partial signal of status; a symptom of a deeper cause.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "feed_back": {
+            "definition": "Information about the outputs of an action are routed back as inputs.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "status_display": {
+            "definition": "Regularly updated information about a particular object.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "alert": {
+            "definition": "A warning signal intended to mobilize a response.",
+            "sentiment": "negative",
+            "sources": ["lexicon"]
+          }
+        }
+      },
+      "state": {
+        "description": "A condition of a system or objects within it.",
+        "lakoff_layer": "grounded",
+        "terms": {
+          "stock": {
+            "definition": "A discrete collection of consumable or expendable resources for future use.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "standard": {
+            "definition": "A set of items made more or less uniform; conformity to criteria.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "fault_detection": {
+            "definition": "Self-diagnosis, self-monitoring, and system-problem identification.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "redundancy": {
+            "definition": "Multiple stockpiles or parallel sub-systems that act as a back-up.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "fault_recovery": {
+            "definition": "Correction or compensation that minimize impact of faults.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "tipping_point": {
+            "definition": "The threshold beyond which rapid, large-scale change happens.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "criticality": {
+            "definition": "The threshold beyond which a dynamic becomes self-sustaining.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "load": {
+            "definition": "A stock of items being moved under containment conditions.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping"]
+          },
+          "mutation": {
+            "definition": "A reconfiguration of an object caused by an error or exogenous factor.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping"]
+          },
+          "transition": {
+            "definition": "Changing from one state to another.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "accumulation": {
+            "definition": "The build-up of items or experiences over time.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "capacity": {
+            "definition": "The finite ability to handle a particular quantity of activity.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "reset": {
+            "definition": "Returning to original conditions or earlier state.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "replication": {
+            "definition": "When an object is copied, reproduced, or divided.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "assembly": {
+            "definition": "Building blocks with which system structures are formed.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "separation": {
+            "definition": "The division of a part into two or more parts.",
+            "sentiment": "negative",
+            "sources": ["lexicon", "mapping"]
+          },
+          "maintenance": {
+            "definition": "The restoration of operations after a malfunction.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "fault": {
+            "definition": "A defect or malfunction in a system component.",
+            "sentiment": "neutral",
+            "sources": ["mapping"],
+            "note": "Not in published VV lexicon; inferred from simulator mapping"
+          }
+        }
+      },
+      "boundary": {
+        "description": "Separates different parts of a system.",
+        "lakoff_layer": "linking",
+        "terms": {
+          "gate": {
+            "definition": "A controlled opening in a barrier.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "buffer": {
+            "definition": "A boundary or zone that diminishes, delays, or otherwise alters a driver.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "reactive_boundary": {
+            "definition": "A boundary that responds to forces and acts as an actant.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "permissions": {
+            "definition": "The control of activity within a bounded area.",
+            "sentiment": "neutral",
+            "sources": ["lexicon"]
+          },
+          "container": {
+            "definition": "A boundary that groups and isolates objects.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "semi_permiable": {
+            "definition": "A barrier that blocks some objects while allowing others.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "divider": {
+            "definition": "A boundary that keeps two or more distinct objects apart.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "protector": {
+            "definition": "A barrier preventing damage by blocking unwanted forces.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping"]
+          },
+          "notional_boundary": {
+            "definition": "A conceptual boundary or delineation.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          },
+          "edge": {
+            "definition": "Outer boundary that defines the scope of domain or system.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "mapping"]
+          }
+        }
+      },
+      "relation": {
+        "description": "The dynamic between two or more objects in a system.",
+        "lakoff_layer": "linking",
+        "terms": {
+          "group": {
+            "definition": "An affiliated collective of actors that share patterns of behavior.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "rank": {
+            "definition": "The hierarchical status bestowed on an object or actor.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "differentiation": {
+            "definition": "A contrast between other items or actors in a system.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "mediation": {
+            "definition": "The mitigation or reconciliation of conflict between parties.",
+            "sentiment": "positive",
+            "sources": ["lexicon"]
+          },
+          "aggregate": {
+            "definition": "A group of objects or actors of the same type.",
+            "sentiment": "neutral",
+            "sources": ["lexicon"]
+          },
+          "coupling": {
+            "definition": "The tightness or looseness of ties between parts of a system.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "network": {
+            "definition": "An arrangement of interconnected parts that interact directly.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "cluster": {
+            "definition": "Elements defined as a group by virtue of proximity.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          }
+        }
+      },
+      "domain": {
+        "description": "The context in which the system (or parts thereof) exists.",
+        "lakoff_layer": "linking",
+        "terms": {
+          "support_structure": {
+            "definition": "Constructed supports that enables activity.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "reference_points": {
+            "definition": "Features in the context that can act as orienting devices.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          },
+          "resources": {
+            "definition": "The availability and access to the factor inputs needed.",
+            "sentiment": "positive",
+            "sources": ["lexicon", "mapping", "crosswalk"]
+          },
+          "levels_of_scale": {
+            "definition": "System attributes at different orders of analysis.",
+            "sentiment": "neutral",
+            "sources": ["lexicon", "crosswalk"]
+          }
+        }
+      }
+    },
+    "ca_extensions": {
+      "description": "Terms added for the Semantic Cellular Automaton layer. These extend the VV categories with discrete-state concepts used in the mito-aging simulator's CA model.",
+      "provenance": "project-specific (Cramer simulator, 2026-02-22)",
+      "terms": {
+        "ca.attractor": {
+          "category": "state",
+          "definition": "A stable state or trajectory toward which the CA system converges.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "aggressive", "transplant_focused", "metabolic_optimizer"]
+        },
+        "ca.attractor_transition": {
+          "category": "driver",
+          "definition": "A shift from one attractor basin to another, driven by parameter changes or rule cascades.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["aggressive", "transplant_focused"]
+        },
+        "ca.bin_lattice": {
+          "category": "domain",
+          "definition": "The structured arrangement of discretization bins forming the CA state space.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.bin_ordering": {
+          "category": "relation",
+          "definition": "The ordinal relationship between bins (e.g., minimal < growing < approaching_cliff < past_cliff).",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.bin_state": {
+          "category": "state",
+          "definition": "The discrete bin assignment of a continuous variable at a given timestep.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.bin_threshold": {
+          "category": "boundary",
+          "definition": "The numeric cutpoint between adjacent bins in the discretization schema.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.bin_transition": {
+          "category": "signal",
+          "definition": "The event of a variable crossing from one bin to an adjacent bin.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.cascade": {
+          "category": "ca",
+          "definition": "A chain of rule firings where the output of one rule triggers the input conditions for another.",
+          "sentiment": "negative",
+          "lakoff_archetypes": ["aggressive", "transplant_focused"]
+        },
+        "ca.cliff_boundary": {
+          "category": "boundary",
+          "definition": "The heteroplasmy threshold (deletion het ~0.50) beyond which ATP collapses nonlinearly.",
+          "sentiment": "negative",
+          "lakoff_archetypes": ["aggressive", "transplant_focused"]
+        },
+        "ca.cliff_crossing_signal": {
+          "category": "signal",
+          "definition": "A bin transition indicating that deletion heteroplasmy has crossed the cliff threshold.",
+          "sentiment": "negative",
+          "lakoff_archetypes": ["aggressive", "transplant_focused"]
+        },
+        "ca.discrete_state": {
+          "category": "state",
+          "definition": "The full tuple of bin assignments across all 8 ODE variables at one timestep.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "metabolic_optimizer"]
+        },
+        "ca.rule_firing": {
+          "category": "driver",
+          "definition": "The activation of a tiered transition rule when its input bin conditions are satisfied.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["aggressive", "transplant_focused"]
+        },
+        "ca.state_space": {
+          "category": "domain",
+          "definition": "The complete set of possible discrete states (11,664 in the mito-aging CA).",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["conservative", "aggressive", "transplant_focused", "metabolic_optimizer"]
+        },
+        "ca.variable_coupling": {
+          "category": "relation",
+          "definition": "The dependency between variables captured by multi-input rule conditions.",
+          "sentiment": "neutral",
+          "lakoff_archetypes": ["metabolic_optimizer"]
+        }
+      }
+    },
+    "vv_additional_terms": {
+      "description": "Additional VV terms identified from version notes. Definitions pending (systemviz.com currently offline).",
+      "confidence": "term names confirmed, definitions not available",
+      "v1_2_0_additions": [
+        "load_balancing",
+        "expulsion",
+        "recursion",
+        "derivation",
+        "entrainment",
+        "objectile",
+        "risk_asymmetry"
+      ],
+      "v1_3_0_additions": [
+        "turbulence",
+        "tolerance",
+        "translation",
+        "correspondence",
+        "observer_influence",
+        "period",
+        "dissipation",
+        "exaptation"
+      ],
+      "v1_3_1_renamed": {
+        "note": "Several icons were updated/renamed in v1.3.1 for the ISSS 2021 presentation",
+        "renamed_terms": [
+          "instruction",
+          "disruptor",
+          "parallelism",
+          "lag",
+          "amplifier",
+          "activation",
+          "trail",
+          "equilibrium"
+        ]
+      },
+      "v1_3_0_icon_updates": [
+        "mutualism",
+        "commensalism",
+        "parasitism",
+        "activation",
+        "auto_environment",
+        "framing"
+      ]
+    },
+    "sentiment_summary": {
+      "total_classified": 86,
+      "positive": 12,
+      "negative": 13,
+      "neutral": 61,
+      "by_category": {
+        "boundary": {"positive": 2, "negative": 0, "neutral": 10, "total": 12},
+        "ca": {"positive": 0, "negative": 3, "neutral": 11, "total": 14},
+        "domain": {"positive": 2, "negative": 0, "neutral": 4, "total": 6},
+        "driver": {"positive": 1, "negative": 3, "neutral": 11, "total": 15},
+        "relation": {"positive": 2, "negative": 0, "neutral": 8, "total": 10},
+        "signal": {"positive": 0, "negative": 1, "neutral": 7, "total": 8},
+        "state": {"positive": 5, "negative": 6, "neutral": 10, "total": 21}
+      }
+    }
+  },
+
+  "pattern_atlas": {
+    "description": "The Pattern Atlas of System Vulnerabilities uses the 'tangle' metaphor to explain weaknesses inherent to elaborate, human-made systems.",
+    "confidence": "category names confirmed from PDF title/search results; individual pattern assignments are provisional (source PDFs inaccessible)",
+    "total_patterns": 30,
+    "levels_of_scale": {
+      "description": "Vulnerabilities operate at four nested levels of analysis.",
+      "levels": [
+        {
+          "id": "component",
+          "level": 1,
+          "name": "Component",
+          "description": "Individual parts or elements within a subsystem."
+        },
+        {
+          "id": "subsystem",
+          "level": 2,
+          "name": "Subsystem",
+          "description": "Functional groupings of components that serve a specific purpose."
+        },
+        {
+          "id": "system",
+          "level": 3,
+          "name": "System",
+          "description": "The complete operational entity with defined boundaries."
+        },
+        {
+          "id": "system_of_systems",
+          "level": 4,
+          "name": "System of Systems",
+          "description": "Interconnected independent systems that together produce emergent behavior."
+        }
+      ]
+    },
+    "vulnerability_categories": {
+      "description": "Seven high-level categories of systemic vulnerability, each containing multiple specific patterns.",
+      "categories": [
+        {
+          "id": "uniform",
+          "name": "UNIFORM",
+          "description": "Vulnerability arising from excessive homogeneity or standardization, reducing adaptive capacity.",
+          "tangle_metaphor": "Threads all the same — no diversity to absorb shocks."
+        },
+        {
+          "id": "untethered",
+          "name": "UNTETHERED",
+          "description": "Vulnerability from disconnection, lack of grounding, or absence of stabilizing connections.",
+          "tangle_metaphor": "Threads floating free — no anchor points."
+        },
+        {
+          "id": "propped_up",
+          "name": "PROPPED UP",
+          "description": "Vulnerability from artificial supports that mask underlying structural weakness.",
+          "tangle_metaphor": "Threads held up by fragile props — collapse when props fail."
+        },
+        {
+          "id": "overextended",
+          "name": "OVEREXTENDED",
+          "description": "Vulnerability from operating beyond sustainable capacity or reach.",
+          "tangle_metaphor": "Threads stretched too far — snapping under tension."
+        },
+        {
+          "id": "precarious",
+          "name": "PRECARIOUS",
+          "description": "Vulnerability from unstable equilibria or positions that small perturbations can topple.",
+          "tangle_metaphor": "Threads balanced on edge — any push tips them."
+        },
+        {
+          "id": "ensnarling",
+          "name": "ENSNARLING",
+          "description": "Vulnerability from excessive entanglement, creating unintended dependencies and lock-in.",
+          "tangle_metaphor": "Threads wound too tight — pulling one disrupts many."
+        },
+        {
+          "id": "spiraling",
+          "name": "SPIRALING",
+          "description": "Vulnerability from self-reinforcing feedback loops that amplify deviations.",
+          "tangle_metaphor": "Threads coiling inward — accelerating toward breakdown."
+        }
+      ]
+    },
+    "known_pattern_names": {
+      "description": "Individual vulnerability pattern names extracted from web search results. The full set of ~30 patterns with definitions requires access to the PDF.",
+      "confirmed_names": [
+        "HAYWIRED",
+        "HOOKED",
+        "CORRALLING",
+        "IMITATION",
+        "DISCONNECTED",
+        "OPAQUE",
+        "RIGGED-UP",
+        "COMPROMISED",
+        "BARREN"
+      ],
+      "note": "These 9 names were found in web-indexed content. The remaining ~21 pattern names are in the full PDF poster."
+    }
+  },
+
+  "anatomy_codex": {
+    "description": "The Anatomy of System Notations: a comprehensive inventory of graphical devices used in visual system notations.",
+    "confidence": "structure confirmed from RSD Symposium publication; individual device catalog requires access to PDF/poster",
+    "total_devices": 65,
+    "source_notations": 70,
+    "device_categories": {
+      "description": "Graphical devices are grouped by the system concepts they represent.",
+      "note": "Categories listed here are inferred from standard systems notation literature and the SystemViz VV category structure. Detailed taxonomy requires the full codex document.",
+      "categories": [
+        {
+          "id": "element_representation",
+          "name": "Element Representation",
+          "description": "Devices for depicting system objects, actors, and components (shapes, icons, labels)."
+        },
+        {
+          "id": "boundary_depiction",
+          "name": "Boundary Depiction",
+          "description": "Devices for showing system boundaries, containers, membranes, and scope (enclosures, dotted lines, shading)."
+        },
+        {
+          "id": "flow_and_connection",
+          "name": "Flow and Connection",
+          "description": "Devices for showing relationships, flows, and connections between elements (arrows, lines, connectors)."
+        },
+        {
+          "id": "feedback_and_loops",
+          "name": "Feedback and Loops",
+          "description": "Devices for depicting feedback loops, cycles, and recursive processes (circular arrows, polarity markers)."
+        },
+        {
+          "id": "state_and_dynamics",
+          "name": "State and Dynamics",
+          "description": "Devices for representing states, transitions, stocks, and accumulations (reservoirs, valves, level indicators)."
+        },
+        {
+          "id": "hierarchy_and_nesting",
+          "name": "Hierarchy and Nesting",
+          "description": "Devices for showing levels of scale, decomposition, and containment (nesting, tree structures, layers)."
+        },
+        {
+          "id": "annotation_and_metadata",
+          "name": "Annotation and Metadata",
+          "description": "Devices for adding explanatory information, labels, legends, and qualitative markers (color coding, typography, icons)."
+        }
+      ]
+    },
+    "source_notation_families": {
+      "description": "The 70 source notations span multiple disciplinary traditions.",
+      "families": [
+        "Systems Dynamics (Forrester, Meadows)",
+        "Cybernetics (Ashby, Beer)",
+        "Soft Systems Methodology (Checkland)",
+        "System Architecture (SysML, UML)",
+        "Causal Loop Diagrams",
+        "Stock-and-Flow Diagrams",
+        "Rich Pictures",
+        "Influence Diagrams",
+        "Bond Graphs",
+        "Petri Nets",
+        "State Charts",
+        "Data Flow Diagrams",
+        "Entity-Relationship Diagrams",
+        "Network Diagrams",
+        "Concept Maps"
+      ]
+    }
+  },
+
+  "escalade": {
+    "description": "ESCALADE: An information-design framework of eight marquee criteria for improving system diagrams, maps, notations, and other graphics. Most system graphics are developed without any consideration to design criteria; ESCALADE fills that gap.",
+    "confidence": "framework existence and 8-criteria structure confirmed; individual criterion names provisional (site offline, slide-notes inaccessible)",
+    "total_criteria": 8,
+    "presented_at": "19th IIID VisionPlus Conference, Vienna, Austria",
+    "criteria": {
+      "note": "The ESCALADE acronym encodes 8 criteria. The names below are reconstructed from available web search fragments and standard information design vocabulary. Definitions should be verified against the published slide-notes when systemviz.com is restored.",
+      "provisional_criteria": [
+        {
+          "letter": "E",
+          "name": "Expressiveness",
+          "description": "The notation should be capable of representing the full range of system concepts required."
+        },
+        {
+          "letter": "S",
+          "name": "Simplicity",
+          "description": "Graphics should use the minimum visual complexity needed to convey the intended meaning."
+        },
+        {
+          "letter": "C",
+          "name": "Consistency",
+          "description": "Visual conventions should be applied uniformly throughout the diagram."
+        },
+        {
+          "letter": "A",
+          "name": "Adaptability",
+          "description": "The notation should accommodate different system types, scales, and domains."
+        },
+        {
+          "letter": "L",
+          "name": "Legibility",
+          "description": "Elements should be visually distinct and readable at intended viewing distances."
+        },
+        {
+          "letter": "A",
+          "name": "Accuracy",
+          "description": "Visual representations should faithfully reflect the underlying system structure and dynamics."
+        },
+        {
+          "letter": "D",
+          "name": "Distinction",
+          "description": "Different types of elements and relationships should be visually distinguishable."
+        },
+        {
+          "letter": "E",
+          "name": "Elegance",
+          "description": "The overall composition should achieve aesthetic coherence that supports comprehension."
+        }
+      ]
+    }
+  },
+
+  "cross_pillar_relations": {
+    "description": "Structural connections between the four SystemViz pillars.",
+    "relations": [
+      {
+        "from": "visual_vocabulary",
+        "to": "anatomy_codex",
+        "type": "implements",
+        "description": "The VV elements are rendered using graphical devices cataloged in the Codex. Each VV icon is assembled from Codex-documented visual primitives."
+      },
+      {
+        "from": "visual_vocabulary",
+        "to": "pattern_atlas",
+        "type": "describes",
+        "description": "VV terms describe the system dynamics that vulnerability patterns exploit. For example, 'cascade' (VV driver) describes the propagation mechanism in 'SPIRALING' vulnerability patterns."
+      },
+      {
+        "from": "anatomy_codex",
+        "to": "escalade",
+        "type": "evaluated_by",
+        "description": "The 65 graphical devices from 70 notations can be evaluated against the 8 ESCALADE criteria to assess their design quality."
+      },
+      {
+        "from": "pattern_atlas",
+        "to": "visual_vocabulary",
+        "type": "uses",
+        "description": "Atlas vulnerability patterns are diagrammed using VV icons and notation conventions."
+      },
+      {
+        "from": "escalade",
+        "to": "visual_vocabulary",
+        "type": "governs",
+        "description": "ESCALADE criteria govern the design quality of VV icons and the syntax rules for their composition."
+      }
+    ],
+    "vv_to_atlas_mapping": {
+      "description": "How VV terms map to Pattern Atlas vulnerability categories.",
+      "mappings": [
+        {
+          "vv_term": "state.redundancy",
+          "atlas_vulnerability": "uniform",
+          "relation": "antidote",
+          "note": "Redundancy counteracts the uniformity vulnerability through diversity."
+        },
+        {
+          "vv_term": "driver.cascade",
+          "atlas_vulnerability": "spiraling",
+          "relation": "mechanism",
+          "note": "Cascades are the propagation mechanism of spiraling vulnerabilities."
+        },
+        {
+          "vv_term": "state.tipping_point",
+          "atlas_vulnerability": "precarious",
+          "relation": "trigger",
+          "note": "Tipping points mark where precarious equilibria collapse."
+        },
+        {
+          "vv_term": "boundary.buffer",
+          "atlas_vulnerability": "overextended",
+          "relation": "antidote",
+          "note": "Buffers prevent overextension by absorbing excess demand."
+        },
+        {
+          "vv_term": "relation.coupling",
+          "atlas_vulnerability": "ensnarling",
+          "relation": "mechanism",
+          "note": "Tight coupling creates the entanglement that ensnarling exploits."
+        },
+        {
+          "vv_term": "state.fault_recovery",
+          "atlas_vulnerability": "propped_up",
+          "relation": "antidote",
+          "note": "Genuine fault recovery replaces artificial propping-up."
+        },
+        {
+          "vv_term": "domain.support_structure",
+          "atlas_vulnerability": "untethered",
+          "relation": "antidote",
+          "note": "Support structures provide the grounding that untethered systems lack."
+        }
+      ]
+    }
+  },
+
+  "lakoff_archetypes": {
+    "description": "Lakoff conceptual metaphor mappings for intervention protocol classification. Each archetype represents a different cognitive framing of the intervention strategy.",
+    "archetypes": {
+      "conservative": {
+        "description": "Low-risk, maintenance-focused intervention with minimal energy cost.",
+        "relevant_vv_terms": [
+          "driver.control_point",
+          "driver.equifinality",
+          "signal.monitor",
+          "signal.indicator",
+          "signal.framing",
+          "state.standard",
+          "state.fault_detection",
+          "boundary.gate",
+          "relation.cluster",
+          "domain.support_structure"
+        ]
+      },
+      "aggressive": {
+        "description": "High-intensity intervention aiming for damage reversal.",
+        "relevant_vv_terms": [
+          "driver.cascade",
+          "driver.inflection",
+          "state.tipping_point",
+          "state.criticality",
+          "state.transition",
+          "boundary.reactive_boundary"
+        ]
+      },
+      "transplant_focused": {
+        "description": "Protocol centered on mtDNA transplant as primary rejuvenation.",
+        "relevant_vv_terms": [
+          "driver.control_point",
+          "driver.cascade",
+          "state.tipping_point",
+          "boundary.reactive_boundary"
+        ]
+      },
+      "metabolic_optimizer": {
+        "description": "Protocol optimizing metabolic flexibility via combined interventions.",
+        "relevant_vv_terms": [
+          "driver.conduit",
+          "driver.cycle",
+          "driver.equifinality",
+          "signal.indicator",
+          "signal.feed_back",
+          "state.transition",
+          "relation.coupling",
+          "relation.network",
+          "relation.cluster",
+          "domain.levels_of_scale"
+        ]
+      }
+    }
+  },
+
+  "simulator_mappings": {
+    "description": "How components of the mito-aging simulator map to VV terms. Enables SystemViz-compatible diagramming of simulation architecture.",
+    "mappings": [
+      {
+        "component_type": "state_variable",
+        "component_id": "N_healthy",
+        "component_name": "Healthy mtDNA copies",
+        "vv_terms": ["state.stock", "state.redundancy", "state.capacity"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "N_deletion",
+        "component_name": "Deletion-mutant mtDNA copies",
+        "vv_terms": ["state.stock", "state.fault", "state.mutation", "driver.repeller"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "ATP",
+        "component_name": "ATP production level",
+        "vv_terms": ["state.capacity", "signal.status_display", "domain.resources"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "ROS",
+        "component_name": "Reactive oxygen species",
+        "vv_terms": ["driver.amplifier", "driver.repeller", "state.fault"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "NAD",
+        "component_name": "NAD+ level",
+        "vv_terms": ["state.stock", "domain.resources", "driver.enabler"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "Senescent_fraction",
+        "component_name": "Senescent cell fraction",
+        "vv_terms": ["state.load", "state.fault", "boundary.container"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "Membrane_potential",
+        "component_name": "Mitochondrial membrane potential",
+        "vv_terms": ["signal.indicator", "state.capacity", "boundary.semi_permiable"]
+      },
+      {
+        "component_type": "state_variable",
+        "component_id": "N_point",
+        "component_name": "Point-mutant mtDNA copies",
+        "vv_terms": ["state.stock", "state.mutation", "state.accumulation"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "rapamycin_dose",
+        "component_name": "Rapamycin (mTOR inhibition)",
+        "vv_terms": ["driver.enabler", "driver.dampener", "boundary.gate"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "nad_supplement",
+        "component_name": "NAD+ precursor supplementation",
+        "vv_terms": ["domain.resources", "driver.enabler", "state.maintenance"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "senolytic_dose",
+        "component_name": "Senolytic (dasatinib + quercetin)",
+        "vv_terms": ["state.fault_recovery", "state.maintenance", "driver.control_point"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "yamanaka_intensity",
+        "component_name": "Yamanaka factor partial reprogramming",
+        "vv_terms": ["state.reset", "driver.genator", "driver.side_effect"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "transplant_rate",
+        "component_name": "Healthy mtDNA transplant",
+        "vv_terms": ["state.replication", "state.assembly", "driver.amplifier"]
+      },
+      {
+        "component_type": "intervention",
+        "component_id": "exercise_level",
+        "component_name": "Exercise hormetic adaptation",
+        "vv_terms": ["driver.cycle", "driver.amplifier", "state.transition"]
+      },
+      {
+        "component_type": "biological_process",
+        "component_id": "mitophagy",
+        "component_name": "Mitophagy (damaged mitochondrion removal)",
+        "vv_terms": ["state.fault_recovery", "state.maintenance", "boundary.gate"]
+      },
+      {
+        "component_type": "biological_process",
+        "component_id": "apoptosis",
+        "component_name": "Apoptosis (programmed cell death)",
+        "vv_terms": ["state.fault_recovery", "state.separation", "driver.control_point"]
+      },
+      {
+        "component_type": "biological_process",
+        "component_id": "replication",
+        "component_name": "mtDNA replication",
+        "vv_terms": ["state.replication", "driver.cycle", "state.assembly"]
+      },
+      {
+        "component_type": "biological_process",
+        "component_id": "cliff_factor",
+        "component_name": "Heteroplasmy cliff factor",
+        "vv_terms": ["state.tipping_point", "state.criticality", "boundary.reactive_boundary"]
+      },
+      {
+        "component_type": "system_boundary",
+        "component_id": "mitochondrial_membrane",
+        "component_name": "Mitochondrial inner membrane",
+        "vv_terms": ["boundary.semi_permiable", "boundary.container", "boundary.protector"]
+      },
+      {
+        "component_type": "system_boundary",
+        "component_id": "nuclear_cytoplasmic_boundary",
+        "component_name": "Nuclear-cytoplasmic boundary",
+        "vv_terms": ["boundary.divider", "boundary.gate", "boundary.notional_boundary"]
+      },
+      {
+        "component_type": "system_boundary",
+        "component_id": "cell_membrane",
+        "component_name": "Cell membrane",
+        "vv_terms": ["boundary.container", "boundary.semi_permiable", "boundary.edge"]
+      }
+    ]
+  },
+
+  "pattern_language_bridge": {
+    "description": "How this lexicon connects to a SystemViz-compatible pattern language for a new project. The VV categories map to pattern language stages.",
+    "stage_mapping": [
+      {
+        "pattern_stage": "context",
+        "vv_categories": ["domain"],
+        "role": "Establishes the operating environment, resources, and scale of the system."
+      },
+      {
+        "pattern_stage": "structure",
+        "vv_categories": ["boundary", "relation"],
+        "role": "Defines containment, connections, and organizational relationships."
+      },
+      {
+        "pattern_stage": "dynamics",
+        "vv_categories": ["driver", "state"],
+        "role": "Captures active forces, conditions, and state changes."
+      },
+      {
+        "pattern_stage": "observation",
+        "vv_categories": ["signal"],
+        "role": "Monitoring, feedback, and diagnostic signaling."
+      },
+      {
+        "pattern_stage": "vulnerability",
+        "vv_categories": ["pattern_atlas"],
+        "role": "Identifies structural weaknesses using the Atlas taxonomy."
+      },
+      {
+        "pattern_stage": "quality",
+        "vv_categories": ["escalade"],
+        "role": "Evaluates diagram and notation quality using ESCALADE criteria."
+      }
+    ]
+  }
+}
